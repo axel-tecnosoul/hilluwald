@@ -44,7 +44,7 @@ include_once("funciones.php");?>
                     <h3><?php include("title.php"); ?></h3>
                     <ol class="breadcrumb">
                       <li class="breadcrumb-item"><a href="#"><i data-feather="home"></i></a></li>
-                      <li class="breadcrumb-item">Ventas</li>
+                      <li class="breadcrumb-item">Pedidos</li>
                     </ol>
                   </div>
                 </div>
@@ -67,10 +67,10 @@ include_once("funciones.php");?>
               <div class="col-sm-12">
                 <div class="card">
                   <div class="card-header">
-                    <h5>Ventas
-                      &nbsp;<a href="nuevaVenta.php"><img src="img/icon_alta.png" width="24" height="25" border="0" alt="Nueva Venta" title="Nueva Venta"></a>
-                      <!-- &nbsp;<a href="exportVentas.php"><img src="img/xls.png" width="24" height="25" border="0" alt="Exportar Ventas" title="Exportar Ventas"></a> -->
-                      &nbsp;<a href="listarVentasAnuladas.php"><img src="img/canceled.png" width="24" height="25" border="0" alt="Ventas Eliminadas" title="Ventas Eliminadas"></a>
+                    <h5>Pedidos
+                      &nbsp;<a href="nuevoPedido.php"><img src="img/icon_alta.png" width="24" height="25" border="0" alt="Nuevo Pedido" title="Nuevo Pedido"></a>
+                      <!-- &nbsp;<a href="exportPedidos.php"><img src="img/xls.png" width="24" height="25" border="0" alt="Exportar Pedidos" title="Exportar Pedidos"></a> -->
+                      &nbsp;<a href="listarPedidosAnuladas.php"><img src="img/canceled.png" width="24" height="25" border="0" alt="Pedidos Eliminados" title="Pedidos Eliminados"></a>
                     </h5>
                   </div>
                   <div class="card-body">
@@ -91,8 +91,8 @@ include_once("funciones.php");?>
                               Database::disconnect();?>
                             </select>
                           </td>
-                          <td rowspan="2" style="vertical-align: middle;" class="text-right border-0 p-1">Facturacion:</td>
-                          <td rowspan="2" style="vertical-align: middle;" class="border-0 p-1">
+                          <td rowspan="2" style="vertical-align: middle;" class="d-none text-right border-0 p-1">Facturacion:</td>
+                          <td rowspan="2" style="vertical-align: middle;" class="d-none border-0 p-1">
                             <select id="tipo_comprobante" class="form-control form-control-sm filtraTabla selectpicker" data-style="multiselect" data-selected-text-format="count > 1" multiple>
                               <option value="Consumidor Final">Consumidor Final</option>
                               <option value="Cliente">Cliente</option>
@@ -149,10 +149,10 @@ include_once("funciones.php");?>
             <h5 class="modal-title" id="exampleModalLabel">Confirmación</h5>
             <button class="close" type="button" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
           </div>
-          <div class="modal-body">¿Está seguro que desea eliminar la venta?</div>
+          <div class="modal-body">¿Está seguro que desea eliminar el pedido?</div>
           <div class="modal-footer">
             <button class="btn btn-light" type="button" data-dismiss="modal" aria-label="Close">Volver</button>
-            <a id="btnEliminarVenta" class="btn btn-primary">Eliminar</a>
+            <a id="btnEliminarPedido" class="btn btn-primary">Eliminar</a>
           </div>
         </div>
       </div>
@@ -201,19 +201,19 @@ include_once("funciones.php");?>
     <script src="assets/js/script.js"></script>
 	<script>
 
-    function openModalEliminarVenta(idVenta){
+    function openModalEliminarPedido(idPedido){
       $('#eliminarModal').modal("show");
-      document.getElementById("btnEliminarVenta").href="anularVenta.php?id="+idVenta;
+      document.getElementById("btnEliminarPedido").href="anularPedido.php?id="+idPedido;
     }
 
 		$(document).ready(function() {
 
-      getVentas();
-      $(".filtraTabla").on("change",getVentas);
+      getPedidos();
+      $(".filtraTabla").on("change",getPedidos);
 
 		});
 
-    function getVentas(){
+    function getPedidos(){
       let desde=$("#desde").val();
       let hasta=$("#hasta").val();
       let tipo_comprobante=$("#tipo_comprobante").val();
@@ -227,7 +227,7 @@ include_once("funciones.php");?>
         //dom: 'rtip',
         serverSide: true,
         processing: true,
-        ajax:{url:'ajaxListarVentas.php?desde='+desde+'&hasta='+hasta+'&tipo_comprobante='+tipo_comprobante+'&id_cliente='+id_cliente},
+        ajax:{url:'ajaxListarPedidos.php?desde='+desde+'&hasta='+hasta+'&tipo_comprobante='+tipo_comprobante+'&id_cliente='+id_cliente},
 				stateSave: true,
 				responsive: true,
 				language: {
@@ -251,8 +251,8 @@ include_once("funciones.php");?>
           }
         },
         "columns":[
-          {"data": "id_venta"},
-          {"data": "fecha_venta"},
+          {"data": "id_pedido"},
+          {"data": "fecha"},
           /*{render: function(data, type, row, meta) {
             return row.fecha_hora+"hs";
           }},*/
@@ -276,14 +276,14 @@ include_once("funciones.php");?>
             className: 'dt-body-right text-right',
           },
           {render: function(data, type, row, meta) {
-            let btnVer='<a href="verVenta.php?id='+row.id_venta+'"><img src="img/eye.png" width="24" height="15" border="0" alt="Ver Venta" title="Ver Venta"></a>&nbsp;&nbsp;'
-            let btnImprimir='<a href="remito.php?id='+row.id_venta+'" target="_blank"><img src="img/print.png" width="30" height="20" border="0" alt="Imprimir Remito" title="Imprimir Remito"></a>&nbsp;&nbsp;'
+            let btnVer='<a href="verPedido.php?id='+row.id_pedido+'"><img src="img/eye.png" width="24" height="15" border="0" alt="Ver Pedido" title="Ver Pedido"></a>&nbsp;&nbsp;'
+            let btnImprimir='<a href="remito.php?id='+row.id_pedido+'" target="_blank"><img src="img/print.png" width="30" height="20" border="0" alt="Imprimir Remito" title="Imprimir Remito"></a>&nbsp;&nbsp;'
             let btnAnular="";
             console.log(id_perfil);
             console.log(row.facturacion);
             if(row.facturacion=="Sin factura"){
               //btnAnular='<a href="#" data-toggle="modal" data-original-title="Confirmación" data-target="#eliminarModal_'+row["id"]+'"><img src="img/icon_baja.png" width="24" height="25" border="0" alt="Anular" title="Anular"></a>&nbsp;&nbsp;'
-              btnAnular='<a href="#" title="Eliminar" onclick="openModalEliminarVenta('+row.id_venta+')"><img src="img/icon_baja.png" width="24" height="25" border="0" alt="Eliminar"></a>&nbsp;&nbsp;'
+              btnAnular='<a href="#" title="Eliminar" onclick="openModalEliminarPedido('+row.id_pedido+')"><img src="img/icon_baja.png" width="24" height="25" border="0" alt="Eliminar"></a>&nbsp;&nbsp;'
             }
             return btnVer+btnImprimir+btnAnular;
           }}

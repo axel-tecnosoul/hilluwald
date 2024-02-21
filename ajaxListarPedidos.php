@@ -5,16 +5,16 @@ error_reporting(E_ALL);
 include 'database.php';
 include 'funciones.php';
 session_start();
-$aProductos=[];
+$aPedidos=[];
 
 $pdo = Database::connect();
 $columns = $_GET['columns'];
 
 //$data_columns = ["","p.cb","p.codigo","c.categoria","p.descripcion","CONCAT(pr.nombre,' ',pr.apellido)","p.precio","p.activo"];//PARA EL ORDENAMIENTO
 
-$data_columns = $fields = ['v.id','date_format(v.fecha_venta,"%d/%m/%Y")','c.razon_social','v.facturacion','v.modalidad_pago','v.total'];//,'v.estado'
+$data_columns = $fields = ['p.id','date_format(p.fecha,"%d/%m/%Y")','c.razon_social','p.campana','p.pago_completo','p.retiro_completo'];//,'p.estado'
 
-$from="FROM ventas v LEFT JOIN clientes c ON c.id = v.id_cliente";
+$from="FROM pedidos p LEFT JOIN clientes c ON c.id = p.id_cliente";
 
 $orderBy = " ORDER BY ";
 foreach ($_GET['order'] as $order) {
@@ -24,37 +24,37 @@ foreach ($_GET['order'] as $order) {
 $desde=$_GET["desde"];
 $filtroDesde="";
 if($desde!=""){
-  $filtroDesde=" AND DATE(v.fecha_venta)>='$desde'";
+  $filtroDesde=" AND DATE(p.fecha)>='$desde'";
 }
 
 $hasta=$_GET["hasta"];
 $filtroHasta="";
 if($hasta!=""){
-  $filtroHasta=" AND DATE(v.fecha_venta)<='$hasta'";
+  $filtroHasta=" AND DATE(p.fecha)<='$hasta'";
 }
 
 $id_cliente=$_GET["id_cliente"];
 $filtroCliente="";
 if($id_cliente!=0 and $id_cliente!=""){
-  $filtroCliente=" AND v.id_cliente IN ($id_cliente)";
+  $filtroCliente=" AND p.id_cliente IN ($id_cliente)";
 }
 
-$tipo_comprobante=$_GET["tipo_comprobante"];
+/*$tipo_comprobante=$_GET["tipo_comprobante"];
 $filtroTipoComprobante="";
 if($tipo_comprobante!=""){
   $ex=explode(",",$tipo_comprobante);
   $tipo_comprobante="'".implode("','",$ex)."'";
-  $filtroTipoComprobante=" AND v.facturacion IN ($tipo_comprobante)";
-}
+  $filtroTipoComprobante=" AND p.facturacion IN ($tipo_comprobante)";
+}*/
 
 //var_dump($orderBy);
 $orderBy = substr($orderBy, 0, -2);
 //var_dump($orderBy);
-$where = "v.anulada = 0";
+$where = "p.anulado = 0";
 if ($_SESSION['user']['id_perfil'] != 1) {
-  $where.=" and a.id = ".$_SESSION['user']['id_almacen']; 
+  $where.=" and a.id = ".$_SESSION['user']['id_sucursal']; 
 }
-$whereFiltered=$where.$filtroDesde.$filtroHasta.$filtroCliente.$filtroTipoComprobante;
+$whereFiltered=$where.$filtroDesde.$filtroHasta.$filtroCliente;//.$filtroTipoComprobante;
 
 foreach ($columns as $k => $column) {
     if ($search = $column['search']['value']) {
@@ -81,7 +81,7 @@ $length = $_GET['length'];
 $start = $_GET['start'];
 
 //OBTENEMOS EL TOTAL DE REGISTROS
-$countSql = "SELECT count(v.id) as Total $from WHERE $where";
+$countSql = "SELECT count(p.id) as Total $from WHERE $where";
 $countSt = $pdo->query($countSql);
 //echo $countSql;
 $total = $countSt->fetch()['Total'];
@@ -90,7 +90,7 @@ $total = $countSt->fetch()['Total'];
 //OBTENEMOS EL TOTAL DE REGISTROS CON FILTRO APLICADO
 // Data set length after filtering
 //$resFilterLength = self::sql_exec( $db, $bindings,"SELECT COUNT(`id`) FROM productos ".($where ? "WHERE $where " : ''));
-$queryFiltered="SELECT COUNT(v.id) AS recordsFiltered $from ".($whereFiltered ? "WHERE $whereFiltered " : '');
+$queryFiltered="SELECT COUNT(p.id) AS recordsFiltered $from ".($whereFiltered ? "WHERE $whereFiltered " : '');
 //var_dump($queryFiltered);
 //echo $queryFiltered;
 
@@ -100,12 +100,12 @@ $recordsFiltered = $resFilterLength->fetch()['recordsFiltered'];
 $campos=implode(",", $fields);
 //$fields = ['cb','codigo','categoria','descripcion','nombre','apellido','precio','p.activo','p.id'];
 
-//$sql2 = "SELECT SUM(CASE WHEN v.tipo_comprobante IN ('NCA','NCB') THEN total*-1 ELSE total END) AS total_facturas_recibos $from WHERE $whereFiltered ";
-$sql2 = "SELECT SUM(CASE WHEN v.facturacion='nota_credito' THEN total*-1 ELSE total END) AS total_facturas_recibos $from WHERE $whereFiltered ";
+//$sql2 = "SELECT SUM(CASE WHEN p.tipo_comprobante IN ('NCA','NCB') THEN total*-1 ELSE total END) AS total_facturas_recibos $from WHERE $whereFiltered ";
+/*$sql2 = "SELECT SUM(CASE WHEN p.facturacion='nota_credito' THEN total*-1 ELSE total END) AS total_facturas_recibos $from WHERE $whereFiltered ";
 //echo $sql2;
 $row2 = $pdo->query($sql2)->fetch();
 
-$total_facturas_recibos = ($row2['total_facturas_recibos'] ?: 0);
+$total_facturas_recibos = ($row2['total_facturas_recibos'] ?: 0);*/
 
 //$sql = "SELECT * FROM productos ".($where ? "WHERE $where " : '')."$orderBy LIMIT $length OFFSET $start";
 $sql = "SELECT $campos $from ".($whereFiltered ? "WHERE $whereFiltered " : '')."$orderBy LIMIT $length OFFSET $start";
@@ -117,16 +117,16 @@ if ($st) {
     //$rs = $st->fetchAll(PDO::FETCH_FUNC, fn($id, $codigo, $categoria) => [$id, $codigo, $categoria] );
     foreach ($pdo->query($sql) as $row) {
 
-      //['v.id','date_format(v.fecha_hora,"%d/%m/%Y %H:%i")','v.facturacion','c.razon_social','v.total'];//,'v.estado'
+      //['p.id','date_format(p.fecha_hora,"%d/%m/%Y %H:%i")','p.facturacion','c.razon_social','p.total'];//,'p.estado'
 
-      $aProductos[]=[
-        "id_venta"=>$row['id'],
-        "fecha_venta"=>$row[1],// AS fecha_hora
+      $aPedidos[]=[
+        "id_pedido"=>$row['id'],
+        "fecha"=>$row[1],// AS fecha_hora
         //"tipo_comprobante"=>$tipo_cbte=get_nombre_comprobante($row["tipo_comprobante"]),
-        "facturacion"=>$row["facturacion"],
-        "modalidad_pago"=>$row["modalidad_pago"],
-        "cliente"=>$row['razon_social'],
-        "total"=>$row['total'],
+        "razon_social"=>$row["razon_social"],
+        "campana"=>$row["campana"],
+        "pago_completo"=>$row['pago_completo'],
+        "retiro_completo"=>$row['retiro_completo'],
         //"estado"=>$row['estado']
       ];
     }
@@ -139,7 +139,7 @@ if ($st) {
       'length' => $length,
       'start' => $start,
       'query' => $sql,
-      'total_facturas_recibos'=>$total_facturas_recibos,
+      //'total_facturas_recibos'=>$total_facturas_recibos,
     ];
 } else {
     var_dump($pdo->errorInfo());
@@ -147,8 +147,8 @@ if ($st) {
 }
 
 echo json_encode([
-  'data' => $aProductos,
+  'data' => $aPedidos,
   'recordsTotal' => $total,
-  'recordsFiltered' => $recordsFiltered,//count($aProductos),
+  'recordsFiltered' => $recordsFiltered,//count($aPedidos),
   'queryInfo'=>$queryInfo,
 ]);
