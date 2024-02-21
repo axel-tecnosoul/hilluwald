@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>Factura</title>
+  <style>
+    /* Estilos para el encabezado */
+    #header {
+      display: flex;
+      position: relative;
+    }
+    #header .left {
+      width: 50%;
+      border: 1px solid black;
+      border-bottom: 0.5px;
+    }
+    #header .right {
+      width: 50%;
+      border: 1px solid black;
+      border-left: 0;
+      border-bottom: 0.5px;
+    }
+    /* Estilos para los datos de la empresa */
+    #header .left .logo {
+      float: left;
+    }
+    #header .left .data {
+      float: left;
+      margin-left: 10px;
+    }
+    /* Estilos para los datos de la factura */
+    #header .right .data {
+      float: right;
+      margin-right: 10px;
+    }
+    #header .square {
+      border: 1px solid black;
+      position: absolute;
+      top: 0;
+      left: 45%;
+      width: 10%;
+      height: 40%;
+      background-color: #ffffff;
+    }
+    #client-info{
+      border: 1px solid black;
+      border-top: 0.5px solid black;
+      border-bottom: 0.5px solid black;
+      padding-left: 10px;
+    }
+    #periodo-facturado{
+      border: 1px solid black;
+      border-top: 0;
+      border-bottom: 0;
+      padding: 1px;
+      padding-left: 10px;
+    }
+    /* Estilos para el cuerpo de la factura */
+    /*#body {
+      
+    }*/
+    /* Estilos para la tabla de detalles */
+    #body table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    #body table th {
+      border: 1px solid black;
+      padding: 5px;
+    }
+    /* Estilos para el pie de la factura */
+    .totales {
+      position: fixed;
+      bottom: 0;
+      border: 1px solid black;
+      border-bottom: 0;
+      padding: 1px;
+      width: 100%;
+    }
+    #footer {
+      position: fixed;
+      bottom: 0;
+      border: 1px solid black;
+      width: 100%;
+    }
+    /* Estilos para el logo de AFIP */
+    #footer .afip-logo {
+      float: right;
+    }
+  </style>
+</head>
+<body>
+  <!-- HEADER -->
+  <div id="header" class="header">
+    <!-- DATOS DE LA EMPRESA EMISORA -->
+    <div class="left">
+      <div class="logo">
+        <img src="../images/logo/logo.png" alt="Logotipo de la empresa">
+      </div>
+      <div class="data">
+        <p>Empresa S.A.</p>
+        <p>Domicilio comercial</p>
+        <p>Condición frente al IVA</p>
+      </div>
+    </div>
+    <!-- DATOS DEL COMPROBANTE -->
+    <div class="right">
+      <div class="data">
+        <p>Punto de venta: 0001</p>
+        <p>Número de comprobante: 123456</p>
+        <p>Fecha de emisión: 01/01/2021</p>
+        <p>CUIT: 20-12345678-9</p>
+        <p>Ingresos brutos: 1-23456789-0</p>
+        <p>Fecha de inicio de actividades: 01/01/2021</p>
+      </div>
+    </div>
+    <!-- TIPO Y CODIGO DE COMPROBANTE -->
+    <div class="square">
+      <p><h1>A</h1></p>
+      <p>COD </p>
+    </div>
+  </div>
+  <!-- DATOS DE LE EMPRESA RECEPTORA -->
+  <div id="client-info">
+    <p>CUIT: 20-98765432-1</p>
+    <p>Apellido y nombre o razón social: Juan Pérez</p>
+    <p>Condición frente al IVA: Responsable inscripto</p>
+    <p>Domicilio: Calle Falsa 123</p>
+    <p>Condición de venta: Contado</p>
+  </div>
+  <!-- PERIODO FACTURADO Y FECHE DE VENCIMINETO DEL PAGO -->
+  <div id="periodo-facturado">
+    <p>Periodo facturado: desde 01/01/2021 hasta 01/01/2021</p>
+    <p>Fecha de vencimiento del pago: 01/02/2021</p>
+  </div>
+  <!-- DETALLE DEL COMPROBANTE -->
+  <div id="body">
+    <table>
+      <tr>
+        <th>Código</th>
+        <th>Producto/Servicio</th>
+        <th>Cantidad</th>
+        <th>Unidad de medida</th>
+        <th>Precio unitario</th>
+        <th>% Bonificación</th>
+        <th>Importe de bonificaciones</th>
+        <th>Subtotal</th>
+      </tr>
+      <tr>
+        <td>001</td>
+        <td>Producto 1</td>
+        <td>10</td>
+        <td>Unidad</td>
+        <td>$ 100</td>
+        <td>10%</td>
+        <td>$ 10</td>
+        <td>$ 900</td>
+      </tr>
+      <!-- Agregar más filas según sea necesario -->
+    </table>
+  </div>
+  <!-- TOTALES -->
+  <div class="totales">
+    <div class="subtotal">
+      <p>Subtotal: $ 900</p>
+    </div>
+    <div class="otros-tributos">
+      <p>Importe de otros tributos: $ 0</p>
+    </div>
+    <div class="total">
+      <p>Total: $ 900</p>
+    </div>
+  </div>
+  <!-- FOOTER -->
+  <div id="footer">
+    <div class="left">
+      <img src="afip.png" alt="Logo AFIP">
+      <p>Comprobante autorizado por la AFIP</p>
+    </div>
+    <div class="right">
+      <p>Página 1 de 1</p>
+      <p>CAE: 1234567890</p>
+      <p>Vencimiento CAE: 01/02/2021</p>
+    </div>
+  </div>
+</body>
+
