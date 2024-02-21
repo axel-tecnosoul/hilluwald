@@ -8,7 +8,7 @@
 		<?php
     $id_perfil=$_SESSION['user']['id_perfil'];?>
 		
-    <li><a class="sidebar-header" href="listarVentas.php"><i data-feather="file"></i><span>Ventas</span><i class="fa fa-angle-right pull-right"></i></a></li>
+    <li><a class="sidebar-header" href="listarPedidos.php"><i data-feather="file"></i><span>Pedidos</span><i class="fa fa-angle-right pull-right"></i></a></li>
 
     <li><a class="sidebar-header" href="listarClientes.php"><i data-feather="user"></i><span>Clientes</span><i class="fa fa-angle-right pull-right"></i></a></li>
 
