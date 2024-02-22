@@ -34,7 +34,7 @@ if(empty($_SESSION['user']))
                     <h3><?php include("title.php"); ?></h3>
                     <ol class="breadcrumb">
                       <li class="breadcrumb-item"><a href="#"><i data-feather="home"></i></a></li>
-                      <li class="breadcrumb-item">Usuarios</li>
+                      <li class="breadcrumb-item">Transportes</li>
                     </ol>
                   </div>
                 </div>
@@ -57,44 +57,38 @@ if(empty($_SESSION['user']))
               <div class="col-sm-12">
                 <div class="card">
                   <div class="card-header">
-                    <h5>Usuarios&nbsp;<a href="nuevoUsuario.php"><img src="img/icon_alta.png" width="24" height="25" border="0" alt="Nuevo" title="Nuevo"></a></h5><span>
+                    <h5>Transportes&nbsp;<a href="nuevoTransporte.php"><img src="img/icon_alta.png" width="24" height="25" border="0" alt="Nuevo" title="Nuevo"></a></h5><span>
                   </div>
                   <div class="card-body">
                     <div class="dt-ext table-responsive">
                       <table class="display" id="dataTables-example666">
                         <thead>
                           <tr>
-						  <th>ID</th>
-						  <th>Usuario</th>
-						  <th>Nombre</th>
-						  <th>Perfil</th>
-						  <th>Sucursal</th>
-						  <th>Activo</th>
-						  <th>Opciones</th>
+                            <th>ID</th>
+                            <th>Nombre</th>
+                            <th>Tipo</th>
+                            <th>Patente</th>
+                            <th>Usuario</th>
+                            <th>Opciones</th>
                           </tr>
                         </thead>
                         <tbody>
                           <?php 
 							include 'database.php';
 							$pdo = Database::connect();
-							$sql = " SELECT u.`id`, u.`usuario`,u.nombre_apellido, p.`perfil`, s.`nombre`, u.`activo` FROM `usuarios` u inner join perfiles p on p.id = u.id_perfil left join sucursales s on s.id = u.id_sucursal WHERE 1 ";
+							$sql = " SELECT t.id, t.nombre, t.tipo, t.patente, t.id_usuario, t.fecha_hora_alta, u.usuario FROM transportes t left join usuarios u on u.id = t.id_usuario WHERE 1 ";
 							
 							foreach ($pdo->query($sql) as $row) {
 								echo '<tr>';
 								echo '<td>'. $row['id'] . '</td>';
-								echo '<td>'. $row['usuario'] . '</td>';
-								echo '<td>'. $row['nombre_apellido'] . '</td>';
-								echo '<td>'. $row['perfil'] . '</td>';
 								echo '<td>'. $row['nombre'] . '</td>';
-								if ($row['activo'] == 1) {
-									echo '<td>Si</td>';
-								} else {
-									echo '<td>No</td>';
-								}
+								echo '<td>'. $row['tipo'] . '</td>';
+								echo '<td>'. $row['patente'] . '</td>';
+								echo '<td>'. $row['usuario'] . '</td>';
 								echo '<td>';
-									echo '<a href="modificarUsuario.php?id='.$row['id'].'"><img src="img/icon_modificar.png" width="24" height="25" border="0" alt="Modificar" title="Modificar"></a>';
+									echo '<a href="modificarTransporte.php?id='.$row[0].'"><img src="img/icon_modificar.png" width="24" height="25" border="0" alt="Modificar" title="Modificar"></a>';
 									echo '&nbsp;&nbsp;';
-									echo '<a href="#" data-toggle="modal" data-original-title="Confirmación" data-target="#eliminarModal_'.$row['id'].'"><img src="img/icon_baja.png" width="24" height="25" border="0" alt="Eliminar" title="Eliminar"></a>';
+									echo '<a href="#" data-toggle="modal" data-target="#eliminarModal_'.$row[0].'"><img src="img/icon_baja.png" width="24" height="25" border="0" alt="Eliminar" title="Eliminar"></a>';
 									echo '&nbsp;&nbsp;';
 								echo '</td>';
 								echo '</tr>';
@@ -119,7 +113,7 @@ if(empty($_SESSION['user']))
     </div>
 	<?php 
 	$pdo = Database::connect();
-	$sql = " SELECT u.`id`, u.`usuario`, p.`perfil`, s.`nombre`, u.`activo` FROM `usuarios` u inner join perfiles p on p.id = u.id_perfil left join sucursales s on s.id = u.id_sucursal WHERE 1 ";
+	$sql = " SELECT id, nombre, tipo, id_usuario, fecha_hora_alta FROM `transportes` WHERE 1 ";
 	foreach ($pdo->query($sql) as $row) {
 	?>
 	<div class="modal fade" id="eliminarModal_<?php echo $row[0];?>" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -129,10 +123,10 @@ if(empty($_SESSION['user']))
 			<h5 class="modal-title" id="exampleModalLabel">Confirmación</h5>
 			<button class="close" type="button" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
 		  </div>
-		  <div class="modal-body">¿Está seguro que desea eliminar el usuario?</div>
+		  <div class="modal-body">¿Está seguro que desea eliminar la Transporte?</div>
 		  <div class="modal-footer">
-			<a href="eliminarUsuario.php?id=<?php echo $row[0];?>" class="btn btn-primary">Eliminar</a>
-			<a onclick="document.location.href='listarUsuarios.php'" class="btn btn-light">Volver</a>
+			<a href="eliminarTransporte.php?id=<?php echo $row[0];?>" class="btn btn-primary">Eliminar</a>
+			<a onclick="document.location.href='listarTransportes.php'" class="btn btn-light">Volver</a>
 		  </div>
 		</div>
 	  </div>

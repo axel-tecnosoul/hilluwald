@@ -14,7 +14,7 @@
 	}
 	
 	if ( null==$id ) {
-		header("Location: listarUsuarios.php");
+		header("Location: listarChoferes.php");
 	}
 	
 	if ( !empty($_POST)) {
@@ -23,19 +23,19 @@
 		$pdo = Database::connect();
 		$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 		
-		$sql = "UPDATE `usuarios` set `usuario` = ?, `clave` = ?, nombre_apellido = ?, `id_perfil` = ?, `id_sucursal` = ?, `activo` = ? WHERE id = ?";
+		$sql = "UPDATE choferes set nombre = ?, apellido = ?, id_usuario = ? where id = ?";
 		$q = $pdo->prepare($sql);
-		$q->execute(array($_POST['usuario'],$_POST['clave'],$_POST['nombre_apellido'],$_POST['id_perfil'],$_POST['id_sucursal'],$_POST['activo'],$_GET['id']));
+		$q->execute(array($_POST['nombre'],$_POST['apellido'],$_POST['id_usuario'],$_GET['id']));
 		
 		Database::disconnect();
 		
-		header("Location: listarUsuarios.php");
+		header("Location: listarChoferes.php");
 	
 	} else {
 		
 		$pdo = Database::connect();
 		$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-		$sql = "SELECT `id`, `usuario`, `clave`, nombre_apellido, `id_perfil`, `id_sucursal` , `activo`FROM `usuarios` WHERE id = ? ";
+		$sql = "SELECT id, nombre, apellido, id_usuario FROM choferes WHERE id = ? ";
 		$q = $pdo->prepare($sql);
 		$q->execute(array($id));
 		$data = $q->fetch(PDO::FETCH_ASSOC);
@@ -70,7 +70,7 @@
                     <h3><?php include("title.php"); ?></h3>
                     <ol class="breadcrumb">
                       <li class="breadcrumb-item"><a href="#"><i data-feather="home"></i></a></li>
-                      <li class="breadcrumb-item">Modificar Usuario</li>
+                      <li class="breadcrumb-item">Modificar Chofer</li>
                     </ol>
                   </div>
                 </div>
@@ -92,87 +92,51 @@
               <div class="col-sm-12">
                 <div class="card">
                   <div class="card-header">
-                    <h5>Modificar Usuario</h5>
+                    <h5>Modificar Chofer</h5>
                   </div>
-				  <form class="form theme-form" role="form" method="post" action="modificarUsuario.php?id=<?php echo $id?>">
+				  <form class="form theme-form" role="form" method="post" action="modificarChofer.php?id=<?php echo $id?>">
                     <div class="card-body">
                       <div class="row">
                         <div class="col">
 							<div class="form-group row">
-								<label class="col-sm-3 col-form-label">Usuario</label>
-								<div class="col-sm-9"><input name="usuario" type="text" maxlength="99" class="form-control" required="required" value="<?php echo $data['usuario']; ?>"></div>
+								<label class="col-sm-3 col-form-label">Nombre</label>
+								<div class="col-sm-9"><input name="nombre" type="text" maxlength="99" class="form-control" value="<?php echo $data['nombre']; ?>" required="required"></div>
 							</div>
-							<div class="form-group row">
-								<label class="col-sm-3 col-form-label">Clave</label>
-								<div class="col-sm-9"><input name="clave" type="text" maxlength="99" class="form-control" required="required" value="<?php echo $data['clave']; ?>"></div>
+                            <div class="form-group row">
+								<label class="col-sm-3 col-form-label">Apellido</label>
+								<div class="col-sm-9"><input name="apellido" type="text" maxlength="99" class="form-control" value="<?php echo $data['apellido']; ?>" required="required"></div>
 							</div>
-							<div class="form-group row">
-								<label class="col-sm-3 col-form-label">Nombre y Apellido</label>
-								<div class="col-sm-9"><input name="nombre_apellido" type="text" maxlength="99" class="form-control" required="required" value="<?php echo $data['nombre_apellido']; ?>"></div>
-							</div>
-							<div class="form-group row">
-								<label class="col-sm-3 col-form-label">Perfil</label>
-								<div class="col-sm-9">
-								<select name="id_perfil" id="id_perfil" class="js-example-basic-single col-sm-12" required="required" onchange="jsAlmacen();">
-								<option value="">Seleccione...</option>
-								<?php 
-								$pdo = Database::connect();
-								$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-								$sqlZon = "SELECT `id`, `perfil` FROM `perfiles` WHERE 1";
-								$q = $pdo->prepare($sqlZon);
-								$q->execute();
-								while ($fila = $q->fetch(PDO::FETCH_ASSOC)) {
-									echo "<option value='".$fila['id']."'";
-									if ($fila['id'] == $data['id_perfil']) {
-										echo " selected ";
-									}
-									echo ">".$fila['perfil']."</option>";
-								}
-								Database::disconnect();
-								?>
-								</select>
-								</div>
-							</div>
-							<div class="form-group row">
-								<label class="col-sm-3 col-form-label">Sucursales</label>
-								<div class="col-sm-9">
-								<select name="id_sucursal" id="id_sucursal" class="js-example-basic-single col-sm-12" <?php if ($data['id_perfil']==1) echo 'disabled="disabled"'; ?>>
-								<option value="">Seleccione...</option>
-								<?php 
-								$pdo = Database::connect();
-								$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-								$sqlZon = "SELECT `id`, `nombre` FROM `sucursales` WHERE 1";
-								$q = $pdo->prepare($sqlZon);
-								$q->execute();
-								while ($fila = $q->fetch(PDO::FETCH_ASSOC)) {
-									echo "<option value='".$fila['id']."'";
-									if ($fila['id'] == $data['id_sucursal']) {
-										echo " selected ";
-									}
-									echo ">".$fila['nombre']."</option>";
-								}
-								Database::disconnect();
-								?>
-								</select>
-								</div>
-							</div>
-							<div class="form-group row">
-								<label class="col-sm-3 col-form-label">Activo</label>
-								<div class="col-sm-9">
-								<select name="activo" id="activo" class="js-example-basic-single col-sm-12" required="required">
-								<option value="">Seleccione...</option>
-								<option value="1" <?php if ($data['activo']==1) echo " selected ";?>>Si</option>
-								<option value="0" <?php if ($data['activo']==0) echo " selected ";?>>No</option>
-								</select>
-								</div>
-							</div>
+                            <div class="form-group row">
+                                <label class="col-sm-3 col-form-label">Usuarios</label>
+                                <div class="col-sm-9">
+                                    <select name="id_usuario" id="id_usuario" class="js-example-basic-single col-sm-12" required>
+                                        <option value="">Seleccione...</option><?php
+                                        $pdo = Database::connect();
+                                        $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+                                        $sqlZon = "SELECT id, usuario FROM usuarios WHERE activo = 1";
+                                        if ($_SESSION['user']['id_perfil'] != 1) {
+                                        $sqlZon .= " and id = ".$_SESSION['user']['id_usuario']; 
+                                        }
+                                        $q = $pdo->prepare($sqlZon);
+                                        $q->execute();
+                                        while ($fila = $q->fetch(PDO::FETCH_ASSOC)) {
+                                        $selected="";
+                                        if($fila['id']==$data["id_usuario"]){
+                                            $selected="selected";
+                                        }
+                                        echo "<option value='".$fila['id']."' $selected>".$fila['usuario']."</option>";
+                                        }
+                                        Database::disconnect();?>
+                                    </select>
+                                </div>
+                            </div>
                         </div>
                       </div>
                     </div>
                     <div class="card-footer">
                       <div class="col-sm-9 offset-sm-3">
                         <button class="btn btn-primary" type="submit">Modificar</button>
-						<a onclick="document.location.href='listarUsuarios.php'" class="btn btn-light">Volver</a>
+						<a onclick="document.location.href='listarChoferes.php'" class="btn btn-light">Volver</a>
                       </div>
                     </div>
                   </form>
@@ -211,16 +175,5 @@
     <!-- Plugin used-->
 	<script src="assets/js/select2/select2.full.min.js"></script>
     <script src="assets/js/select2/select2-custom.js"></script>
-	<script>
-	function jsAlmacen() {
-		if (document.getElementById("id_perfil").value != 1) {
-			document.getElementById("id_sucursal").disabled = "";
-			document.getElementById("id_sucursal").required = "required";
-		} else {
-			document.getElementById("id_sucursal").disabled = "disabled";
-			document.getElementById("id_sucursal").required = "";			
-		}
-	}
-	</script>
   </body>
 </html>

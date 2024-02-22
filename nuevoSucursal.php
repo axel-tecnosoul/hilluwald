@@ -14,13 +14,13 @@
 		$pdo = Database::connect();
 		$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 		
-		$sql = "INSERT INTO `usuarios`(`usuario`, `clave`, `nombre_apellido`, `id_perfil`, `id_sucursal`, `activo`) VALUES (?,?,?,?,?,1)";
+		$sql = "INSERT INTO sucursales(nombre, direccion) VALUES (?,?)";
 		$q = $pdo->prepare($sql);
-		$q->execute(array($_POST['usuario'],$_POST['clave'],$_POST['nombre_apellido'],$_POST['id_perfil'],$_POST['id_sucursal']));
+		$q->execute(array($_POST['nombre'], $_POST['direccion']));
 		
 		Database::disconnect();
 		
-		header("Location: listarUsuarios.php");
+		header("Location: listarSucursales.php");
 	}
 	
 ?>
@@ -30,17 +30,6 @@
     <?php include('head_forms.php');?>
 	<link rel="stylesheet" type="text/css" href="assets/css/select2.css">
   </head>
-  <script>
-	function jsSucursal() {
-		if (document.getElementById("id_perfil").value != 1) {
-			document.getElementById("id_sucursal").disabled = "";
-			document.getElementById("id_sucursal").required = "required";
-		} else {
-			document.getElementById("id_sucursal").disabled = "disabled";
-			document.getElementById("id_sucursal").required = "";			
-		}
-	}
-	</script>
   <body class="light-only">
     <!-- Loader ends-->
     <!-- page-wrapper Start-->
@@ -61,7 +50,7 @@
                     <h3><?php include("title.php"); ?></h3>
                     <ol class="breadcrumb">
                       <li class="breadcrumb-item"><a href="#"><i data-feather="home"></i></a></li>
-                      <li class="breadcrumb-item">Nuevo Usuario</li>
+                      <li class="breadcrumb-item">Nuevo Sucursal</li>
                     </ol>
                   </div>
                 </div>
@@ -83,64 +72,20 @@
               <div class="col-sm-12">
                 <div class="card">
                   <div class="card-header">
-                    <h5>Nuevo Usuario</h5>
+                    <h5>Nuevo Sucursal</h5>
                   </div>
-				  <form class="form theme-form" role="form" method="post" action="nuevoUsuario.php">
+				          <form class="form theme-form" role="form" method="post" action="nuevoSucursal.php">
                     <div class="card-body">
                       <div class="row">
                         <div class="col">
 						
 							<div class="form-group row">
-								<label class="col-sm-3 col-form-label">Usuario</label>
-								<div class="col-sm-9"><input name="usuario" type="text" maxlength="99" class="form-control" value="" required="required"></div>
-							</div>
-							<div class="form-group row">
-								<label class="col-sm-3 col-form-label">Clave</label>
-								<div class="col-sm-9"><input name="clave" type="text" maxlength="99" class="form-control" value="" required="required"></div>
+								<label class="col-sm-3 col-form-label">Nombres</label>
+								<div class="col-sm-9"><input name="nombre" type="text" maxlength="99" class="form-control" value="" required="required"></div>
 							</div>
               <div class="form-group row">
-								<label class="col-sm-3 col-form-label">Nombre y Apellido</label>
-								<div class="col-sm-9"><input name="nombre_apellido" type="text" maxlength="99" class="form-control" value="" required="required"></div>
-							</div>
-							<div class="form-group row">
-								<label class="col-sm-3 col-form-label">Perfil</label>
-								<div class="col-sm-9">
-								<select name="id_perfil" id="id_perfil" class="js-example-basic-single col-sm-12" required="required" onchange="jsSucursal();">
-								<option value="">Seleccione...</option>
-								<?php 
-								$pdo = Database::connect();
-								$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-								$sqlZon = "SELECT `id`, `perfil` FROM `perfiles` WHERE 1";
-								$q = $pdo->prepare($sqlZon);
-								$q->execute();
-								while ($fila = $q->fetch(PDO::FETCH_ASSOC)) {
-									echo "<option value='".$fila['id']."'";
-									echo ">".$fila['perfil']."</option>";
-								}
-								Database::disconnect();
-								?>
-								</select>
-								</div>
-							</div>
-							<div class="form-group row">
-								<label class="col-sm-3 col-form-label">Sucursal</label>
-								<div class="col-sm-9">
-								<select name="id_sucursal" id="id_sucursal" class="js-example-basic-single col-sm-12" disabled="disabled">
-								<option value="">Seleccione...</option>
-								<?php 
-								$pdo = Database::connect();
-								$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-								$sqlZon = "SELECT `id`, `nombre` FROM `sucursales` WHERE 1";
-								$q = $pdo->prepare($sqlZon);
-								$q->execute();
-								while ($fila = $q->fetch(PDO::FETCH_ASSOC)) {
-									echo "<option value='".$fila['id']."'";
-									echo ">".$fila['nombre']."</option>";
-								}
-								Database::disconnect();
-								?>
-								</select>
-								</div>
+								<label class="col-sm-3 col-form-label">Direccion</label>
+								<div class="col-sm-9"><input name="direccion" type="text" maxlength="99" class="form-control" value="" required="required"></div>
 							</div>
                         </div>
                       </div>
@@ -148,7 +93,7 @@
                     <div class="card-footer">
                       <div class="col-sm-9 offset-sm-3">
                         <button class="btn btn-primary" type="submit">Crear</button>
-						<a href="listarUsuarios.php" class="btn btn-light">Volver</a>
+						<a href="listarsucursales.php" class="btn btn-light">Volver</a>
                       </div>
                     </div>
                   </form>
@@ -187,6 +132,5 @@
     <!-- Plugin used-->
 	<script src="assets/js/select2/select2.full.min.js"></script>
     <script src="assets/js/select2/select2-custom.js"></script>
-	
   </body>
 </html>
