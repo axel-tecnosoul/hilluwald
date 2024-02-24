@@ -11,7 +11,7 @@ if ( !empty($_POST)) {
   $pdo = Database::connect();
   $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-  $sql = "INSERT INTO clientes (razon_social, cuit, cond_fiscal, direccion, email, telefono, fecha_alta, activo, id_usuario_alta_modificacion) VALUES (?,?,?,?,?,?,?,1,?)";
+  $sql = "INSERT INTO clientes (razon_social, cuit, cond_fiscal, direccion, email, telefono, fecha_alta, activo, id_usuario, fecha_hora_alta) VALUES (?,?,?,?,?,?,?,1,?,NOW())";
   $q = $pdo->prepare($sql);
   $q->execute(array($_POST['razon_social'],str_replace("-","",$_POST['cuit']),$_POST['cond_fiscal'],$_POST['direccion'],$_POST['email'],$_POST['telefono'],$_POST['fecha_alta'],$_SESSION["user"]["id"]));
 

@@ -83,6 +83,7 @@ if(empty($_SESSION['user'])){
                           </tr>
                         </thead>
                         <tbody><?php
+                        
                           include 'database.php';
                           $pdo = Database::connect();
                           $sql = " SELECT id, razon_social, direccion, cuit, cond_fiscal, email, activo, date_format(fecha_alta,'%d/%m/%Y') AS fecha_alta, telefono FROM clientes WHERE 1 ";
@@ -105,8 +106,8 @@ if(empty($_SESSION['user'])){
                             echo '&nbsp;&nbsp;';
                             echo '<a href="#" title="Eliminar" onclick="openModalEliminar('.$row["id"].')"><img src="img/icon_baja.png" width="24" height="25" border="0" alt="Eliminar"></a>';
                             echo '&nbsp;&nbsp;';
-                            /*echo '<a href="verCliente.php?id='.$row["id"].'"><img src="img/eye.png" width="30" border="0" alt="Ver Operaciones" title="Ver Operaciones"></a>';
-                            echo '&nbsp;&nbsp;';*/
+                            echo '<a href="verCliente.php?id='.$row["id"].'"><img src="img/eye.png" width="30" border="0" alt="Ver Operaciones" title="Ver Operaciones"></a>';
+                            //echo '&nbsp;&nbsp;';
                             echo '</td>';
                             echo '<td>'. $row["direccion"] . '</td>';
                             echo '<td>'. $row["email"] . '</td>';

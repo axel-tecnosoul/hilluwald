@@ -81,7 +81,7 @@ if(!empty($_POST)){
             <div class="col-md-12">
               <div class="auth-innerright">
                 <div class="authentication-box">
-                  <div class="text-center"><img src="assets/images/logoLogin.jpeg" width="250px" alt=""></div>
+                  <div class="text-center"><img src="assets/images/logoLoginHilluwald.png" width="250px" alt=""></div>
                   <div class="card mt-4">
                     <div class="card-body">
                       <div class="text-center">

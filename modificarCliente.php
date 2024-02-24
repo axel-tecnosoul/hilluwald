@@ -21,7 +21,7 @@ if ( !empty($_POST)) {
   $pdo = Database::connect();
   $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
   
-  $sql = "UPDATE clientes set razon_social = ?, direccion = ?, cuit = ?, cond_fiscal = ?, email = ?, telefono = ?, fecha_alta = ?, activo = ?, id_usuario_alta_modificacion = ? where id = ?";
+  $sql = "UPDATE clientes set razon_social = ?, direccion = ?, cuit = ?, cond_fiscal = ?, email = ?, telefono = ?, fecha_alta = ?, activo = ?, id_usuario = ? where id = ?";
   $q = $pdo->prepare($sql);
   $q->execute(array($_POST['razon_social'],$_POST['direccion'],str_replace("-","",$_POST['cuit']),$_POST["cond_fiscal"],$_POST['email'],$_POST['telefono'],$_POST['fecha_alta'],$_POST['activo'],$_SESSION["user"]["id"],$_GET['id']));
   
@@ -39,6 +39,22 @@ if ( !empty($_POST)) {
   $data = $q->fetch(PDO::FETCH_ASSOC);
   
   Database::disconnect();
+
+  $aOptionsActivo=[
+    [
+      "value"=>0,
+      "id"=>"activo_no",
+      "label"=>"No",
+      "checked"=>$data["activo"]==0 ? true : false,
+      "disabled"=>false,
+    ],[
+      "value"=>1,
+      "id"=>"activo_si",
+      "label"=>"Si",
+      "checked"=>$data["activo"]==1 ? true : false,
+      "disabled"=>false,
+    ]
+  ];
 }
 ?>
 <!DOCTYPE html>
@@ -136,12 +152,16 @@ if ( !empty($_POST)) {
                           </div>
                           <div class="form-group row">
                             <label class="col-sm-3 col-form-label">Activo</label>
-                            <div class="col-sm-9">
-                              <select name="activo" id="activo" class="js-example-basic-single col-sm-12" required="required">
-                                <option value="">Seleccione...</option>
-                                <option value="1" <?php if ($data['activo']==1) echo " selected ";?>>Si</option>
-                                <option value="0" <?php if ($data['activo']==0) echo " selected ";?>>No</option>
-                              </select>
+                            <div class="col-sm-9"><?php
+                              foreach ($aOptionsActivo as $option) {?>
+                                <label class="d-block" for="<?=$option["id"]?>">
+                                  <input type="radio" name="activo" class="radio_animated" id="<?=$option["id"]?>" value="<?=$option["value"]?>" required<?php
+                                    if($option["checked"]) echo "checked";
+                                    if($option["disabled"]) echo "disabled";?>
+                                  >
+                                  <label for="<?=$option["id"]?>"><?=$option["label"]?></label>
+                                </label><?php
+                              }?>
                             </div>
                           </div>
                         </div>
@@ -161,7 +181,7 @@ if ( !empty($_POST)) {
           <!-- Container-fluid Ends-->
         </div>
         <!-- footer start-->
-		<?php include("footer.php"); ?>
+		    <?php include("footer.php"); ?>
       </div>
     </div>
     <!-- latest jquery-->
@@ -176,33 +196,13 @@ if ( !empty($_POST)) {
     <script src="assets/js/sidebar-menu.js"></script>
     <script src="assets/js/config.js"></script>
     <!-- Plugins JS start-->
-    <script src="assets/js/typeahead/handlebars.js"></script>
-    <script src="assets/js/typeahead/typeahead.bundle.js"></script>
-    <script src="assets/js/typeahead/typeahead.custom.js"></script>
     <script src="assets/js/chat-menu.js"></script>
     <script src="assets/js/tooltip-init.js"></script>
-    <script src="assets/js/typeahead-search/handlebars.js"></script>
-    <script src="assets/js/typeahead-search/typeahead-custom.js"></script>
     <!-- Plugins JS Ends-->
     <!-- Theme js-->
     <script src="assets/js/script.js"></script>
     <!-- Plugin used-->
-	<script src="assets/js/select2/select2.full.min.js"></script>
+    <script src="assets/js/select2/select2.full.min.js"></script>
     <script src="assets/js/select2/select2-custom.js"></script>
-	<script>
-	var password = document.getElementById("password")
-	  , confirm_password = document.getElementById("confirm_password");
-
-	function validatePassword(){
-	  if(password.value != confirm_password.value) {
-		confirm_password.setCustomValidity("Las claves no coinciden");
-	  } else {
-		confirm_password.setCustomValidity('');
-	  }
-	}
-
-	password.onchange = validatePassword;
-	confirm_password.onkeyup = validatePassword;
-	</script>
   </body>
 </html>

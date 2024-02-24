@@ -81,11 +81,11 @@ Database::disconnect();
                     <ul class="nav nav-tabs border-tab" id="pills-tab" role="tablist" style="margin-bottom: 40px;margin-top: -20px;">
                       <li class="nav-item"><a class="nav-link active" id="pills-contacto-tab" data-toggle="pill" href="#pills-contacto" role="tab" aria-controls="pills-contacto" aria-selected="true"><i class="icofont icofont-ui-user"></i>Datos</a></li>
 
-                      <li class="nav-item"><a class="nav-link" id="pills-id_producto_pino-tab" data-toggle="pill" href="#pills-id_producto_pino" role="tab" aria-controls="pills-id_producto_pino" aria-selected="false"><i class="fa fa-shopping-cart"></i>Pino Taeda semilla Bosques del plata</a></li>
+                      <li class="nav-item"><a class="nav-link" id="pills-pedidos-tab" data-toggle="pill" href="#pills-pedidos" role="tab" aria-controls="pills-pedidos" aria-selected="false"><i class="fa fa-shopping-cart"></i>Pedidos</a></li>
 
-                      <li class="nav-item"><a class="nav-link" id="pills-id_producto_yerba-tab" data-toggle="pill" href="#pills-id_producto_yerba" role="tab" aria-controls="pills-id_producto_yerba" aria-selected="false"><i class="fa fa-truck"></i></i>Yerba</a></li>
+                      <li class="nav-item"><a class="nav-link" id="pills-retiros-tab" data-toggle="pill" href="#pills-retiros" role="tab" aria-controls="pills-retiros" aria-selected="false"><i class="fa fa-truck"></i></i>Retiros</a></li>
 
-                      <li class="nav-item"><a class="nav-link" id="pills-id_producto_eucaliptus-tab" data-toggle="pill" href="#pills-id_producto_eucaliptus" role="tab" aria-controls="pills-id_producto_eucaliptus" aria-selected="false"><i class="fa fa-usd"></i>Eucaliptus</a></li>
+                      <li class="nav-item"><a class="nav-link" id="pills-pagos-tab" data-toggle="pill" href="#pills-pagos" role="tab" aria-controls="pills-pagos" aria-selected="false"><i class="fa fa-usd"></i>Pagos</a></li>
 
                       <li class="nav-item"><a class="nav-link" id="pills-bandejas-tab" data-toggle="pill" href="#pills-bandejas" role="tab" aria-controls="pills-bandejas" aria-selected="false"><i class="fa fa-th"></i>Bandejas</a></li>
                     </ul>
@@ -133,201 +133,97 @@ Database::disconnect();
                         </div>
 
                       </div>
-                      <div class="tab-pane fade" id="pills-id_producto_pino" role="tabpanel" aria-labelledby="pills-id_producto_pino-tab"><?php
+                      <div class="tab-pane fade" id="pills-pedidos" role="tabpanel" aria-labelledby="pills-pedidos-tab"><?php
 
                         //include_once("tablaPedidos.php");?>
 
                         <!-- <h2>Listado de Pedidos</h2> -->
-
-                        <table  class="table table-striped tablas_cliente" style="width:100%">
+                        <table id="pedidosTable" class="table table-striped table-bordered tablas_cliente" style="width:100%">
                           <thead>
                             <tr>
-                              <th style="text-align: center;vertical-align: middle;" rowspan="2">Fecha</th>
-                              <th style="text-align: center;vertical-align: middle;" rowspan="2">Comprobante</th>
-                              <th style="text-align: center;vertical-align: middle;" rowspan="2">Campaña</th>
-                              <th style="text-align: center;vertical-align: middle;" rowspan="2">Cantidad</th>
-                              <th style="text-align: center;vertical-align: middle;" colspan="2">Cta Cte Retiros</th>
-                              <th style="text-align: center;vertical-align: middle;" colspan="2">Cta Cte Pagos</th>
-                            </tr>
-                            <tr>
-                              <th style="text-align: center;vertical-align: middle;">Cantidad</th>
-                              <th style="text-align: center;vertical-align: middle;">Saldo</th>
-                              <th style="text-align: center;vertical-align: middle;">Cantidad</th>
-                              <th style="text-align: center;vertical-align: middle;">Saldo</th>
+                              <th>ID Pedido</th>
+                              <th>Fecha</th>
+                              <th>Cultivo</th>
+                              <th>Campaña</th>
+                              <th>Pedido</th>
+                              <th>Retirado</th>
+                              <th>Pagado</th>
+                              <!-- <th>Pago Completo</th>
+                              <th>Retiro Completo</th>
+                              <th>Motivo Saldado</th> -->
                             </tr>
                           </thead>
                           <tbody>
                             <tr>
-                              <td>1 02 2024</td>
-                              <td>Pedido N° 1</td>
+                              <td>1</td>
+                              <td>01-02-2024</td>
+                              <td>Yerba</td>
                               <td>2024</td>
-                              <td align="right">1.000</td>
-                              <td align="right"></td>
-                              <td align="right">1.000</td>
-                              <td align="right"></td>
-                              <td align="right">1.000</td>
+                              <td>1.000</td>
+                              <td>200</td>
+                              <td>500</td>
                             </tr>
                             <tr>
-                              <td>1 02 2024</td>
-                              <td>Retiro N° 1</td>
+                              <td>1</td>
+                              <td>01-02-2024</td>
+                              <td>Pino Taeda semilla Bosques del plata</td>
                               <td>2024</td>
-                              <td align="right"></td>
-                              <td align="right">200</td>
-                              <td align="right">800</td>
-                              <td align="right"></td>
-                              <td align="right">1000</td>
+                              <td>2.000</td>
+                              <td>1.000</td>
+                              <td>500</td>
                             </tr>
                             <tr>
-                              <td>5 02 2024</td>
-                              <td>Pago N° 1</td>
+                              <td>2</td>
+                              <td>05-02-2024</td>
+                              <td>Pino Taeda semilla Bosques del plata</td>
                               <td>2024</td>
-                              <td align="right"></td>
-                              <td align="right"></td>
-                              <td align="right">800</td>
-                              <td align="right">500</td>
-                              <td align="right">500</td>
+                              <td>500</td>
+                              <td>0</td>
+                              <td>0</td>
                             </tr>
-                            <tr>
-                              <td>6 02 2024</td>
-                              <td>Pedido N° 2</td>
-                              <td>2024</td>
-                              <td align="right">500</td>
-                              <td align="right"></td>
-                              <td align="right">1.300</td>
-                              <td align="right"></td>
-                              <td align="right">1.000</td>
-                            </tr>
-                            <tr>
-                              <td>6 02 2024</td>
-                              <td>Retiro N° 2</td>
-                              <td>2024</td>
-                              <td align="right"></td>
-                              <td align="right">200</td>
-                              <td align="right">1.100</td>
-                              <td align="right"></td>
-                              <td align="right">1.000</td>
-                            </tr>
-                            <tr>
-                              <td>7 02 2024</td>
-                              <td>Retiro N° 3</td>
-                              <td>2024</td>
-                              <td align="right"></td>
-                              <td align="right">200</td>
-                              <td align="right">900</td>
-                              <td align="right"></td>
-                              <td align="right">1.000</td>
-                            </tr>
-                            <tr>
-                              <td><strong>Totales</strong></td>
-                              <td></td>
-                              <td></td>
-                              <td align="right"><strong>1.500</strong></td>
-                              <td align="right"><strong>600</strong></td>
-                              <td><strong></strong></td>
-                              <td align="right"><strong>500</strong></td>
-                              <td><strong></strong></td>
-                            </tr>
+                            <!-- Agregar más filas con datos ficticios según sea necesario -->
                           </tbody>
                         </table>
 
                       </div>
-                      <div class="tab-pane fade" id="pills-id_producto_yerba" role="tabpanel" aria-labelledby="pills-id_producto_yerba-tab"><?php
+                      <div class="tab-pane fade" id="pills-retiros" role="tabpanel" aria-labelledby="pills-retiros-tab"><?php
 
-                        //include_once("formid_producto_yerba.php");?>
+                        //include_once("formRetiros.php");?>
 
-                        <table  class="table table-striped tablas_cliente" style="width:100%">
+                        <table id="remitosTable" class="table table-striped table-bordered tablas_cliente" style="width:100%">
                           <thead>
                             <tr>
-                              <th style="text-align: center;vertical-align: middle;" rowspan="2">Fecha</th>
-                              <th style="text-align: center;vertical-align: middle;" rowspan="2">Comprobante</th>
-                              <th style="text-align: center;vertical-align: middle;" rowspan="2">Campaña</th>
-                              <th style="text-align: center;vertical-align: middle;" rowspan="2">Cantidad</th>
-                              <th style="text-align: center;vertical-align: middle;" colspan="2">Cta Cte Retiros</th>
-                              <th style="text-align: center;vertical-align: middle;" colspan="2">Cta Cte Pagos</th>
-                            </tr>
-                            <tr>
-                              <th style="text-align: center;vertical-align: middle;">Cantidad</th>
-                              <th style="text-align: center;vertical-align: middle;">Saldo</th>
-                              <th style="text-align: center;vertical-align: middle;">Cantidad</th>
-                              <th style="text-align: center;vertical-align: middle;">Saldo</th>
+                              <th>ID Remito</th>
+                              <th>Transporte</th>
+                              <th>Chofer</th>
+                              <th>Cantidad de Bandejas</th>
+                              <th>Bandejas Devueltas</th>
+                              <th>Fecha</th>
                             </tr>
                           </thead>
                           <tbody>
                             <tr>
-                              <td>1 02 2024</td>
-                              <td>Pedido N° 1</td>
-                              <td>2024</td>
-                              <td align="right">800</td>
-                              <td align="right"></td>
-                              <td align="right">800</td>
-                              <td align="right"></td>
-                              <td align="right">800</td>
+                              <td>1</td>
+                              <td>Transporte 1</td>
+                              <td>Chofer 1</td>
+                              <td>50</td>
+                              <td>5</td>
+                              <td>2024-02-10</td>
                             </tr>
                             <tr>
-                              <td>1 02 2024</td>
-                              <td>Pedido N° 3</td>
-                              <td>2024</td>
-                              <td align="right">300</td>
-                              <td align="right"></td>
-                              <td align="right">1.100</td>
-                              <td align="right"></td>
-                              <td align="right">1.100</td>
+                              <td>2</td>
+                              <td>Transporte 2</td>
+                              <td>Chofer 2</td>
+                              <td>75</td>
+                              <td>10</td>
+                              <td>2024-02-15</td>
                             </tr>
-                            <tr>
-                              <td>5 02 2024</td>
-                              <td>Pago N° 1</td>
-                              <td>2024</td>
-                              <td align="right"></td>
-                              <td align="right"></td>
-                              <td align="right">1.100</td>
-                              <td align="right">500</td>
-                              <td align="right">600</td>
-                            </tr>
-                            <tr>
-                              <td>6 02 2024</td>
-                              <td>Pago N° 2</td>
-                              <td>2024</td>
-                              <td align="right"></td>
-                              <td align="right"></td>
-                              <td align="right">1.100</td>
-                              <td align="right">500</td>
-                              <td align="right">100</td>
-                            </tr>
-                            <tr>
-                              <td>6 02 2024</td>
-                              <td>Retiro N° 2</td>
-                              <td>2024</td>
-                              <td align="right"></td>
-                              <td align="right">200</td>
-                              <td align="right">900</td>
-                              <td align="right"></td>
-                              <td align="right">100</td>
-                            </tr>
-                            <tr>
-                              <td>7 02 2024</td>
-                              <td>Retiro N° 3</td>
-                              <td>2024</td>
-                              <td align="right"></td>
-                              <td align="right">200</td>
-                              <td align="right">700</td>
-                              <td align="right"></td>
-                              <td align="right">100</td>
-                            </tr>
-                            <tr>
-                              <td><strong>Totales</strong></td>
-                              <td></td>
-                              <td></td>
-                              <td align="right"><strong>1.100</strong></td>
-                              <td align="right"><strong>400</strong></td>
-                              <td><strong></strong></td>
-                              <td align="right"><strong>1.00</strong></td>
-                              <td><strong></strong></td>
-                            </tr>
+                            <!-- Agregar más filas según sea necesario -->
                           </tbody>
                         </table>
                         
                       </div>
-                      <div class="tab-pane fade" id="pills-id_producto_eucaliptus" role="tabpanel" aria-labelledby="pills-id_producto_eucaliptus-tab"><?php
+                      <div class="tab-pane fade" id="pills-pagos" role="tabpanel" aria-labelledby="pills-pagos-tab"><?php
 
                         //include_once("tablaPagos.php");?>
                         <table id="pagosTable" class="table table-striped table-bordered tablas_cliente" style="width:100%">
