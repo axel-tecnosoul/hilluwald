@@ -14,9 +14,9 @@
 		$pdo = Database::connect();
 		$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 		
-		$sql = "INSERT INTO `usuarios`(`usuario`, `clave`, `nombre_apellido`, `id_perfil`, `id_sucursal`, `activo`) VALUES (?,?,?,?,?,1)";
+		$sql = "INSERT INTO `usuarios`(`usuario`, `clave`, `nombre_apellido`, email, `id_perfil`, `id_sucursal`, `activo`) VALUES (?,?,?,?,?,?,1)";
 		$q = $pdo->prepare($sql);
-		$q->execute(array($_POST['usuario'],$_POST['clave'],$_POST['nombre_apellido'],$_POST['id_perfil'],$_POST['id_sucursal']));
+		$q->execute(array($_POST['usuario'],$_POST['clave'],$_POST['nombre_apellido'], $_POST['email'],$_POST['id_perfil'],$_POST['id_sucursal']));
 		
 		Database::disconnect();
 		
@@ -101,6 +101,10 @@
               <div class="form-group row">
 								<label class="col-sm-3 col-form-label">Nombre y Apellido</label>
 								<div class="col-sm-9"><input name="nombre_apellido" type="text" maxlength="99" class="form-control" value="" required="required"></div>
+							</div>
+              <div class="form-group row">
+								<label class="col-sm-3 col-form-label">Email</label>
+								<div class="col-sm-9"><input name="email" type="email" maxlength="99" class="form-control" value="" required="required"></div>
 							</div>
 							<div class="form-group row">
 								<label class="col-sm-3 col-form-label">Perfil</label>

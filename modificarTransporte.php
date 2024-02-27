@@ -25,7 +25,7 @@
 		
 		$sql = "UPDATE transportes set nombre = ?, tipo = ?, patente = ?, id_usuario = ? where id = ?";
 		$q = $pdo->prepare($sql);
-		$q->execute(array($_POST['nombre'],$_POST['tipo'],$_POST['patente'],$_POST['id_usuario'],$_GET['id']));
+		$q->execute(array($_POST['nombre'],$_POST['tipo'],$_POST['patente'],$_SESSION['user']['id_perfil'],$_GET['id']));
 		
 		Database::disconnect();
 		
@@ -110,30 +110,7 @@
 								<label class="col-sm-3 col-form-label">Patente</label>
 								<div class="col-sm-9"><input name="patente" type="text" maxlength="99" class="form-control" value="<?php echo $data['patente']; ?>" required="required"></div>
 							</div>
-                            <div class="form-group row">
-                                <label class="col-sm-3 col-form-label">Usuarios</label>
-                                <div class="col-sm-9">
-                                    <select name="id_usuario" id="id_usuario" class="js-example-basic-single col-sm-12" required>
-                                        <option value="">Seleccione...</option><?php
-                                        $pdo = Database::connect();
-                                        $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-                                        $sqlZon = "SELECT id, usuario FROM usuarios WHERE activo = 1";
-                                        if ($_SESSION['user']['id_perfil'] != 1) {
-                                        $sqlZon .= " and id = ".$_SESSION['user']['id_usuario']; 
-                                        }
-                                        $q = $pdo->prepare($sqlZon);
-                                        $q->execute();
-                                        while ($fila = $q->fetch(PDO::FETCH_ASSOC)) {
-                                        $selected="";
-                                        if($fila['id']==$data["id_usuario"]){
-                                            $selected="selected";
-                                        }
-                                        echo "<option value='".$fila['id']."' $selected>".$fila['usuario']."</option>";
-                                        }
-                                        Database::disconnect();?>
-                                    </select>
-                                </div>
-                            </div>
+                            
                         </div>
                       </div>
                     </div>
