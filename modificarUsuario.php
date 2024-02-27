@@ -23,9 +23,9 @@
 		$pdo = Database::connect();
 		$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 		
-		$sql = "UPDATE `usuarios` set `usuario` = ?, `clave` = ?, nombre_apellido = ?, `id_perfil` = ?, `id_sucursal` = ?, `activo` = ? WHERE id = ?";
+		$sql = "UPDATE `usuarios` set `usuario` = ?, `clave` = ?, nombre_apellido = ?, email = ?, `id_perfil` = ?, `id_sucursal` = ?, `activo` = ? WHERE id = ?";
 		$q = $pdo->prepare($sql);
-		$q->execute(array($_POST['usuario'],$_POST['clave'],$_POST['nombre_apellido'],$_POST['id_perfil'],$_POST['id_sucursal'],$_POST['activo'],$_GET['id']));
+		$q->execute(array($_POST['usuario'],$_POST['clave'],$_POST['nombre_apellido'], $_POST['email'],$_POST['id_perfil'],$_POST['id_sucursal'],$_POST['activo'],$_GET['id']));
 		
 		Database::disconnect();
 		
@@ -35,7 +35,7 @@
 		
 		$pdo = Database::connect();
 		$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-		$sql = "SELECT `id`, `usuario`, `clave`, nombre_apellido, `id_perfil`, `id_sucursal` , `activo`FROM `usuarios` WHERE id = ? ";
+		$sql = "SELECT `id`, `usuario`, `clave`, nombre_apellido, email, `id_perfil`, `id_sucursal` , `activo`FROM `usuarios` WHERE id = ? ";
 		$q = $pdo->prepare($sql);
 		$q->execute(array($id));
 		$data = $q->fetch(PDO::FETCH_ASSOC);
@@ -109,6 +109,10 @@
 							<div class="form-group row">
 								<label class="col-sm-3 col-form-label">Nombre y Apellido</label>
 								<div class="col-sm-9"><input name="nombre_apellido" type="text" maxlength="99" class="form-control" required="required" value="<?php echo $data['nombre_apellido']; ?>"></div>
+							</div>
+							<div class="form-group row">
+								<label class="col-sm-3 col-form-label">Email</label>
+								<div class="col-sm-9"><input name="email" type="email" maxlength="99" class="form-control" required="required" value="<?php echo $data['email']; ?>"></div>
 							</div>
 							<div class="form-group row">
 								<label class="col-sm-3 col-form-label">Perfil</label>

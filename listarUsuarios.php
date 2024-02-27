@@ -67,6 +67,7 @@ if(empty($_SESSION['user']))
 						  <th>ID</th>
 						  <th>Usuario</th>
 						  <th>Nombre</th>
+						  <th>Email</th>
 						  <th>Perfil</th>
 						  <th>Sucursal</th>
 						  <th>Activo</th>
@@ -83,6 +84,7 @@ if(empty($_SESSION['user']))
 								echo '<td>'. $row['id'] . '</td>';
 								echo '<td>'. $row['usuario'] . '</td>';
 								echo '<td>'. $row['nombre_apellido'] . '</td>';
+								echo '<td>'. $row['email'] . '</td>';
 								echo '<td>'. $row['perfil'] . '</td>';
 								echo '<td>'. $row['nombre'] . '</td>';
 								if ($row['activo'] == 1) {
@@ -125,10 +127,9 @@ if(empty($_SESSION['user']))
 	  <div class="modal-dialog" role="document">
 		<div class="modal-content">
 		  <div class="modal-header">
-			<h5 class="modal-title" id="exampleModalLabel">Confirmación</h5>
 			<button class="close" type="button" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
 		  </div>
-		  <div class="modal-body">¿Está seguro que desea eliminar el usuario?</div>
+		  <div class="modal-body">¿Está seguro que desea eliminar el Usuario?</div>
 		  <div class="modal-footer">
 			<a href="eliminarUsuario.php?id=<?php echo $row[0];?>" class="btn btn-primary">Eliminar</a>
 			<a onclick="document.location.href='listarUsuarios.php'" class="btn btn-light">Volver</a>

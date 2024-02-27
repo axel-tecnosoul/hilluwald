@@ -7,16 +7,15 @@
     }
 	
 	require 'database.php';
-	
+
 	if ( !empty($_POST)) {
-		
 		// insert data
 		$pdo = Database::connect();
 		$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 		
-		$sql = "INSERT INTO transportes(nombre, tipo, patente,id_usuario, fecha_hora_alta) VALUES (?,?,?,?,now())";
+		$sql = "INSERT INTO transportes(razon_social, cuit, domicilio,id_usuario, fecha_hora_alta) VALUES (?,?,?,?,now())";
 		$q = $pdo->prepare($sql);
-		$q->execute(array($_POST['nombre'], $_POST['tipo'],$_POST['patente'],$_POST['id_usuario']));
+		$q->execute(array($_POST['razon_social'], $_POST['cuit'],$_POST['domicilio'],$_SESSION['user']['id_perfil']));
 		
 		Database::disconnect();
 		
@@ -70,53 +69,140 @@
           <div class="container-fluid">
             <div class="row">
               <div class="col-sm-12">
-                <div class="card">
-                  <div class="card-header">
-                    <h5>Nuevo Transporte</h5>
-                  </div>
-				          <form class="form theme-form" role="form" method="post" action="nuevoTransporte.php">
-                    <div class="card-body">
-                      <div class="row">
-                        <div class="col">
-						
-							<div class="form-group row">
-								<label class="col-sm-3 col-form-label">Nombres</label>
-								<div class="col-sm-9"><input name="nombre" type="text" maxlength="99" class="form-control" value="" required="required"></div>
-							</div>
-                            <div class="form-group row">
-								<label class="col-sm-3 col-form-label">Tipo</label>
-								<div class="col-sm-9"><input name="tipo" type="text" maxlength="99" class="form-control" value="" required="required"></div>
-							</div>
-                            <div class="form-group row">
-								<label class="col-sm-3 col-form-label">Patente</label>
-								<div class="col-sm-9"><input name="patente" type="text" maxlength="99" class="form-control" value="" required="required"></div>
-							</div>
-                            <div class="form-group row">
-								<label class="col-sm-3 col-form-label">Usuario</label>
-								<div class="col-sm-9">
-								<select name="id_usuario" id="id_usuario" class="js-example-basic-single col-sm-12" required="required">
-								<option value="">Seleccione...</option>
-								<?php 
-								$pdo = Database::connect();
-								$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-								$sqlZon = "SELECT `id`, `usuario` FROM `usuarios` WHERE 1";
-								$q = $pdo->prepare($sqlZon);
-								$q->execute();
-								while ($fila = $q->fetch(PDO::FETCH_ASSOC)) {
-									echo "<option value='".$fila['id']."'";
-									echo ">".$fila['usuario']."</option>";
-								}
-								Database::disconnect();
-								?>
-								</select>
-							</div>   
+                  <div class="card">
+                    <div class="card-header">
+                      <h5 class="text-center">Nuevo Transporte</h5>
+                    </div>
+                    <form class="form theme-form" role="form" method="post" action="nuevoTransporte.php">
+                      <div class="card-body">
+                        <div class="row">
+                          <div class="col">
+                          <div class="form-group row">
+                            <div class="col-sm-12">
+                              <table class="table-detalle table table-bordered table-hover text-center" id="tableTransporte">
+                                <thead>
+                                  <tr>
+                                    <th>Razon Social</th>
+                                    <th>CUIT</th>
+                                    <th>Domicilio</th>
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                  <tr id='addr0' data-id="0" style="display: none;">
+                                    <td data-name="razon_social">
+                                      <input name="razon_social" type="text" class="form-control" placeholder="Razon Social" name="razon_social" id="razon_social" required="required">
+                                    </td>
+                                    <td data-name="cuit">
+                                      <input name="cuit" type="text" class="form-control" placeholder="CUIT" name="cuit" id="cuit">
+                                    </td>
+                                    <td data-name="domicilio">
+                                      <input name="domicilio" type="text" class="form-control" placeholder="Domicilio" name="domicilio" id="domicilio">
+                                    </td>
+                                  </tr>
+                                </tbody>
+                              </table>
+                            </div>
+                          </div>
                         </div>
                       </div>
-                    </div>
+                    
+                      <div class="row">
+                        <div class="col-sm-6">
+                          <div class="card-header">
+                              <h5 class="text-center">Nuevo Chofer</h5>
+                          </div>
+                          <div class="form-group row">
+                            <div class="col-sm-12">
+                              <table class="table-detalle table table-bordered table-hover text-center" id="tableChofer">
+                                <thead>
+                                  <tr>
+                                    <th>Nombre</th>
+                                    <th>Apellido</th>
+                                    <th>Eliminar</th>
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                  <tr id='addr0' data-id="0" style="display: none;">
+                                    <td data-name="nombre">
+                                      <input type="text" class="form-control" placeholder="Nombre" name="nombre[]" id="nombre-0"/>
+                                    </td>
+                                    <td data-name="apellido">
+                                      <input type="text" class="form-control" placeholder="Apellido" name="apellido[]" id="apellido-0"/>
+                                    </td>
+                                    <td data-name="eliminar">
+                                      <span name="eliminar[]" title="Eliminar" class="btn btn-sm row-remove text-center" onClick="eliminarFila(this);">
+                                        <img src="img/icon_baja.png" width="24" height="25" border="0" alt="Eliminar" title="Eliminar">
+                                      </span>
+                                    </td>
+                                  </tr>
+                                </tbody>
+                                <tfoot>
+                                  <tr>
+                                    <td colspan="2"></td>
+                                    <td colspan="4" align='center'>
+                                      <input type="button" class="btn btn-dark" id="addRowChofer" value="Agregar Chofer">
+                                      <input type="hidden" name="emailEliminados" id="emailEliminados">
+                                    </td>
+                                  </tr>
+                                </tfoot>
+                              </table>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div class="col-sm-6">
+                          <div class="card-header">
+                              <h5 class="text-center">Nuevo Vehiculos</h5>
+                          </div>
+                          <div class="card-body p-0">
+                            <div class="form-group row">
+                              <div class="col-sm-6">
+                                <table class="table-detalle table table-bordered table-hover text-center" id="tableVehiculo">
+                                  <thead>
+                                    <tr>
+                                      <th>Descripcion</th>
+                                      <th>Patente</th>
+                                      <th>Patente2</th>
+                                      <th>Eliminar</th>
+                                    </tr>
+                                  </thead>
+                                  <tbody>
+                                    <tr id='addr0' data-id="0" style="display: none;">
+                                      <td data-name="descripcion">
+                                        <input type="text" class="form-control" placeholder="Descripcion" name="descripcion[]" id="descripcion-0"/>
+                                      </td>
+                                      <td data-name="patente">
+                                        <input type="text" class="form-control" placeholder="Patente" name="patente[]" id="patente-0"/>
+                                      </td>
+                                      <td data-name="patente2">
+                                        <input type="text" class="form-control" placeholder="Patente" name="patente2[]" id="patente2-0"/>
+                                      </td>
+              
+                                      <td data-name="eliminar">
+                                        <span name="eliminar[]" title="Eliminar" class="btn btn-sm row-remove text-center" onClick="eliminarFila(this);">
+                                          <img src="img/icon_baja.png" width="24" height="25" border="0" alt="Eliminar" title="Eliminar">
+                                        </span>
+                                      </td>
+                                    </tr>
+                                </tbody>
+                                <tfoot>
+                                  <tr>
+                                    <td colspan="3"></td>
+                                    <td colspan="1" align='center'>
+                                      <input type="button" class="btn btn-dark " id="addRowVehiculo" value="Agregar Vehiculo">
+                                      <input type="hidden" name="emailEliminados" id="emailEliminados">
+                                    </td>
+                                  </tr>
+                                </tfoot>
+                              </table>
+                            </div>  
+                          </div>
+                        </div>
+                      </div>
                     <div class="card-footer">
-                      <div class="col-sm-9 offset-sm-3">
+                      <div class="col-sm-12 offset-sm-9">
                         <button class="btn btn-primary" type="submit">Crear</button>
-						<a href="listarTransportes.php" class="btn btn-light">Volver</a>
+						            <a href="listarTransportes.php" class="btn btn-light">Volver</a>
                       </div>
                     </div>
                   </form>
@@ -155,5 +241,161 @@
     <!-- Plugin used-->
 	<script src="assets/js/select2/select2.full.min.js"></script>
     <script src="assets/js/select2/select2-custom.js"></script>
+    <script type="text/javascript">
+
+      $(document).ready(function(){
+          $("#addRowChofer").on('click', function(event) {
+            event.preventDefault();
+            addRowChofer();
+          }).click();
+
+          $("#addRowVehiculo").on('click', function(event) {
+            event.preventDefault();
+            addRowVehiculo();
+          }).click();
+      });
+
+      function eliminarFila(t){
+        var fila=$(t).closest("tr");
+        fila.remove();
+      }
+
+      function addRowChofer(){
+        //alert("hola");
+        var newid = 0;
+        var primero="";
+        var ultimoRegistro=0;
+        $.each($("#tableChofer tr"), function() {
+          if (parseInt($(this).data("id")) > newid) {
+            newid = parseInt($(this).data("id"));
+          }
+        });
+        //debugger;
+        newid++;
+        //console.log(newid);
+        var tr = $("<tr></tr>", {
+          "id": "addr"+newid,
+          "data-id": newid
+        });
+        //console.log(newid);
+        var p=0;
+        $.each($("#tableChofer tbody tr:nth(0) td"),function(){//loop through each td and create new elements with name of newid
+          var cur_td = $(this); 
+          var children = cur_td.children();
+          if($(this).data("name")!=undefined){// add new td and element if it has a name
+            var td = $("<td></td>", {
+              "data-name": $(cur_td).data("name"),
+              "class": this.className
+            });
+            var c = $(cur_td).find($(children[0]).prop('tagName')).clone();//.val("")
+            
+            var id=$(c).attr("id");
+            $(c).attr("required",true);
+            ultimoRegistro=id;
+            if(id!=undefined){
+              //console.log("id1: ");
+              //console.log(id);
+              id=id.split("-");
+              c.attr("id", id[0]+"-"+newid);//modificamos el id de cada input
+              if(p==0){
+                primero=c;
+                p++;
+              }
+            }
+            c.appendTo($(td));
+            td.appendTo($(tr));
+            
+          }else {
+            //console.log("<td></td>",{'text':$('#tab_logic tr').length})
+            var td = $("<td></td>", {
+              'text': $('#tableChofer tr').length
+            }).appendTo($(tr));
+          }
+        });
+        //console.log($(tr).find($("input[name='detalledni[]']")));
+        //console.log(tr);//.find($("input"))
+        $(tr).appendTo($('#tableChofer'));// add the new row
+        if(newid>0){
+          primero.focus();
+          var sel2=$("#id_categoria-"+newid)
+          //console.log(sel2);
+          
+          sel2.select2();//llamamos para inicializar select2
+          sel2.select2('destroy');//como no se iniciliaza bien lo destruimos para que elimine las clases que arrastra de la clonacion
+          sel2.select2();//volvemos a inicializar y ahora si se inicializa bien
+          
+        }
+        return tr.attr("id");
+      }
+
+      function addRowVehiculo(){
+        //alert("hola");
+        var newid = 0;
+        var primero="";
+        var ultimoRegistro=0;
+        $.each($("#tableVehiculo tr"), function() {
+          if (parseInt($(this).data("id")) > newid) {
+            newid = parseInt($(this).data("id"));
+          }
+        });
+        //debugger;
+        newid++;
+        //console.log(newid);
+        var tr = $("<tr></tr>", {
+          "id": "addr"+newid,
+          "data-id": newid
+        });
+        //console.log(newid);
+        var p=0;
+        $.each($("#tableVehiculo tbody tr:nth(0) td"),function(){//loop through each td and create new elements with name of newid
+          var cur_td = $(this); 
+          var children = cur_td.children();
+          if($(this).data("name")!=undefined){// add new td and element if it has a name
+            var td = $("<td></td>", {
+              "data-name": $(cur_td).data("name"),
+              "class": this.className
+            });
+            var c = $(cur_td).find($(children[0]).prop('tagName')).clone();//.val("")
+            
+            var id=$(c).attr("id");
+            $(c).attr("required",true);
+            ultimoRegistro=id;
+            if(id!=undefined){
+              //console.log("id1: ");
+              //console.log(id);
+              id=id.split("-");
+              c.attr("id", id[0]+"-"+newid);//modificamos el id de cada input
+              if(p==0){
+                primero=c;
+                p++;
+              }
+            }
+            c.appendTo($(td));
+            td.appendTo($(tr));
+            
+          }else {
+            //console.log("<td></td>",{'text':$('#tab_logic tr').length})
+            var td = $("<td></td>", {
+              'text': $('#tableVehiculo tr').length
+            }).appendTo($(tr));
+          }
+        });
+        //console.log($(tr).find($("input[name='detalledni[]']")));
+        //console.log(tr);//.find($("input"))
+        $(tr).appendTo($('#tableVehiculo'));// add the new row
+        if(newid>0){
+          primero.focus();
+          var sel2=$("#id_categoria-"+newid)
+          //console.log(sel2);
+          
+          sel2.select2();//llamamos para inicializar select2
+          sel2.select2('destroy');//como no se iniciliaza bien lo destruimos para que elimine las clases que arrastra de la clonacion
+          sel2.select2();//volvemos a inicializar y ahora si se inicializa bien
+          
+        }
+        return tr.attr("id");
+      }
+
+    </script>
   </body>
 </html>

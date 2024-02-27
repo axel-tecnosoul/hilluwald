@@ -14,9 +14,9 @@
 		$pdo = Database::connect();
 		$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 		
-		$sql = "INSERT INTO cultivos(nombre, precio, id_usuario, fecha_hora_alta) VALUES (?,?,?,now())";
+		$sql = "INSERT INTO cultivos(nombre, nombre_corto, precio, id_usuario, fecha_hora_alta) VALUES (?,?,?,?,now())";
 		$q = $pdo->prepare($sql);
-		$q->execute(array($_POST['nombre'], $_POST['precio'],$_POST['id_usuario']));
+		$q->execute(array($_POST['nombre'],$_POST['nombre_corto'], $_POST['precio'],$_SESSION['user']['id_perfil']));
 		
 		Database::disconnect();
 		
@@ -83,30 +83,14 @@
 								<label class="col-sm-3 col-form-label">Nombres</label>
 								<div class="col-sm-9"><input name="nombre" type="text" maxlength="99" class="form-control" value="" required="required"></div>
 							</div>
+              <div class="form-group row">
+								<label class="col-sm-3 col-form-label">Nombre Corto</label>
+								<div class="col-sm-9"><input name="nombre_corto" type="text" maxlength="99" class="form-control" value="" required="required"></div>
+							</div>
                             <div class="form-group row">
 								<label class="col-sm-3 col-form-label">Precio</label>
 								<div class="col-sm-9"><input name="precio" type="text" maxlength="99" class="form-control" value="" required="required"></div>
 							</div>
-                            <div class="form-group row">
-								<label class="col-sm-3 col-form-label">Usuario</label>
-								<div class="col-sm-9">
-								<select name="id_usuario" id="id_usuario" class="js-example-basic-single col-sm-12" required="required" onchange="jsAlmacen();">
-								<option value="">Seleccione...</option>
-								<?php 
-								$pdo = Database::connect();
-								$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-								$sqlZon = "SELECT `id`, `usuario` FROM `usuarios` WHERE 1";
-								$q = $pdo->prepare($sqlZon);
-								$q->execute();
-								while ($fila = $q->fetch(PDO::FETCH_ASSOC)) {
-									echo "<option value='".$fila['id']."'";
-									echo ">".$fila['usuario']."</option>";
-								}
-								Database::disconnect();
-								?>
-								</select>
-							</div>   
-                        </div>
                       </div>
                     </div>
                     <div class="card-footer">

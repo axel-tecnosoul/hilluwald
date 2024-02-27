@@ -66,6 +66,7 @@ if(empty($_SESSION['user']))
                           <tr>
                             <th>ID</th>
                             <th>Nombre</th>
+                            <th>Nombre Corto</th>
                             <th>Precio</th>
                             <th>Usuario</th>
                             <th>Opciones</th>
@@ -75,12 +76,13 @@ if(empty($_SESSION['user']))
                           <?php 
 							include 'database.php';
 							$pdo = Database::connect();
-							$sql = " SELECT c.id, c.nombre, c.precio, c.id_usuario, c.fecha_hora_alta, u.usuario FROM cultivos c left join usuarios u on u.id = c.id_usuario WHERE 1 ";
+							$sql = " SELECT c.id, c.nombre, c.nombre_corto, c.precio, c.id_usuario, c.fecha_hora_alta, u.usuario FROM cultivos c left join usuarios u on u.id = c.id_usuario WHERE 1 ";
 							
 							foreach ($pdo->query($sql) as $row) {
 								echo '<tr>';
 								echo '<td>'. $row['id'] . '</td>';
 								echo '<td>'. $row['nombre'] . '</td>';
+								echo '<td>'. $row['nombre_corto'] . '</td>';
 								echo '<td>$'. $row['precio'] . '</td>';
 								echo '<td>'. $row['usuario'] . '</td>';
 								echo '<td>';

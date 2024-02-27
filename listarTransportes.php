@@ -65,10 +65,9 @@ if(empty($_SESSION['user']))
                         <thead>
                           <tr>
                             <th>ID</th>
-                            <th>Nombre</th>
-                            <th>Tipo</th>
-                            <th>Patente</th>
-                            <th>Usuario</th>
+                            <th>Razon Social</th>
+                            <th>CUIT</th>
+                            <th>Domicilio</th>
                             <th>Opciones</th>
                           </tr>
                         </thead>
@@ -76,15 +75,14 @@ if(empty($_SESSION['user']))
                           <?php 
 							include 'database.php';
 							$pdo = Database::connect();
-							$sql = " SELECT t.id, t.nombre, t.tipo, t.patente, t.id_usuario, t.fecha_hora_alta, u.usuario FROM transportes t left join usuarios u on u.id = t.id_usuario WHERE 1 ";
+							$sql = " SELECT t.id, t.razon_social, t.cuit, t.domicilio, t.id_usuario, t.fecha_hora_alta, u.usuario FROM transportes t left join usuarios u on u.id = t.id_usuario WHERE 1 ";
 							
 							foreach ($pdo->query($sql) as $row) {
 								echo '<tr>';
 								echo '<td>'. $row['id'] . '</td>';
-								echo '<td>'. $row['nombre'] . '</td>';
-								echo '<td>'. $row['tipo'] . '</td>';
-								echo '<td>'. $row['patente'] . '</td>';
-								echo '<td>'. $row['usuario'] . '</td>';
+								echo '<td>'. $row['razon_social'] . '</td>';
+								echo '<td>'. $row['cuit'] . '</td>';
+								echo '<td>'. $row['domicilio'] . '</td>';
 								echo '<td>';
 									echo '<a href="modificarTransporte.php?id='.$row[0].'"><img src="img/icon_modificar.png" width="24" height="25" border="0" alt="Modificar" title="Modificar"></a>';
 									echo '&nbsp;&nbsp;';
@@ -113,7 +111,7 @@ if(empty($_SESSION['user']))
     </div>
 	<?php 
 	$pdo = Database::connect();
-	$sql = " SELECT id, nombre, tipo, id_usuario, fecha_hora_alta FROM `transportes` WHERE 1 ";
+	$sql = " SELECT id, razon_social, cuit, id_usuario, fecha_hora_alta FROM `transportes` WHERE 1 ";
 	foreach ($pdo->query($sql) as $row) {
 	?>
 	<div class="modal fade" id="eliminarModal_<?php echo $row[0];?>" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">

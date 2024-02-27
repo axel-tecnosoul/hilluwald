@@ -23,9 +23,9 @@
 		$pdo = Database::connect();
 		$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 		
-		$sql = "UPDATE cultivos set nombre = ?, precio = ?, id_usuario = ? where id = ?";
+		$sql = "UPDATE cultivos set nombre = ?, nombre_corto = ?, precio = ?, id_usuario = ? where id = ?";
 		$q = $pdo->prepare($sql);
-		$q->execute(array($_POST['nombre'],$_POST['precio'],$_POST['id_usuario'],$_GET['id']));
+		$q->execute(array($_POST['nombre'], $_POST['nombre_corto'],$_POST['precio'],$_SESSION['user']['id_perfil'],$_GET['id']));
 		
 		Database::disconnect();
 		
@@ -35,7 +35,7 @@
 		
 		$pdo = Database::connect();
 		$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-		$sql = "SELECT id, nombre, precio, id_usuario FROM cultivos WHERE id = ? ";
+		$sql = "SELECT id, nombre, nombre_corto, precio, id_usuario FROM cultivos WHERE id = ? ";
 		$q = $pdo->prepare($sql);
 		$q->execute(array($id));
 		$data = $q->fetch(PDO::FETCH_ASSOC);
@@ -102,34 +102,15 @@
 								<label class="col-sm-3 col-form-label">Nombre</label>
 								<div class="col-sm-9"><input name="nombre" type="text" maxlength="99" class="form-control" value="<?php echo $data['nombre']; ?>" required="required"></div>
 							</div>
-                            <div class="form-group row">
+              <div class="form-group row">
+								<label class="col-sm-3 col-form-label">Nombre Corto</label>
+								<div class="col-sm-9"><input name="nombre_corto" type="text" maxlength="99" class="form-control" value="<?php echo $data['nombre_corto']; ?>" required="required"></div>
+							</div>
+              <div class="form-group row">
 								<label class="col-sm-3 col-form-label">Precio</label>
 								<div class="col-sm-9"><input name="precio" type="text" maxlength="99" class="form-control" value="<?php echo $data['precio']; ?>" required="required"></div>
 							</div>
-                            <div class="form-group row">
-                                <label class="col-sm-3 col-form-label">Usuarios</label>
-                                <div class="col-sm-9">
-                                    <select name="id_usuario" id="id_usuario" class="js-example-basic-single col-sm-12" required>
-                                        <option value="">Seleccione...</option><?php
-                                        $pdo = Database::connect();
-                                        $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-                                        $sqlZon = "SELECT id, usuario FROM usuarios WHERE activo = 1";
-                                        if ($_SESSION['user']['id_perfil'] != 1) {
-                                        $sqlZon .= " and id = ".$_SESSION['user']['id_usuario']; 
-                                        }
-                                        $q = $pdo->prepare($sqlZon);
-                                        $q->execute();
-                                        while ($fila = $q->fetch(PDO::FETCH_ASSOC)) {
-                                        $selected="";
-                                        if($fila['id']==$data["id_usuario"]){
-                                            $selected="selected";
-                                        }
-                                        echo "<option value='".$fila['id']."' $selected>".$fila['usuario']."</option>";
-                                        }
-                                        Database::disconnect();?>
-                                    </select>
-                                </div>
-                            </div>
+                            
                         </div>
                       </div>
                     </div>
