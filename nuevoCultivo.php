@@ -76,27 +76,47 @@
                   </div>
 				          <form class="form theme-form" role="form" method="post" action="nuevoCultivo.php">
                     <div class="card-body">
-                      <div class="row">
-                        <div class="col">
-						
-							<div class="form-group row">
-								<label class="col-sm-3 col-form-label">Nombres</label>
-								<div class="col-sm-9"><input name="nombre" type="text" maxlength="99" class="form-control" value="" required="required"></div>
-							</div>
-              <div class="form-group row">
-								<label class="col-sm-3 col-form-label">Nombre Corto</label>
-								<div class="col-sm-9"><input name="nombre_corto" type="text" maxlength="99" class="form-control" value="" required="required"></div>
-							</div>
-                            <div class="form-group row">
-								<label class="col-sm-3 col-form-label">Precio</label>
-								<div class="col-sm-9"><input name="precio" type="text" maxlength="99" class="form-control" value="" required="required"></div>
-							</div>
+                      <div class="form-group row">
+                        <label class="col-sm-3 col-form-label">Nombres</label>
+                        <div class="col-sm-9"><input name="nombre" type="text" maxlength="99" class="form-control" value="" required="required"></div>
+                      </div>
+                      <div class="form-group row">
+                        <label class="col-sm-3 col-form-label">Nombre Corto</label>
+                        <div class="col-sm-9"><input name="nombre_corto" type="text" maxlength="99" class="form-control" value="" required="required"></div>
+                      </div>
+                      <div class="form-group row">
+                        <label class="col-sm-3 col-form-label">Precio</label>
+                        <div class="col-sm-9"><input name="precio" type="text" maxlength="99" class="form-control" value="" required="required"></div>
+                      </div>
+                      <div class="form-group row">
+                        <label class="col-sm-3 col-form-label">Icono</label>
+                        <div class="col-sm-9">
+                          <div class="btn-group btn-group-toggle" data-toggle="buttons"><?php
+                            foreach ($aIconos as $icono) {?>
+                              <label class="btn btn-outline-primary">
+                                <input type="radio" value="<?=$icono?>" name="icon" id="icon1" autocomplete="off">
+                                <i class="<?=$icono?>" aria-hidden="true"></i>
+                              </label><?php
+                            }?>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="form-group row">
+                        <label class="col-sm-3 col-form-label">Color del icono</label>
+                        <div class="col-sm-9">
+                          <input type="color" id="basic-color" name="basic-color" list="basic-colors">
+                          <datalist id="basic-colors"><?php
+                            foreach ($aColores as $codigo => $nombre) {?>
+                              <option value="<?=$codigo?>"><?=$nombre?></option><?php
+                            }?>
+                          </datalist>
+                        </div>
                       </div>
                     </div>
                     <div class="card-footer">
                       <div class="col-sm-9 offset-sm-3">
                         <button class="btn btn-primary" type="submit">Crear</button>
-						<a href="listarCultivos.php" class="btn btn-light">Volver</a>
+						            <a href="listarCultivos.php" class="btn btn-light">Volver</a>
                       </div>
                     </div>
                   </form>
