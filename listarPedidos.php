@@ -68,9 +68,9 @@ include_once("funciones.php");?>
                 <div class="card">
                   <div class="card-header">
                     <h5>Pedidos
-                      &nbsp;<a href="nuevoPedido.php"><img src="img/icon_alta.png" width="24" height="25" border="0" alt="Nuevo Pedido" title="Nuevo Pedido"></a>
+                      <!-- &nbsp;<a href="nuevoPedido.php"><img src="img/icon_alta.png" width="24" height="25" border="0" alt="Nuevo Pedido" title="Nuevo Pedido"></a>
+                      &nbsp;<a href="listarPedidosAnuladas.php"><img src="img/canceled.png" width="24" height="25" border="0" alt="Pedidos Eliminados" title="Pedidos Eliminados"></a> -->
                       <!-- &nbsp;<a href="exportPedidos.php"><img src="img/xls.png" width="24" height="25" border="0" alt="Exportar Pedidos" title="Exportar Pedidos"></a> -->
-                      &nbsp;<a href="listarPedidosAnuladas.php"><img src="img/canceled.png" width="24" height="25" border="0" alt="Pedidos Eliminados" title="Pedidos Eliminados"></a>
                     </h5>
                   </div>
                   <div class="card-body">

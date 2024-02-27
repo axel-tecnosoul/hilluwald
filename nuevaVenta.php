@@ -8,8 +8,35 @@ if(empty($_SESSION['user'])){
   die("Redirecting to index.php"); 
 }
 require 'database.php';
+include 'vendor/afip/Afip.php';
+include 'config_facturacion_electronica.php';//poner $homologacion=1 para facturar en modo homologacion. Retorna $aInitializeAFIP.
 
 if ( !empty($_POST)) {
+  $facturacion=$_POST["facturacion"];
+  
+  if($facturacion!="Sin factura"){
+    $afip = new Afip($aInitializeAFIP);
+    $server_status = (array) $afip->ElectronicBilling->GetServerStatus();
+    //var_dump($server_status);
+    //$server_status["AppServer"]="Error";
+    //$server_status["DbServer"]="Error2";
+    //$server_status["AuthServer"]="Error3";
+    $afip_ok=0;
+    foreach($server_status as $key => $value){
+      if($key!="DbServer"){//este parametro no lo contemplamos porque casi siempre está en NO y funciona igual
+        if($value!="OK"){
+          if($afip_ok==0){
+            echo "<br>AFIP informa los siguientes errores:<br>";
+          }
+          $afip_ok++;
+          echo "<b>".$key.":</b> ".$value."<br>";
+        }
+      }
+    }
+    if($afip_ok>0){
+      die("Actualiza la página para volver a intentarlo o vuelve mas tarde.");
+    }
+  }
   // insert data
   $pdo = Database::connect();
   $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
@@ -21,16 +48,16 @@ if ( !empty($_POST)) {
   
   if ($modoDebug==1) {
     var_dump($_POST);
-    var_dump($_GET);
   }
 
   //$id_cliente=($_POST['id_cliente']) ?: NULL;
+  $total=array_sum($_POST["subtotal"]);
   
-  $sql = "INSERT INTO pedidos (id_cliente, fecha, campana, id_usuario) VALUES (?,?,?,?)";
+  $sql = "INSERT INTO ventas (fecha_venta, id_cliente, facturacion, total, modalidad_pago, observaciones, id_usuario, anulada) VALUES (?,?,?,?,?,?,?,0)";
   $q = $pdo->prepare($sql);
-  $params=array($_GET['id_cliente'],$_POST['fecha'],$_POST['campana'],$_SESSION['user']['id']);
+  $params=array($_POST['fecha'],$_POST['id_cliente'],$facturacion,$total,$_POST["modalidad_pago"],$_POST['observaciones'],$_SESSION['user']['id']);
   $q->execute($params);
-  $id_pedido = $pdo->lastInsertId();
+  $idVenta = $pdo->lastInsertId();
 
   $aDebug[]=[
     "consulta"=>$sql,
@@ -44,25 +71,36 @@ if ( !empty($_POST)) {
     echo "<br><br>";
   }
   
-  //$cantPrendas = count($_POST["id_cultivo"]);
+  //$cantPrendas = count($_POST["id_producto"]);
 
   $aProductos=[];
 
   $cantProdOK=0;
-  foreach ($_POST['id_cultivo'] as $key => $id_cultivo) {
+  foreach ($_POST['id_producto'] as $key => $id_producto) {
     $cantidad = $_POST['cantidad'][$key];
 
     if($cantidad>0){
+      
+      $subtotal = $_POST['subtotal'][$key];
+      $precio = $_POST['precio'][$key];
+      $iva = $_POST['iva'][$key];
 
       $aProductos[]=[
-        "id_cultivo"=>$id_cultivo,
+        "id_producto"=>$id_producto,
         "cantidad"=>$cantidad,
+        "precio"=>$precio,
+        "subtotal"=>$subtotal,
+        "iva"=>$iva,
       ];
 
-      $sql = "INSERT INTO pedidos_detalle (id_pedido, id_cultivo, cantidad_plantines) VALUES (?,?,?)";
+      if($subtotal==$cantidad*$precio){
+        //echo "el subtotal coicide<br><br>";
+      }
+
+      $sql = "INSERT INTO ventas_detalle (id_venta, id_producto, cantidad, precio, iva, subtotal) VALUES (?,?,?,?,?,?)";
       $q = $pdo->prepare($sql);
-      //$q->execute(array($idVenta,$id_cultivo,$cantidad,$precio,$subtotal,$modalidad,$pagado));
-      $params=array($id_pedido,$id_cultivo,$cantidad);
+      //$q->execute(array($idVenta,$id_producto,$cantidad,$precio,$subtotal,$modalidad,$pagado));
+      $params=array($idVenta,$id_producto,$cantidad,$precio,$iva,$subtotal);
       $q->execute($params);
       $afe=$q->rowCount();
 
@@ -82,6 +120,22 @@ if ( !empty($_POST)) {
         "afe"=>$q->rowCount(),
       ];
 
+      $sql = "UPDATE productos SET precio = ? WHERE id = ?";
+      $q = $pdo->prepare($sql);
+      $params=array($precio,$id_producto);
+      $q->execute($params);
+
+      $aDebug[]=[
+        "consulta"=>$sql,
+        "params"=>$params,
+        "afe"=>$q->rowCount(),
+      ];
+
+      if ($modoDebug==1) {
+        $q->debugDumpParams();
+        echo "<br><br>Afe: ".$q->rowCount();
+        echo "<br><br>";
+      }
     }
     
   }
@@ -100,6 +154,283 @@ if ( !empty($_POST)) {
     var_dump($aDebug);
     die("Ha ocurrido un error al cargar los productos de la venta");
   }
+  
+  if($facturacion!="Sin factura"){
+
+    $afip = new Afip($aInitializeAFIP);
+    $server_status = $afip->ElectronicBilling->GetServerStatus();
+    /*echo 'Este es el estado del servidor:';
+    var_dump($server_status);*/
+
+    // Arreglo auxiliar para ir almacenando las sumas de los elementos con el mismo valor de iva
+    $sumasPorIva = array();
+    // Usamos array_reduce() para iterar sobre los elementos del arreglo original y agruparlos por el valor de iva
+    $agrupadosPorIva = array_reduce($aProductos, function($acumulador, $elemento) use(&$sumasPorIva) {
+        $iva = $elemento['iva'];
+        if (!isset($acumulador[$iva])) {
+            $acumulador[$iva] = array();
+            $sumasPorIva[$iva] = 0;
+        }
+        $acumulador[$iva][] = $elemento;
+        $sumasPorIva[$iva] += $elemento['subtotal'];
+        return $acumulador;
+    }, array());
+    /*echo "Arreglo agrupado por iva:\n";
+    var_dump($agrupadosPorIva);*/
+
+    if ($modoDebug==1) {
+      var_dump($sumasPorIva);
+    }
+    
+    $sql = "SELECT valor FROM parametros WHERE id = 6 ";
+    $q = $pdo->prepare($sql);
+    $q->execute();
+    $data = $q->fetch(PDO::FETCH_ASSOC);
+    $monto_maximo_factura_consumidor_final=$data["valor"];
+
+    $aFacturas = array();
+
+    $punto_venta=2;
+    $tipo_comprobante=1;//1 -> Factura A
+    $tipo_comprobante_bbdd="A";
+    $DocTipo=80;
+    $DocNro=$_POST["cuit"];
+    if($facturacion=="Consumidor Final"){
+
+      $tipo_comprobante=6;//6 -> Factura B
+      $tipo_comprobante_bbdd="B";
+      $DocTipo=99;
+      $DocNro=0;
+
+      if ($modoDebug==1) {
+        echo "total>monto_maximo_factura_consumidor_final<br>";
+        echo $total.">".$monto_maximo_factura_consumidor_final."<br>";
+        var_dump($total>$monto_maximo_factura_consumidor_final);
+        echo "<br><br>";
+      }
+
+      if($total>$monto_maximo_factura_consumidor_final){
+
+        foreach ($sumasPorIva as $iva => $monto) {
+          $cant_facturas=intval($monto/$monto_maximo_factura_consumidor_final);
+          $monto_ultima_factura=$monto-($cant_facturas*$monto_maximo_factura_consumidor_final);
+          
+          /*echo "generar $cant_facturas facturas al $iva% de $monto_maximo_factura_consumidor_final y 1 factura de $monto_ultima_factura<br>";
+          echo $cant_facturas."*".$monto_maximo_factura_consumidor_final."+".$monto_ultima_factura."=".(($cant_facturas*$monto_maximo_factura_consumidor_final)+$monto_ultima_factura)."<br>";
+          echo "monto=".$monto."<hr>";*/
+  
+          //completamos el array de facturas para generar $cant_facturas por el valor $monto_maximo_factura_consumidor_final
+          for ($i=0; $i < $cant_facturas; $i++) { 
+            $aFacturas[]=[
+              $iva=>$monto_maximo_factura_consumidor_final,
+            ];
+          }
+          //si queda un saldo según el total del pedido lo agregamos al final del array de facturas
+          if($monto_ultima_factura>0){
+            $aFacturas[]=[
+              $iva=>$monto_ultima_factura,
+            ];
+          }
+        }
+      }else{
+        $aFacturas[]=$sumasPorIva;
+      }
+    }else{
+      //para la factura A el array de facturas tiene 1 solo valor y está discriminado por IVA
+      $aFacturas[]=$sumasPorIva;
+    }
+
+    if ($modoDebug==1) {
+      var_dump($aFacturas);
+    }
+
+    $cantFacturasOK=0;
+    $porcentaje_ingresos_brutos=0;
+    $porcentaje_percepcion_iva=0;
+    if($tipo_comprobante_bbdd=="A"){
+      $porcentaje_ingresos_brutos=3.31;
+      //$porcentaje_percepcion_iva=3;
+    }
+
+    $monto_tributos=0;
+    $aIngresosBrutos=[];
+    foreach ($aFacturas as $factura) {
+
+      $ImpTotal=array_sum($factura);
+      
+      $aIva=[];
+      $sumaIVA=$sumaNuevoIVA=0;
+      $ImpNeto=$ImpTotal;
+      $ImpNeto=0;
+      
+      //declaramos los tipos de IVA de la factura
+      $sumaBaseImp=0;
+      foreach ($factura as $iva => $monto) {
+        $IdIVA=4;
+        if($iva==21){
+          $IdIVA=5;
+        }
+
+        $total_impuestos=$iva+$porcentaje_ingresos_brutos+$porcentaje_percepcion_iva;
+
+        //echo $monto."<br>";
+        //echo $total_impuestos."<br>";
+        //$baseImponible=round($monto/(($total_impuestos/100)+1),2);//1.21
+        $baseImponible=round($monto/(($iva/100)+1),2);//1.21
+        //var_dump($baseImponible);
+        $sumaBaseImp+=$baseImponible;
+
+        $ImpIVA=round(($baseImponible * $iva) / 100, 2);
+        $nuevoImpIVA=round(($baseImponible * $iva) / 100, 2);
+        /*var_dump($ImpIVA);
+        var_dump($nuevoImpIVA);*/
+
+        $sumaIVA+=$ImpIVA;
+        $sumaNuevoIVA+=$nuevoImpIVA;
+
+        $aIva[]=array(
+          'Id'=> $IdIVA, // Id del tipo de IVA (5 para 21%)(ver tipos disponibles) 
+          'BaseImp'=> number_format($baseImponible,2,".",""),//100, // Base imponible -> ES IGUAL A ImpNeto?
+          'Importe'=> number_format($ImpIVA,2,".",""),//21 // Importe -> ES IGUAL A ImpIVA?
+        );
+
+        $monto_percepcion_iva=$monto_ingresos_brutos=0;
+        if($tipo_comprobante_bbdd=="A"){
+
+          //$baseImponible = $baseImponible / ((100 + $porcentaje_ingresos_brutos + $porcentaje_percepcion_iva) / 100);
+          $baseImponible=$sumaBaseImp;
+          $monto_ingresos_brutos = round($baseImponible * $porcentaje_ingresos_brutos / 100, 2);
+          //$monto_percepcion_iva = round($baseImponible * $porcentaje_percepcion_iva / 100, 2);
+
+          $monto_tributos=$monto_ingresos_brutos+$monto_percepcion_iva;
+          
+          $aIngresosBrutos=[//array( // (Opcional) Tributos asociados al comprobante
+            [
+              'Id' => 2, // Id del tipo de tributo (ver tipos disponibles) 
+              'Desc' => 'Ingresos Brutos', // (Opcional) Descripcion
+              'BaseImp' => $baseImponible, // Base imponible para el tributo
+              'Alic' => $porcentaje_ingresos_brutos, // Alícuota
+              'Importe' => $monto_ingresos_brutos // Importe del tributo
+            ]/*,[
+              'Id' => 1, // Id del tipo de tributo (ver tipos disponibles) 
+              'Desc' => 'Percepcion del IVA', // (Opcional) Descripcion
+              'BaseImp' => $baseImponible, // Base imponible para el tributo
+              'Alic' => $porcentaje_percepcion_iva, // Alícuota
+              'Importe' => $monto_percepcion_iva // Importe del tributo
+            ]*/
+          ];
+        }
+      }
+
+      //echo $ImpTotal."<br>";
+      //echo $monto_tributos."<br>";
+      $ImpTotal+=$monto_tributos;
+      //echo $ImpTotal."<br>";
+
+      /*var_dump($sumaIVA);
+      var_dump($sumaNuevoIVA);*/
+
+      $ImpNeto=number_format($ImpNeto,2,".","");
+      $sumaIVA=number_format($sumaIVA,2,".","");
+      $monto_tributos=number_format($monto_tributos,2,".","");
+
+      if($tipo_comprobante_bbdd=="A"){
+        $monto_ingresos_brutos=number_format($monto_ingresos_brutos,2,".","");
+        $monto_percepcion_iva=number_format($monto_percepcion_iva,2,".","");
+        //$aIngresosBrutos=[];
+        //$aIngresosBrutos['Tributos']=[
+      }
+
+      //$fecha=date('Y-m-d');
+      $fecha=$_POST["fecha"];
+
+      //$ImpNeto=$ImpTotal-$sumaIVA-$monto_tributos;
+      $ImpNeto=$sumaBaseImp;
+      $data = array(
+        'CantReg' 	=> 1,  // Cantidad de comprobantes a registrar
+        'PtoVta' 	=> $punto_venta,  // Punto de venta
+        'CbteTipo' 	=> $tipo_comprobante,  // Tipo de comprobante (ver tipos disponibles) 
+        'Concepto' 	=> 1,  // Concepto del Comprobante: (1)Productos, (2)Servicios, (3)Productos y Servicios
+        'DocTipo' 	=> $DocTipo, // Tipo de documento del comprador (99 consumidor final, ver tipos disponibles). Para comprobantes clase A y M el campo DocTipo debe ser igual a 80 (CUIT)
+        'DocNro' 	=> $DocNro,  // Número de documento del comprador (0 consumidor final)
+        'CbteDesde' 	=> 2,  // Número de comprobante o numero del primer comprobante en caso de ser mas de uno
+        'CbteHasta' 	=> 2,  // Número de comprobante o numero del último comprobante en caso de ser mas de uno
+        'CbteFch' 	=> intval(date('Ymd',strtotime($fecha))), // (Opcional) Fecha del comprobante (yyyymmdd) o fecha actual si es nulo
+        'ImpTotal' 	=> number_format($ImpTotal,2,".",""),//121, // Importe total del comprobante
+        'ImpTotConc' 	=> 0,   // Importe neto no gravado
+        'ImpNeto' 	=> $ImpNeto,//100, // Importe neto gravado
+        'ImpOpEx' 	=> 0,   // Importe exento de IVA
+        'ImpIVA' 	=> $sumaIVA,//21,  //Importe total de IVA
+        //'ImpTrib' 	=> 0,   //Importe total de tributos
+        'ImpTrib' 	=> $monto_tributos,   //Importe total de tributos
+        'MonId' 	=> 'PES', //Tipo de moneda usada en el comprobante (ver tipos disponibles)('PES' para pesos argentinos) 
+        'MonCotiz' 	=> 1,     // Cotización de la moneda usada (1 para pesos argentinos)  
+        'Iva'=>$aIva, // (Opcional) Alícuotas asociadas al comprobante
+      );
+
+      if($tipo_comprobante_bbdd=="A"){
+        $data['Tributos']=$aIngresosBrutos;
+      }
+
+      if ($modoDebug==1) {
+        var_dump($data);
+      }
+      
+      //$res = $afip->ElectronicBilling->CreateVoucher($data);
+      $res = $afip->ElectronicBilling->CreateNextVoucher($data);
+
+      $estado="E";
+      $CAE=NULL;
+      $CAEFchVto=NULL;
+      $voucher_number=NULL;
+      if(isset($res['CAE'])){
+        $estado="A";
+        $CAE=$res['CAE'];//CAE asignado el comprobante
+        $CAEFchVto=$res['CAEFchVto'];//Fecha de vencimiento del CAE (yyyy-mm-dd)
+        $voucher_number=$res['voucher_number'];//Número asignado al comprobante
+        //var_dump($res);
+      }
+      
+      if ($modoDebug==1) {
+        var_dump($res);
+        var_dump($CAE);
+        var_dump($CAEFchVto);
+        var_dump($voucher_number);
+      }
+
+      /*$sql = "INSERT INTO facturas (id_venta,fecha_cbte,tipo_doc,dni,tipo_comprobante,total_bruto,total_neto,id_iva,total_iva,alicuota_ingresos_brutos,total_ingresos_brutos,punto_venta,numero_cbte,estado,cae,fecha_vto_cae,id_cbte_relacionado) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,NULL)";
+      $q = $pdo->prepare($sql);
+      $params=array($idVenta,$fecha,$DocTipo,$DocNro,$tipo_comprobante_bbdd,$ImpTotal,$ImpNeto,$IdIVA,$sumaIVA,$porcentaje_ingresos_brutos,$monto_ingresos_brutos,$punto_venta,$voucher_number,$estado,$CAE,$CAEFchVto);*/
+      $sql = "INSERT INTO facturas (id_venta,fecha_cbte,tipo_doc,dni,tipo_comprobante,total_bruto,total_neto,id_iva,total_iva,alicuota_ingresos_brutos,total_ingresos_brutos,alicuota_percepcion_iva,total_percepcion_iva,punto_venta,numero_cbte,estado,cae,fecha_vto_cae,id_cbte_relacionado) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,NULL)";
+      $q = $pdo->prepare($sql);
+      $params=array($idVenta,$fecha,$DocTipo,$DocNro,$tipo_comprobante_bbdd,$ImpTotal,$ImpNeto,$IdIVA,$sumaIVA,$porcentaje_ingresos_brutos,$monto_ingresos_brutos,$porcentaje_percepcion_iva,$monto_percepcion_iva,$punto_venta,$voucher_number,$estado,$CAE,$CAEFchVto);
+      $q->execute($params);
+      $afe=$q->rowCount();
+
+      if($afe==1){
+        $cantFacturasOK++;
+      }
+
+      $aDebug[]=[
+        "consulta"=>$sql,
+        "params"=>$params,
+        "afe"=>$q->rowCount(),
+      ];
+
+      if ($modoDebug==1) {
+        $q->debugDumpParams();
+        echo "<br><br>Afe: ".$q->rowCount();
+        echo "<br><br>";
+      }
+    }
+
+    if($cantFacturasOK!=count($aFacturas)){
+      $pdo->rollBack();
+      var_dump($aDebug);
+      die("Ha ocurrido un error con las factuas");
+    }
+
+  }
 
   if ($modoDebug==1) {
     $pdo->rollBack();
@@ -109,7 +440,7 @@ if ( !empty($_POST)) {
   $pdo->commit();
   Database::disconnect();
   
-  header("Location: verCliente.php?id=".$_GET["id_cliente"]);
+  header("Location: listarVentas.php");
 }
 $id_perfil=$_SESSION["user"]["id_perfil"];?>
 <!DOCTYPE html>
