@@ -17,7 +17,7 @@
     <li><a class="sidebar-header" href="#"><i data-feather="database"></i><span>Maestros</span><i class="fa fa-angle-right pull-right"></i></a>
         <ul class="sidebar-submenu">
           <li><a href="listarSucursales.php"><i class="fa fa-circle"></i>Sucursales</a></li>
-          <li><a href="listarChoferes.php"><i class="fa fa-circle"></i>Choferes</a></li>
+          <!-- <li><a href="listarChoferes.php"><i class="fa fa-circle"></i>Choferes</a></li> -->
           <li><a href="listarCultivos.php"><i class="fa fa-circle"></i>Cultivos</a></li>
           <li><a href="listarTransportes.php"><i class="fa fa-circle"></i>Transportes</a></li>
           <li><a href="listarUsuarios.php"><i class="fa fa-circle"></i>Usuarios</a></li>

@@ -789,32 +789,27 @@ Database::disconnect();
                 return '<span class="badge '+clase+'">Pedido N° '+row.id_pedido+'</span>';
               }},
               {"data": "campana"},
-              {"data": "cantidad"},
-              {render: function(data, type, row, meta) {
-                return '0';
-              }},
               {
                 render: function(data, type, row, meta) {
-                  if (typeof row.cantidad !== 'undefined') {
-                    //return new Intl.NumberFormat('es-AR', {style: 'decimal'}).format(row.cantidad);
-                    return row.cantidad;
-                  } else {
-                    return '';
-                  }
+                  return row.cantidad;
                 },
                 className: 'dt-body-right text-right',
               },
               {render: function(data, type, row, meta) {
-                return '0';
+                return '';
               }},
               {
                 render: function(data, type, row, meta) {
-                  if (typeof row.cantidad !== 'undefined') {
-                    //return new Intl.NumberFormat('es-AR', {style: 'decimal'}).format(row.cantidad);
-                    return row.cantidad;
-                  } else {
-                    return '';
-                  }
+                  return row.cantidad;
+                },
+                className: 'dt-body-right text-right',
+              },
+              {render: function(data, type, row, meta) {
+                return '';
+              }},
+              {
+                render: function(data, type, row, meta) {
+                  return row.cantidad;
                 },
                 className: 'dt-body-right text-right',
               },

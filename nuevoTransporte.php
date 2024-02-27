@@ -78,6 +78,21 @@
                         <div class="row">
                           <div class="col">
                           <div class="form-group row">
+                            <div class="form-group col-4">
+                                <label for="exampleInputEmail1">Email address</label>
+                                <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="Enter email">
+                                <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small>
+                              </div>
+                              <div class="form-group col-4">
+                                <label for="exampleInputEmail1">Email address</label>
+                                <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="Enter email">
+                                <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small>
+                              </div>
+                              <div class="form-group col-4">
+                                <label for="exampleInputEmail1">Email address</label>
+                                <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="Enter email">
+                                <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small>
+                              </div>
                             <div class="col-sm-12">
                               <table class="table-detalle table table-bordered table-hover text-center" id="tableTransporte">
                                 <thead>
@@ -109,7 +124,7 @@
                       <div class="row">
                         <div class="col-sm-6">
                           <div class="card-header">
-                              <h5 class="text-center">Nuevo Chofer</h5>
+                              <h4 class="text-center">Choferes</h4>
                           </div>
                           <div class="form-group row">
                             <div class="col-sm-12">
@@ -138,8 +153,7 @@
                                 </tbody>
                                 <tfoot>
                                   <tr>
-                                    <td colspan="2"></td>
-                                    <td colspan="4" align='center'>
+                                    <td colspan="3" align='right'>
                                       <input type="button" class="btn btn-dark" id="addRowChofer" value="Agregar Chofer">
                                       <input type="hidden" name="emailEliminados" id="emailEliminados">
                                     </td>
@@ -152,7 +166,7 @@
 
                         <div class="col-sm-6">
                           <div class="card-header">
-                              <h5 class="text-center">Nuevo Vehiculos</h5>
+                              <h4 class="text-center">Vehiculos</h4>
                           </div>
                           <div class="card-body p-0">
                             <div class="form-group row">
@@ -187,8 +201,7 @@
                                 </tbody>
                                 <tfoot>
                                   <tr>
-                                    <td colspan="3"></td>
-                                    <td colspan="1" align='center'>
+                                    <td colspan="4" align='right'>
                                       <input type="button" class="btn btn-dark " id="addRowVehiculo" value="Agregar Vehiculo">
                                       <input type="hidden" name="emailEliminados" id="emailEliminados">
                                     </td>
