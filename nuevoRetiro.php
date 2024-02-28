@@ -25,12 +25,12 @@ if ( !empty($_POST)) {
   }
 
   //$id_cliente=($_POST['id_cliente']) ?: NULL;
-  
-  $sql = "INSERT INTO pedidos (id_cliente, fecha, campana, id_usuario) VALUES (?,?,?,?)";
+
+  $sql = "INSERT INTO remitos (fecha, id_cliente, id_cliente_retira, campana, id_transporte, id_chofer, id_vehiculo, id_usuario) VALUES (?,?,?,?,?,?,?,?)";
   $q = $pdo->prepare($sql);
-  $params=array($_GET['id_cliente'],$_POST['fecha_pedido'],$_POST['campana_pedido'],$_SESSION['user']['id']);
+  $params=array($_POST['fecha_retiro'],$_GET['id_cliente'],$_POST['id_cliente_retira'],$_POST['campana_retiro'],$_POST['id_transporte'],$_POST['id_chofer'],$_POST['id_vehiculo'],$_SESSION['user']['id']);
   $q->execute($params);
-  $id_pedido = $pdo->lastInsertId();
+  $id_remito = $pdo->lastInsertId();
 
   $aDebug[]=[
     "consulta"=>$sql,
@@ -59,10 +59,10 @@ if ( !empty($_POST)) {
         "cantidad"=>$cantidad,
       ];
 
-      $sql = "INSERT INTO pedidos_detalle (id_pedido, id_cultivo, cantidad_plantines) VALUES (?,?,?)";
+      $sql = "INSERT INTO remitos_detalle (id_remito, id_cultivo, cantidad_plantines) VALUES (?,?,?)";
       $q = $pdo->prepare($sql);
       //$q->execute(array($idVenta,$id_cultivo,$cantidad,$precio,$subtotal,$modalidad,$pagado));
-      $params=array($id_pedido,$id_cultivo,$cantidad);
+      $params=array($id_remito,$id_cultivo,$cantidad);
       $q->execute($params);
       $afe=$q->rowCount();
 

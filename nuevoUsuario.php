@@ -28,7 +28,7 @@
 <html lang="en">
   <head>
     <?php include('head_forms.php');?>
-	<link rel="stylesheet" type="text/css" href="assets/css/select2.css">
+  	<link rel="stylesheet" type="text/css" href="assets/css/select2.css">
   </head>
   <script>
 	function jsSucursal() {
@@ -109,40 +109,36 @@
 							<div class="form-group row">
 								<label class="col-sm-3 col-form-label">Perfil</label>
 								<div class="col-sm-9">
-								<select name="id_perfil" id="id_perfil" class="js-example-basic-single col-sm-12" required="required" onchange="jsSucursal();">
-								<option value="">Seleccione...</option>
-								<?php 
-								$pdo = Database::connect();
-								$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-								$sqlZon = "SELECT `id`, `perfil` FROM `perfiles` WHERE 1";
-								$q = $pdo->prepare($sqlZon);
-								$q->execute();
-								while ($fila = $q->fetch(PDO::FETCH_ASSOC)) {
-									echo "<option value='".$fila['id']."'";
-									echo ">".$fila['perfil']."</option>";
-								}
-								Database::disconnect();
-								?>
-								</select>
+                  <select name="id_perfil" id="id_perfil" class="js-example-basic-single" style="width: 100%;" required="required" onchange="jsSucursal();">
+                    <option value="">Seleccione...</option><?php
+                    $pdo = Database::connect();
+                    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+                    $sqlZon = "SELECT `id`, `perfil` FROM `perfiles` WHERE 1";
+                    $q = $pdo->prepare($sqlZon);
+                    $q->execute();
+                    while ($fila = $q->fetch(PDO::FETCH_ASSOC)) {
+                      echo "<option value='".$fila['id']."'";
+                      echo ">".$fila['perfil']."</option>";
+                    }
+                    Database::disconnect();?>
+                  </select>
 								</div>
 							</div>
 							<div class="form-group row">
 								<label class="col-sm-3 col-form-label">Sucursal</label>
 								<div class="col-sm-9">
-								<select name="id_sucursal" id="id_sucursal" class="js-example-basic-single col-sm-12" disabled="disabled">
-								<option value="">Seleccione...</option>
-								<?php 
-								$pdo = Database::connect();
-								$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-								$sqlZon = "SELECT `id`, `nombre` FROM `sucursales` WHERE 1";
-								$q = $pdo->prepare($sqlZon);
-								$q->execute();
-								while ($fila = $q->fetch(PDO::FETCH_ASSOC)) {
-									echo "<option value='".$fila['id']."'";
-									echo ">".$fila['nombre']."</option>";
-								}
-								Database::disconnect();
-								?>
+								<select name="id_sucursal" id="id_sucursal" class="js-example-basic-single" style="width: 100%;" disabled="disabled">
+                  <option value="">Seleccione...</option><?php 
+                  $pdo = Database::connect();
+                  $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+                  $sqlZon = "SELECT `id`, `nombre` FROM `sucursales` WHERE 1";
+                  $q = $pdo->prepare($sqlZon);
+                  $q->execute();
+                  while ($fila = $q->fetch(PDO::FETCH_ASSOC)) {
+                    echo "<option value='".$fila['id']."'";
+                    echo ">".$fila['nombre']."</option>";
+                  }
+                  Database::disconnect();?>
 								</select>
 								</div>
 							</div>
@@ -152,7 +148,7 @@
                     <div class="card-footer">
                       <div class="col-sm-9 offset-sm-3">
                         <button class="btn btn-primary" type="submit">Crear</button>
-						<a href="listarUsuarios.php" class="btn btn-light">Volver</a>
+						            <a href="listarUsuarios.php" class="btn btn-light">Volver</a>
                       </div>
                     </div>
                   </form>
@@ -163,7 +159,7 @@
           <!-- Container-fluid Ends-->
         </div>
         <!-- footer start-->
-		<?php include("footer.php"); ?>
+		    <?php include("footer.php"); ?>
       </div>
     </div>
     <!-- latest jquery-->
@@ -178,18 +174,14 @@
     <script src="assets/js/sidebar-menu.js"></script>
     <script src="assets/js/config.js"></script>
     <!-- Plugins JS start-->
-    <script src="assets/js/typeahead/handlebars.js"></script>
-    <script src="assets/js/typeahead/typeahead.bundle.js"></script>
-    <script src="assets/js/typeahead/typeahead.custom.js"></script>
     <script src="assets/js/chat-menu.js"></script>
     <script src="assets/js/tooltip-init.js"></script>
-    <script src="assets/js/typeahead-search/handlebars.js"></script>
-    <script src="assets/js/typeahead-search/typeahead-custom.js"></script>
+
     <!-- Plugins JS Ends-->
     <!-- Theme js-->
     <script src="assets/js/script.js"></script>
     <!-- Plugin used-->
-	<script src="assets/js/select2/select2.full.min.js"></script>
+	  <script src="assets/js/select2/select2.full.min.js"></script>
     <script src="assets/js/select2/select2-custom.js"></script>
 	
   </body>

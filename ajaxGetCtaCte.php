@@ -1,25 +1,10 @@
 <?php
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
-include 'database.php';
-include 'funciones.php';
-session_start();
-$aPedidos=[];
-
-$pdo = Database::connect();
-$columns = $_GET['columns'];
-
-//$data_columns = ["","p.cb","p.codigo","c.categoria","p.descripcion","CONCAT(pr.nombre,' ',pr.apellido)","p.precio","p.activo"];//PARA EL ORDENAMIENTO
-
-$data_columns = $fields = ['p.id','date_format(p.fecha,"%d/%m/%Y")','p.campana','pd.cantidad_plantines'];//,'p.estado'
-
-$from="FROM pedidos p INNER JOIN pedidos_detalle pd ON pd.id_pedido=p.id";
-
-$orderBy = " ORDER BY ";
-foreach ($_GET['order'] as $order) {
-  $orderBy .= $data_columns[$order['column']] . " {$order['dir']}, ";
+if (session_status() === PHP_SESSION_NONE) {
+  session_start();
 }
+
+include_once 'database.php';
+$pdo = Database::connect();
 
 $desde=$_GET["desde"];
 $filtroDesde="";
@@ -45,115 +30,182 @@ if($id_cultivo!=0 and $id_cultivo!=""){
   $filtroCultivo=" AND pd.id_cultivo IN ($id_cultivo)";
 }
 
-/*$tipo_comprobante=$_GET["tipo_comprobante"];
-$filtroTipoComprobante="";
-if($tipo_comprobante!=""){
-  $ex=explode(",",$tipo_comprobante);
-  $tipo_comprobante="'".implode("','",$ex)."'";
-  $filtroTipoComprobante=" AND p.facturacion IN ($tipo_comprobante)";
-}*/
-
-//var_dump($orderBy);
-$orderBy = substr($orderBy, 0, -2);
-//var_dump($orderBy);
-$where = "p.anulado = 0";
-/*if ($_SESSION['user']['id_perfil'] != 1) {
-  $where.=" and a.id = ".$_SESSION['user']['id_sucursal']; 
-}*/
-$whereFiltered=$where.$filtroDesde.$filtroHasta.$filtroCliente.$filtroCultivo;//.$filtroTipoComprobante;
-
-foreach ($columns as $k => $column) {
-    if ($search = $column['search']['value']) {
-        $where .= ' AND '.$fields[$k].' = '.$search;
-    }
+function encerrar_entre_comillas($valor) {
+  return '"' . addslashes($valor) . '"';
 }
 
-//$where = substr($where, 0, -5);
+$aCtaCte=[];
+//if($desde<=$hasta and $id_almacen!=0){
+if($desde<=$hasta){
 
-$globalSearch = $_GET['search'];
-/*if ( $globalSearchValue = $globalSearch['value'] ) {
-	$where .= ($where ? $where.' AND ' : '' )."name LIKE '%$globalSearchValue%'";
-}*/
-if ( $globalSearchValue = $globalSearch['value'] ) {
-  $aWhere=[];
-  foreach ($fields as $k => $field) {
-    $aWhere[]=$field.' LIKE "%'.$globalSearchValue.'%"';
-    //$where .= ($where ? $where.' AND ' : '' )."name LIKE '%$globalSearchValue%'";
-  }
-  $where .= '('.implode(' OR ', $aWhere).')';
-}
+  //INICIO SALDO ANTERIOR
+  /*
+  $filtroHastaSaldoAnterior="AND DATE(fecha_hora)<'$desde'";
 
-$length = $_GET['length'];
-$start = $_GET['start'];
+  $aCtaCte[]=[
+    "id_venta"=>0,
+    "id"=>"Saldo anterior",
+    "fecha_hora"=>date("d-m-Y H:i",strtotime($desde)),
+    "motivo"=>"",
+    "detalle"=>"",
+    "forma_pago"=>"",
+    "credito"=>0,
+    "debito"=>0,
+    "saldo"=>$saldo_anterior,
+    "detalle_productos"=>"",
+  ];
 
-//OBTENEMOS EL TOTAL DE REGISTROS
-$countSql = "SELECT count(p.id) as Total $from WHERE $where";
-$countSt = $pdo->query($countSql);
-//echo $countSql;
-$total = $countSt->fetch()['Total'];
-
-
-//OBTENEMOS EL TOTAL DE REGISTROS CON FILTRO APLICADO
-// Data set length after filtering
-//$resFilterLength = self::sql_exec( $db, $bindings,"SELECT COUNT(`id`) FROM productos ".($where ? "WHERE $where " : ''));
-$queryFiltered="SELECT COUNT(p.id) AS recordsFiltered $from ".($whereFiltered ? "WHERE $whereFiltered " : '');
-//var_dump($queryFiltered);
-//echo $queryFiltered;
-
-$resFilterLength = $pdo->query($queryFiltered);
-$recordsFiltered = $resFilterLength->fetch()['recordsFiltered'];
-
-$campos=implode(",", $fields);
-//$fields = ['cb','codigo','categoria','descripcion','nombre','apellido','precio','p.activo','p.id'];
-
-//$sql2 = "SELECT SUM(CASE WHEN p.tipo_comprobante IN ('NCA','NCB') THEN total*-1 ELSE total END) AS total_facturas_recibos $from WHERE $whereFiltered ";
-/*$sql2 = "SELECT SUM(CASE WHEN p.facturacion='nota_credito' THEN total*-1 ELSE total END) AS total_facturas_recibos $from WHERE $whereFiltered ";
-//echo $sql2;
-$row2 = $pdo->query($sql2)->fetch();
-
-$total_facturas_recibos = ($row2['total_facturas_recibos'] ?: 0);*/
-
-//$sql = "SELECT * FROM productos ".($where ? "WHERE $where " : '')."$orderBy LIMIT $length OFFSET $start";
-$sql = "SELECT $campos $from ".($whereFiltered ? "WHERE $whereFiltered " : '')."$orderBy LIMIT $length OFFSET $start";
-error_log($sql);
-//echo $sql;
-$st = $pdo->query($sql);
-$queryInfo="";
-if ($st) {
-    //$rs = $st->fetchAll(PDO::FETCH_FUNC, fn($id, $codigo, $categoria) => [$id, $codigo, $categoria] );
-    foreach ($pdo->query($sql) as $row) {
-
-      //['p.id','date_format(p.fecha_hora,"%d/%m/%Y %H:%i")','p.facturacion','c.razon_social','p.total'];//,'p.estado'
-
-      $aPedidos[]=[
-        "id_pedido"=>$row['id'],
-        "fecha"=>$row[1],// AS fecha_hora
-        //"tipo_comprobante"=>$tipo_cbte=get_nombre_comprobante($row["tipo_comprobante"]),
-        "tipo_comprobante"=>"Pedido",
-        "campana"=>$row["campana"],
-        "cantidad"=>$row['cantidad_plantines'],
-        //"estado"=>$row['estado']
-      ];
-    }
-
-    $queryInfo=[
-      'campos' => $campos,
-      'from' => $from,
-      'where' => $whereFiltered,
-      'orderBy' => $orderBy,
-      'length' => $length,
-      'start' => $start,
-      'query' => $sql,
-      //'total_facturas_recibos'=>$total_facturas_recibos,
+  $modo_debug=0;
+  //PARA PODER DEBUGUEAR MOSTRAMOS VARIABLES EN LA COLUMNA DETALLE
+  if($modo_debug==1){
+    $detalle="total_facturas_recibos: $total_facturas_recibos<br>ingresos_externos: $ingresos_externos<br>egresos_caja_chica: $egresos_caja_chica<br>total_pago_proveedores: $total_pago_proveedores<br>";
+    $detalle.="data[total_ventas]: $data[total_ventas]<br>data2[ingresos_externos]: $data2[ingresos_externos]<br>data3[egresos_caja_chica]: $data3[egresos_caja_chica]<br>data4[total_pago_proveedores]: $data4[total_pago_proveedores]<br>";
+    $aCtaCte[]=[
+      "id_venta"=>0,
+      "id"=>"",
+      "fecha_hora"=>date("d-m-Y H:i",strtotime($desde)),
+      "motivo"=>"",
+      "detalle"=>$detalle,
+      "forma_pago"=>"",
+      "credito"=>0,
+      "debito"=>0,
+      "saldo"=>0,
+      "detalle_productos"=>"",
     ];
-} else {
-    var_dump($pdo->errorInfo());
-    die;
+  }*/
+
+  //FIN SALDO ANTERIOR
+
+  //INICIO OBTENCION DE REGISTROS A MOSTRAR EN LA TABLA
+
+  //obtenemos los pedidos
+  $sql = " SELECT p.id,date_format(p.fecha,'%d/%m/%Y') AS fecha,p.campana,pd.cantidad_plantines,p.fecha_hora_alta FROM pedidos p INNER JOIN pedidos_detalle pd ON pd.id_pedido=p.id WHERE p.anulado=0 $filtroDesde $filtroHasta $filtroCliente $filtroCultivo";
+  //echo $sql;
+  foreach ($pdo->query($sql) as $row) {
+    
+    //$iconVer="<a href='verMovimientoCajaChica.php?id=".$row["id_movimiento"]."' target='_blank' class='badge badge-primary'><i class='fa fa-eye' aria-hidden='true'></i></a>";
+    //$iconVer="<span data-id='".$row["id_movimiento"]."' data-tipo='movimiento' class='ver badge badge-primary'><i class='fa fa-eye' aria-hidden='true'></i></span>";
+
+    /*$iconEdit="";
+    $cerrado="<i class='fa fa-lock' aria-hidden='true'></i> ";
+    if($row["id_cierre_caja"]==0){
+      $iconEdit="<a href='modificarMovimientoCajaChica.php?id=".$row["id_movimiento"]."' target='_blank' class='badge badge-secondary'><i class='fa fa-pencil-square-o' aria-hidden='true'></i></a>";
+      $cerrado="<i class='fa fa-unlock' aria-hidden='true'></i> ";
+    }
+
+    if($row["tipo_movimiento"]=="Ingreso"){
+      $credito=$row["total"];
+      $debito=0;
+      $saldo=0;
+    }else{
+      $credito=0;
+      $debito=$row["total"];
+      $saldo=0;
+    }*/
+    $aCtaCte[]=[
+      "tipo_comprobante"=>"Pedido",
+      "id_pedido"=>$row['id'],
+      "fecha"=>$row['fecha'],// AS fecha_hora
+      "campana"=>$row["campana"],
+      "cantidad"=>$row['cantidad_plantines'],
+      /*"cantidad_pedido"=>$row['cantidad_plantines'],
+      "cantidad_retiro"=>"",
+      "cantidad_pago"=>"",*/
+      "fecha_hora_alta"=>$row['fecha_hora_alta'],
+    ];
+  }
+
+  //obtenemos los retiros
+  $sql = " SELECT p.id,date_format(p.fecha,'%d/%m/%Y') AS fecha,p.campana,pd.cantidad_plantines,p.fecha_hora_alta FROM remitos p INNER JOIN remitos_detalle pd ON pd.id_remito=p.id WHERE 1 $filtroDesde $filtroHasta $filtroCliente $filtroCultivo";//p.anulado=0 
+  //echo $sql;
+  foreach ($pdo->query($sql) as $row) {
+    
+    //$iconVer="<a href='verMovimientoCajaChica.php?id=".$row["id_movimiento"]."' target='_blank' class='badge badge-primary'><i class='fa fa-eye' aria-hidden='true'></i></a>";
+    //$iconVer="<span data-id='".$row["id_movimiento"]."' data-tipo='movimiento' class='ver badge badge-primary'><i class='fa fa-eye' aria-hidden='true'></i></span>";
+
+    /*$iconEdit="";
+    $cerrado="<i class='fa fa-lock' aria-hidden='true'></i> ";
+    if($row["id_cierre_caja"]==0){
+      $iconEdit="<a href='modificarMovimientoCajaChica.php?id=".$row["id_movimiento"]."' target='_blank' class='badge badge-secondary'><i class='fa fa-pencil-square-o' aria-hidden='true'></i></a>";
+      $cerrado="<i class='fa fa-unlock' aria-hidden='true'></i> ";
+    }
+
+    if($row["tipo_movimiento"]=="Ingreso"){
+      $credito=$row["total"];
+      $debito=0;
+      $saldo=0;
+    }else{
+      $credito=0;
+      $debito=$row["total"];
+      $saldo=0;
+    }*/
+    $aCtaCte[]=[
+      "tipo_comprobante"=>"Retiro",
+      "id_pedido"=>$row['id'],
+      "fecha"=>$row['fecha'],// AS fecha_hora
+      "campana"=>$row["campana"],
+      "cantidad"=>$row['cantidad_plantines'],
+      /*"cantidad_pedido"=>"",
+      "cantidad_retiro"=>$row['cantidad_plantines'],
+      "cantidad_pago"=>"",*/
+      "fecha_hora_alta"=>$row['fecha_hora_alta'],
+    ];
+  }
+  Database::disconnect();
+
+  function date_compare($a, $b){
+    $t1 = strtotime($a['fecha']);
+    $t2 = strtotime($b['fecha']);
+
+    if ($t1 == $t2) {
+      // Si las fechas son iguales, comparar por fecha_hora_alta
+      $t1_alta = strtotime($a['fecha_hora_alta']);
+      $t2_alta = strtotime($b['fecha_hora_alta']);
+      return $t1_alta - $t2_alta;
+    } else {
+      return $t1 - $t2;
+    }
+  }
+
+  usort($aCtaCte, 'date_compare');
+
+  foreach ($aCtaCte as $key => $value) {
+    //$aCtaCte[$key]['fecha']=date("d/m/Y H:i",strtotime($value['fecha']));
+    $cantidad=$aCtaCte[$key]['cantidad'];
+    switch ($value["tipo_comprobante"]) {
+      case 'Pedido':
+        $saldo_retiro=$cantidad;
+        $saldo_pago=$cantidad;
+        if($key>0){
+          $saldo_retiro=$aCtaCte[$key-1]["saldo_retiro"]+$cantidad;
+          $saldo_pago=$aCtaCte[$key-1]["saldo_pago"]+$cantidad;
+        }
+
+        $aCtaCte[$key]["cantidad_pedido"]=$cantidad;
+        $aCtaCte[$key]["cantidad_retiro"]="";
+        $aCtaCte[$key]["saldo_retiro"]=$saldo_retiro;
+        $aCtaCte[$key]["cantidad_pago"]="";
+        $aCtaCte[$key]["saldo_pago"]=$saldo_pago;
+        break;
+      case 'Retiro':
+        $saldo_retiro=$cantidad;
+        $saldo_pago=0;
+        if($key>0){
+          $saldo_retiro=$aCtaCte[$key-1]["saldo_retiro"]-$cantidad;
+          $saldo_pago=$aCtaCte[$key-1]["saldo_pago"];
+        }
+
+        $aCtaCte[$key]["cantidad_pedido"]="";
+        $aCtaCte[$key]["cantidad_retiro"]=$cantidad;
+        $aCtaCte[$key]["saldo_retiro"]=$saldo_retiro;
+        $aCtaCte[$key]["cantidad_pago"]="";
+        $aCtaCte[$key]["saldo_pago"]=$saldo_pago;
+        break;
+      case 'Pago':
+        # code...
+        break;
+    }
+  }
 }
 
-echo json_encode([
-  'data' => $aPedidos,
-  'recordsTotal' => $total,
-  'recordsFiltered' => $recordsFiltered,//count($aPedidos),
-  'queryInfo'=>$queryInfo,
-]);
+echo json_encode($aCtaCte);
