@@ -20,9 +20,9 @@
 	$pdo = Database::connect();
 	$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 		
-	$sql = "delete from `choferes` WHERE id = ?";
+	$sql = "UPDATE `choferes` set activo = ? WHERE id = ?";
 	$q = $pdo->prepare($sql);
-	$q->execute(array($id));
+	$q->execute(array(0, $id));
 	
 	Database::disconnect();
 		

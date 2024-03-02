@@ -16,7 +16,7 @@
 		
 		$sql = "INSERT INTO cultivos(nombre, nombre_corto, precio, id_usuario, fecha_hora_alta) VALUES (?,?,?,?,now())";
 		$q = $pdo->prepare($sql);
-		$q->execute(array($_POST['nombre'],$_POST['nombre_corto'], $_POST['precio'],$_SESSION['user']['id_perfil']));
+		$q->execute(array($_POST['nombre'],$_POST['nombre_corto'], $_POST['precio'],$_SESSION['user']['id']));
 		
 		Database::disconnect();
 		

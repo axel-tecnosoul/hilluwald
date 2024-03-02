@@ -1,8 +1,10 @@
 <?php
     require("config.php");
-    if(empty($_SESSION['user']['id_perfil'])){
+    if(empty($_SESSION['user']['id'])){
       header("Location: index.php");
       die("Redirecting to index.php"); 
+    }else{
+      var_dump($_SESSION['user']['id']);
     }
 	
 	require 'database.php';
@@ -17,7 +19,7 @@
 		
 		$sql = "INSERT INTO transportes(razon_social, cuit, domicilio,id_usuario, fecha_hora_alta) VALUES (?,?,?,?,now())";
 		$q = $pdo->prepare($sql);
-		$q->execute(array($_POST['razon_social'], $_POST['cuit'],$_POST['domicilio'],$_SESSION['user']['id_perfil']));
+		$q->execute(array($_POST['razon_social'], $_POST['cuit'],$_POST['domicilio'],$_SESSION['user']['id']));
     $idTransporte = $pdo->lastInsertId();
 
     foreach($_POST["nombre_apellido"] as $key => $nombre_apellido){
@@ -27,7 +29,7 @@
       
       $sql = "INSERT INTO choferes (nombre_apellido, dni, id_transporte, id_usuario) VALUES (?,?,?,?) ";
       $q = $pdo->prepare($sql);
-      $q->execute(array($nombre_apellido,$_POST["dni"][$key],$idTransporte,$_SESSION['user']['id_perfil']));
+      $q->execute(array($nombre_apellido,$_POST["dni"][$key],$idTransporte,$_SESSION['user']['id']));
     }
     
     foreach($_POST["descripcion"] as $key => $descripcion){
@@ -37,7 +39,7 @@
 
       $sql = "INSERT INTO vehiculos (descripcion, patente, patente2, id_transporte, id_usuario) VALUES (?,?,?,?,?) ";
       $q = $pdo->prepare($sql);
-      $q->execute(array($descripcion,$_POST["patente"][$key],$_POST["patente2"][$key],$idTransporte,$_SESSION['user']['id_perfil']));
+      $q->execute(array($descripcion,$_POST["patente"][$key],$_POST["patente2"][$key],$idTransporte,$_SESSION['user']['id']));
     }
 		
 		Database::disconnect();

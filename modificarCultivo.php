@@ -25,7 +25,7 @@
 		
 		$sql = "UPDATE cultivos set nombre = ?, nombre_corto = ?, precio = ?, id_usuario = ? where id = ?";
 		$q = $pdo->prepare($sql);
-		$q->execute(array($_POST['nombre'], $_POST['nombre_corto'],$_POST['precio'],$_SESSION['user']['id_perfil'],$_GET['id']));
+		$q->execute(array($_POST['nombre'], $_POST['nombre_corto'],$_POST['precio'],$_SESSION['user']['id'],$_GET['id']));
 		
 		Database::disconnect();
 		
