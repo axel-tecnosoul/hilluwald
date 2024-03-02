@@ -1,6 +1,6 @@
 <?php
     require("config.php");
-    if(empty($_SESSION['user']))
+    if(empty($_SESSION['user']['id']))
     {
         header("Location: index.php");
         die("Redirecting to index.php"); 
@@ -27,26 +27,36 @@
 		
 		$sql = "UPDATE transportes set razon_social = ?, cuit = ?, domicilio = ?, id_usuario = ? where id = ?";
 		$q = $pdo->prepare($sql);
-		$q->execute(array($_POST['razon_social'],$_POST['cuit'],$_POST['domicilio'],$_SESSION['user']['id_perfil'],$_GET['id']));
+		$q->execute(array($_POST['razon_social'],$_POST['cuit'],$_POST['domicilio'],$_SESSION['user']['id'],$_GET['id']));
 
     foreach($_POST["nombre_apellido"] as $key => $nombre_apellido){
       if($key==0){
         continue;
       }
-      
-      $sql2 = "UPDATE choferes set nombre_apellido = ?, dni = ?, id_usuario = ? WHERE id = ?";
-      $q2 = $pdo->prepare($sql2);
-      $q2->execute(array($nombre_apellido,$_POST["dni"][$key],$_SESSION['user']['id_perfil'], $_POST['id_chofer'][$key]));
+      if($_POST["id_chofer"][$key] == 0){
+        $sql = "INSERT INTO choferes (nombre_apellido, dni, id_transporte, id_usuario) VALUES (?,?,?,?) ";
+        $q = $pdo->prepare($sql);
+        $q->execute(array($nombre_apellido,$_POST["dni"][$key], $id, $_SESSION['user']['id']));
+      }else{
+        $sql2 = "UPDATE choferes set nombre_apellido = ?, dni = ?, id_usuario = ? WHERE id = ?";
+        $q2 = $pdo->prepare($sql2);
+        $q2->execute(array($nombre_apellido,$_POST["dni"][$key],$_SESSION['user']['id'], $_POST['id_chofer'][$key]));
+      }
     }
     
     foreach($_POST["descripcion"] as $key => $descripcion){
       if($key==0){
         continue;
       }
-
-      $sql3 = "UPDATE vehiculos set descripcion = ?, patente = ?, patente2 = ?, id_usuario = ? WHERE id = ?";
-      $q3 = $pdo->prepare($sql3);
-      $q3->execute(array($descripcion,$_POST["patente"][$key],$_POST["patente2"][$key],$_SESSION['user']['id_perfil'], $_POST['id_vehiculo'][$key]));
+      if($_POST["id_vehiculo"][$key] == 0){
+        $sql = "INSERT INTO vehiculos (descripcion, patente, patente2, id_transporte, id_usuario) VALUES (?,?,?,?,?) ";
+        $q = $pdo->prepare($sql);
+        $q->execute(array($descripcion,$_POST["patente"][$key],$_POST["patente2"][$key], $id, $_SESSION['user']['id']));
+      }else{
+        $sql3 = "UPDATE vehiculos set descripcion = ?, patente = ?, patente2 = ?, id_usuario = ? WHERE id = ?";
+        $q3 = $pdo->prepare($sql3);
+        $q3->execute(array($descripcion,$_POST["patente"][$key],$_POST["patente2"][$key],$_SESSION['user']['id'], $_POST['id_vehiculo'][$key]));
+      }
     }
 		
 		Database::disconnect();
@@ -197,16 +207,15 @@
                                     } ?>
                                   <tr id='addr<?=$clave?>' data-id="<?=$clave?>" style="<?=$style?>">
 
-                                    <input type="hidden" class="form-control" id="id_chofer" name="id_chofer[]" value="<?= $valor['id']; ?>"id="id_chofer-<?=$clave?>">
-
                                     <td data-name="nombre_apellido">
+                                      <input type="hidden" class="form-control" name="id_chofer[]" value="<?= $valor['id']; ?>"id="id_chofer-<?=$clave?>">
                                       <input type="text" class="form-control" placeholder="Nombre y Apellido" name="nombre_apellido[]" value="<?=$valor['nombre_apellido']?>" id="nombre_apellido-<?=$clave?>"/>
                                     </td>
                                     <td data-name="DNI">
                                       <input type="text" class="form-control" placeholder="DNI" name="dni[]" value="<?=$valor['dni']?>" id="dni-<?=$clave?>"/>
                                     </td>
-                                    <td data-name="eliminar">
-                                      <span name="eliminar[]" title="Eliminar" class="btn btn-sm row-remove text-center" onClick="eliminarFila(this);">
+                                    <td data-name="eliminar_choferes">
+                                      <span name="eliminar_choferes[]" title="Eliminar" class="btn btn-sm row-remove text-center" onClick="eliminarFila(this);">
                                         <img src="img/icon_baja.png" width="24" height="25" border="0" alt="Eliminar" title="Eliminar">
                                       </span>
                                     </td>
@@ -217,6 +226,7 @@
                                   <tr>
                                     <td colspan="3" align='right'>
                                       <input type="button" class="btn btn-dark" id="addRowChofer" value="Agregar Chofer">
+                                      <input type="hidden" name="eliminar_choferes" id="eliminar_choferes">
                                     </td>
                                   </tr>
                                 </tfoot>
@@ -246,10 +256,9 @@
                                     if ($clave==0) {
                                         $style="display:none";
                                     } ?>
-                                  <tr id='addr<?=$clave?>' data-id="<?=$clave?>" style="<?=$style?>"> 
-                                    <input type="text" class="form-control" id="id_vehiculo" name="id_vehiculo[]" value="<?= $valor['id']; ?>" id="id_vehiculo-<?=$clave?>" style="display:none;">
-                                    
+                                  <tr id='addr<?=$clave?>' data-id="<?=$clave?>" style="<?=$style?>">
                                     <td data-name="descripcion">
+                                      <input type="hidden" class="form-control" name="id_vehiculo[]" value="<?= $valor['id']; ?>" id="id_vehiculo-<?=$clave?>">
                                       <input type="text" class="form-control" placeholder="Descripcion" name="descripcion[]" value="<?=$valor['descripcion']?>" id="descripcion-<?=$clave?>"/>
                                     </td>
                                     <td data-name="patente">
@@ -259,8 +268,8 @@
                                       <input type="text" class="form-control" placeholder="Patente" name="patente2[]" value="<?=$valor['patente2']?>" id="patente2-<?=$clave?>"/>
                                     </td>
                 
-                                    <td data-name="eliminar">
-                                      <span name="eliminar[]" title="Eliminar" class="btn btn-sm row-remove text-center" onClick="eliminarFila(this);">
+                                    <td data-name="eliminar_vehiculos">
+                                      <span name="eliminar_vehiculos[]" title="Eliminar" class="btn btn-sm row-remove text-center" onClick="eliminarFila(this);">
                                         <img src="img/icon_baja.png" width="24" height="25" border="0" alt="Eliminar" title="Eliminar">
                                       </span>
                                     </td>
@@ -271,7 +280,7 @@
                                   <tr>
                                     <td colspan="4" align='right'>
                                       <input type="button" class="btn btn-dark " id="addRowVehiculo" value="Agregar Vehiculo">
-                                      <input type="hidden" name="emailEliminados" id="emailEliminados">
+                                      <input type="hidden" name="eliminar_vehiculos" id="eliminar_vehiculos">
                                     </td>
                                   </tr>
                                 </tfoot>
