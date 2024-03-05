@@ -18,8 +18,8 @@
 	}
 	
 	if ( !empty($_POST)) {
-		var_dump($_POST);
-    die;
+		// var_dump($_POST);
+    // die;
 
 		// insert data
 		$pdo = Database::connect();
@@ -38,9 +38,9 @@
         $q = $pdo->prepare($sql);
         $q->execute(array($nombre_apellido,$_POST["dni"][$key], $id, $_SESSION['user']['id']));
       }else{
-        $sql2 = "UPDATE choferes set nombre_apellido = ?, dni = ?, id_usuario = ? WHERE id = ?";
+        $sql2 = "UPDATE choferes set nombre_apellido = ?, dni = ?, activo = ?, id_usuario = ? WHERE id = ?";
         $q2 = $pdo->prepare($sql2);
-        $q2->execute(array($nombre_apellido,$_POST["dni"][$key],$_SESSION['user']['id'], $_POST['id_chofer'][$key]));
+        $q2->execute(array($nombre_apellido,$_POST["dni"][$key], $_POST["chofer_activo"][$key], $_SESSION['user']['id'], $_POST['id_chofer'][$key]));
       }
     }
     
@@ -53,9 +53,9 @@
         $q = $pdo->prepare($sql);
         $q->execute(array($descripcion,$_POST["patente"][$key],$_POST["patente2"][$key], $id, $_SESSION['user']['id']));
       }else{
-        $sql3 = "UPDATE vehiculos set descripcion = ?, patente = ?, patente2 = ?, id_usuario = ? WHERE id = ?";
+        $sql3 = "UPDATE vehiculos set descripcion = ?, patente = ?, patente2 = ?, activo = ?, id_usuario = ? WHERE id = ?";
         $q3 = $pdo->prepare($sql3);
-        $q3->execute(array($descripcion,$_POST["patente"][$key],$_POST["patente2"][$key],$_SESSION['user']['id'], $_POST['id_vehiculo'][$key]));
+        $q3->execute(array($descripcion,$_POST["patente"][$key],$_POST["patente2"][$key],$_POST["vehiculo_activo"][$key],$_SESSION['user']['id'], $_POST['id_vehiculo'][$key]));
       }
     }
 		
@@ -76,14 +76,16 @@
       "id"  =>0,
       "nombre_apellido" =>"",
       "dni" =>"",
+      "chofer_activo" => 0
     ];
 
-    $sql = "SELECT id,nombre_apellido,dni FROM `choferes` WHERE id_transporte = ".$id;
+    $sql = "SELECT id,nombre_apellido,dni, activo FROM `choferes` WHERE id_transporte = ".$id;
     foreach ($pdo->query($sql) as $row) {
         $Choferes[]=[
           "id" =>$row["id"],
           "nombre_apellido" =>$row["nombre_apellido"],
           "dni" =>$row["dni"],
+          "chofer_activo" =>$row["activo"]
         ];
     }
 
@@ -92,15 +94,17 @@
       "descripcion" =>"",
       "patente" =>"",
       "patente2" =>"",
+      "vehiculo_activo" =>""
     ];
 
-    $sql = "SELECT id, descripcion, patente, patente2 FROM `vehiculos` WHERE id_transporte = ".$id;
+    $sql = "SELECT id, descripcion, patente, patente2, activo FROM `vehiculos` WHERE id_transporte = ".$id;
     foreach ($pdo->query($sql) as $row) {
         $Vehiculos[]=[
           "id" =>$row["id"],
           "descripcion" =>$row["descripcion"],
           "patente" =>$row["patente"],
           "patente2" =>$row["patente2"],
+          "vehiculo_activo" =>$row["activo"]
         ];
     }
 		
@@ -196,13 +200,13 @@
                                   <tr>
                                     <th>Nombre y Apellido</th>
                                     <th>DNI</th>
-                                    <th>Eliminar</th>
+                                    <th>Activo</th>
                                   </tr>
                                 </thead>
                                 <tbody><?php
                                 foreach ($Choferes as $clave => $valor) {
                                     $style="";
-                                    if ($clave==0) {
+                                    if ($clave==0 || $valor['chofer_activo'] == 0) {
                                         $style="display:none";
                                     } ?>
                                   <tr id='addr<?=$clave?>' data-id="<?=$clave?>" style="<?=$style?>">
@@ -214,10 +218,12 @@
                                     <td data-name="DNI">
                                       <input type="text" class="form-control" placeholder="DNI" name="dni[]" value="<?=$valor['dni']?>" id="dni-<?=$clave?>"/>
                                     </td>
-                                    <td data-name="eliminar_choferes">
-                                      <span name="eliminar_choferes[]" title="Eliminar" class="btn btn-sm row-remove text-center" onClick="eliminarFila(this);">
-                                        <img src="img/icon_baja.png" width="24" height="25" border="0" alt="Eliminar" title="Eliminar">
-                                      </span>
+                                    <td class="form-control">
+                                      <select name="chofer_activo[]" id="chofer_activo-<?=$clave?>" class="js-example-basic-single">
+                                      <option value="">Seleccione...</option>
+                                      <option value="1" <?php if ($valor['chofer_activo']==1) echo " selected ";?>>Si</option>
+                                      <option value="0" <?php if ($valor['chofer_activo']==0) echo " selected ";?>>No</option>
+                                      </select>
                                     </td>
                                   </tr><?php
                                 }?>
@@ -226,7 +232,7 @@
                                   <tr>
                                     <td colspan="3" align='right'>
                                       <input type="button" class="btn btn-dark" id="addRowChofer" value="Agregar Chofer">
-                                      <input type="hidden" name="eliminar_choferes" id="eliminar_choferes">
+                                     
                                     </td>
                                   </tr>
                                 </tfoot>
@@ -247,18 +253,17 @@
                                     <th>Descripcion</th>
                                     <th>Patente</th>
                                     <th>Patente2</th>
-                                    <th>Eliminar</th>
+                                    <th>Activo</th>
                                   </tr>
                                 </thead>
                                 <tbody><?php
                                 foreach ($Vehiculos as $clave => $valor) {
                                     $style="";
-                                    if ($clave==0) {
+                                    if ($clave==0 || $valor['vehiculo_activo'] == 0) {
                                         $style="display:none";
                                     } ?>
                                   <tr id='addr<?=$clave?>' data-id="<?=$clave?>" style="<?=$style?>">
                                     <td data-name="descripcion">
-                                      <input type="hidden" class="form-control" name="id_vehiculo[]" value="<?= $valor['id']; ?>" id="id_vehiculo-<?=$clave?>">
                                       <input type="text" class="form-control" placeholder="Descripcion" name="descripcion[]" value="<?=$valor['descripcion']?>" id="descripcion-<?=$clave?>"/>
                                     </td>
                                     <td data-name="patente">
@@ -268,11 +273,14 @@
                                       <input type="text" class="form-control" placeholder="Patente" name="patente2[]" value="<?=$valor['patente2']?>" id="patente2-<?=$clave?>"/>
                                     </td>
                 
-                                    <td data-name="eliminar_vehiculos">
-                                      <span name="eliminar_vehiculos[]" title="Eliminar" class="btn btn-sm row-remove text-center" onClick="eliminarFila(this);">
-                                        <img src="img/icon_baja.png" width="24" height="25" border="0" alt="Eliminar" title="Eliminar">
-                                      </span>
+                                    <td class="form-control">
+                                      <select name="vehiculo_activo[]" id="vehiculo_activo-<?=$clave?>" class="js-example-basic-single">
+                                      <option value="">Seleccione...</option>
+                                      <option value="1" <?php if ($valor['vehiculo_activo']==1) echo " selected ";?>>Si</option>
+                                      <option value="0" <?php if ($valor['vehiculo_activo']==0) echo " selected ";?>>No</option>
+                                      </select>
                                     </td>
+                                    <input type="hidden" class="form-control" name="id_vehiculo[]" value="<?= $valor['id']; ?>" id="id_vehiculo-<?=$clave?>">
                                   </tr><?php
                                 }?>
                                 </tbody>
