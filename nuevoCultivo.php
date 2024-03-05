@@ -9,14 +9,15 @@
 	require 'database.php';
 	
 	if ( !empty($_POST)) {
-		
+		// var_dump($_POST);
+    // die;
 		// insert data
 		$pdo = Database::connect();
 		$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 		
-		$sql = "INSERT INTO cultivos(nombre, nombre_corto, precio, id_usuario, fecha_hora_alta) VALUES (?,?,?,?,now())";
+		$sql = "INSERT INTO cultivos(nombre, nombre_corto, precio, icono, color, id_usuario, fecha_hora_alta) VALUES (?,?,?,?,?,?,now())";
 		$q = $pdo->prepare($sql);
-		$q->execute(array($_POST['nombre'],$_POST['nombre_corto'], $_POST['precio'],$_SESSION['user']['id']));
+		$q->execute(array($_POST['nombre'],$_POST['nombre_corto'], $_POST['precio'],$_POST['icon'],$_POST['basic-color'],$_SESSION['user']['id']));
 		
 		Database::disconnect();
 		
@@ -94,7 +95,7 @@
                           <div class="btn-group btn-group-toggle" data-toggle="buttons"><?php
                             foreach ($aIconos as $icono) {?>
                               <label class="btn btn-outline-primary">
-                                <input type="radio" value="<?=$icono?>" name="icon" id="icon1" autocomplete="off">
+                                <input type="radio" value="<?=$icono?>" name="icon" id="icon" autocomplete="off">
                                 <i class="<?=$icono?>" aria-hidden="true"></i>
                               </label><?php
                             }?>

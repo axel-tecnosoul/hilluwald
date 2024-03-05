@@ -76,7 +76,7 @@
       "id"  =>0,
       "nombre_apellido" =>"",
       "dni" =>"",
-      "chofer_activo" => 0
+      "chofer_activo" => ""
     ];
 
     $sql = "SELECT id,nombre_apellido,dni, activo FROM `choferes` WHERE id_transporte = ".$id;
@@ -218,8 +218,8 @@
                                     <td data-name="DNI">
                                       <input type="text" class="form-control" placeholder="DNI" name="dni[]" value="<?=$valor['dni']?>" id="dni-<?=$clave?>"/>
                                     </td>
-                                    <td class="form-control">
-                                      <select name="chofer_activo[]" id="chofer_activo-<?=$clave?>" class="js-example-basic-single">
+                                    <td data-name="activo">
+                                      <select name="chofer_activo[]" class="form-control" id="chofer_activo-<?=$clave?>" class="js-example-basic-single">
                                       <option value="">Seleccione...</option>
                                       <option value="1" <?php if ($valor['chofer_activo']==1) echo " selected ";?>>Si</option>
                                       <option value="0" <?php if ($valor['chofer_activo']==0) echo " selected ";?>>No</option>
@@ -273,8 +273,8 @@
                                       <input type="text" class="form-control" placeholder="Patente" name="patente2[]" value="<?=$valor['patente2']?>" id="patente2-<?=$clave?>"/>
                                     </td>
                 
-                                    <td class="form-control">
-                                      <select name="vehiculo_activo[]" id="vehiculo_activo-<?=$clave?>" class="js-example-basic-single">
+                                    <td data-name="activo">
+                                      <select name="vehiculo_activo[]" class="form-control" id="vehiculo_activo-<?=$clave?>" class="js-example-basic-single">
                                       <option value="">Seleccione...</option>
                                       <option value="1" <?php if ($valor['vehiculo_activo']==1) echo " selected ";?>>Si</option>
                                       <option value="0" <?php if ($valor['vehiculo_activo']==0) echo " selected ";?>>No</option>

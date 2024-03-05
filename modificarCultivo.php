@@ -23,7 +23,7 @@
 		$pdo = Database::connect();
 		$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 		
-		$sql = "UPDATE cultivos set nombre = ?, nombre_corto = ?, precio = ?, id_usuario = ? where id = ?";
+		$sql = "UPDATE cultivos set nombre = ?, nombre_corto = ?, precio = ?, icono = ?, color =?, id_usuario = ? where id = ?";
 		$q = $pdo->prepare($sql);
 		$q->execute(array($_POST['nombre'], $_POST['nombre_corto'],$_POST['precio'],$_SESSION['user']['id'],$_GET['id']));
 		
@@ -35,7 +35,7 @@
 		
 		$pdo = Database::connect();
 		$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-		$sql = "SELECT id, nombre, nombre_corto, precio, id_usuario FROM cultivos WHERE id = ? ";
+		$sql = "SELECT id, nombre, nombre_corto, precio, icono, color, id_usuario FROM cultivos WHERE id = ? ";
 		$q = $pdo->prepare($sql);
 		$q->execute(array($id));
 		$data = $q->fetch(PDO::FETCH_ASSOC);
@@ -110,6 +110,36 @@
 								<label class="col-sm-3 col-form-label">Precio</label>
 								<div class="col-sm-9"><input name="precio" type="text" maxlength="99" class="form-control" value="<?php echo $data['precio']; ?>" required="required"></div>
 							</div>
+              <div class="form-group row">
+                        <label class="col-sm-3 col-form-label">Icono</label>
+                        <div class="col-sm-9">
+                          <div class="btn-group btn-group-toggle" data-toggle="buttons"><?php
+                            foreach ($aIconos as $icono) {?>
+                              <label class="btn btn-outline-primary">
+                                <input type="radio" value="<?=$icono?>" name="icon" id="icon" <?php
+                                   if($data['icono'] == $icono){
+                                      echo "selected";
+                                   }?>autocomplete="off">
+                                <i class="<?=$icono?>" aria-hidden="true"></i>
+                              </label><?php
+                            }?>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="form-group row">
+                        <label class="col-sm-3 col-form-label">Color del icono</label>
+                        <div class="col-sm-9">
+                          <input type="color" id="basic-color" name="basic-color" list="basic-colors">
+                          <datalist id="basic-colors"><?php
+                            foreach ($aColores as $codigo => $nombre) {?>
+                              <option value="<?=$codigo?>" class="<?php
+                              if($data['color'] == $codigo){
+                                      echo "active";
+                              }?>" autocomplete="off"><?=$nombre?></option><?php
+                            }?>
+                          </datalist>
+                        </div>
+                      </div>
                             
                         </div>
                       </div>
