@@ -77,7 +77,7 @@ if(empty($_SESSION['user']))
                         <tbody><?php
 							include 'database.php';
 							$pdo = Database::connect();
-							$sql = " SELECT u.id, u.usuario,u.nombre_apellido, p.perfil, s.nombre, u.activo FROM usuarios u inner join perfiles p on p.id = u.id_perfil left join sucursales s on s.id = u.id_sucursal WHERE u.id != 1 ";
+							$sql = " SELECT u.id, u.usuario,u.nombre_apellido, p.perfil, u.email, s.nombre, u.activo FROM usuarios u inner join perfiles p on p.id = u.id_perfil left join sucursales s on s.id = u.id_sucursal WHERE u.id != 1 ";
 							
 							foreach ($pdo->query($sql) as $row) {
 								echo '<tr>';

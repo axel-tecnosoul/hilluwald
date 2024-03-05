@@ -70,22 +70,22 @@ Database::disconnect();
     .borderRetiroLeft{
       /*border-left: solid 1px #6c757d !important;*/
       /*background-color: #6c757d !important;*/
-      background-color: rgb(108 117 125)!important;
+      /*background-color: rgb(108 117 125)!important;*/
     }
     .borderRetiroRight{
       /*border-right: solid 1px #6c757d !important;*/
       /*background-color: #6c757d !important;*/
-      background-color: rgb(108 117 125)!important;
+      /*background-color: rgb(108 117 125)!important;*/
     }
     .borderPagoLeft{
       /*border-left: solid 1px #007bff !important;*/
       /*background-color: #007bff !important;*/
-      background-color: rgb(0,123,255,0.5) !important;
+      /*background-color: rgb(0,123,255,0.5) !important;*/
     }
     .borderPagoRight{
       /*border-right: solid 1px #007bff !important;*/
       /*background-color: #007bff !important;*/
-      background-color: rgb(0,123,255,0.5) !important;
+      /*background-color: rgb(0,123,255,0.5) !important;*/
     }
     td.child {
       background-color: beige;
