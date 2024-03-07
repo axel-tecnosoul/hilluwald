@@ -20,13 +20,20 @@
 	if ( !empty($_POST)) {
 		// var_dump($_POST);
     // die;
+
+    if(!isset($_POST['icon'])){
+      $icono = $_POST['icono_cargado'];
+    }else{
+      $icono = $_POST['icon'];
+    }
+    
 		// insert data
 		$pdo = Database::connect();
 		$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 		
 		$sql = "UPDATE cultivos set nombre = ?, nombre_corto = ?, precio = ?, icono = ?, color =?, id_usuario = ? where id = ?";
 		$q = $pdo->prepare($sql);
-		$q->execute(array($_POST['nombre'], $_POST['nombre_corto'],$_POST['precio'],$_POST['icon'],$_POST['basic-color'],$_SESSION['user']['id'],$_GET['id']));
+		$q->execute(array($_POST['nombre'], $_POST['nombre_corto'],$_POST['precio'],$icono,$_POST['basic-color'],$_SESSION['user']['id'],$_GET['id']));
 		
 		Database::disconnect();
 		
@@ -113,7 +120,9 @@
 							</div>
               <div class="form-group row">
                         <label class="col-sm-3 col-form-label">Icono</label>
-                        <div class="col-sm-9">
+                        <div class="col-sm-9"><?php
+                          $valor_defecto = $data['icono'];        
+                        ?><input type="hidden" id="icono_cargado" name="icono_cargado" list="icono_cargado" value="<?=$valor_defecto?>">
                           <div class="btn-group btn-group-toggle" data-toggle="buttons"><?php
                             foreach ($aIconos as $icono) {
                               $checked = "";
