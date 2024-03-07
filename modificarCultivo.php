@@ -18,13 +18,20 @@ if ( null==$id ) {
 if ( !empty($_POST)) {
   // var_dump($_POST);
   // die;
+
+  if(!isset($_POST['icon'])){
+    $icono = $_POST['icono_cargado'];
+  }else{
+    $icono = $_POST['icon'];
+  }
+  
   // insert data
   $pdo = Database::connect();
   $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
   
   $sql = "UPDATE cultivos set nombre = ?, nombre_corto = ?, precio = ?, icono = ?, color =?, id_usuario = ? where id = ?";
   $q = $pdo->prepare($sql);
-  $q->execute(array($_POST['nombre'], $_POST['nombre_corto'],$_POST['precio'],$_POST['icon'],$_POST['basic-color'],$_SESSION['user']['id'],$_GET['id']));
+  $q->execute(array($_POST['nombre'], $_POST['nombre_corto'],$_POST['precio'],$icono,$_POST['basic-color'],$_SESSION['user']['id'],$_GET['id']));
   
   Database::disconnect();
   
@@ -51,11 +58,11 @@ if ( !empty($_POST)) {
     <!-- Loader ends-->
     <!-- page-wrapper Start-->
     <div class="page-wrapper">
-	  <?php include('header.php');?>
+	    <?php include('header.php');?>
 	  
       <!-- Page Header Start-->
       <div class="page-body-wrapper">
-		<?php include('menu.php');?>
+		    <?php include('menu.php');?>
         <!-- Page Sidebar Start-->
         <!-- Right sidebar Ends-->
         <div class="page-body">
@@ -91,59 +98,78 @@ if ( !empty($_POST)) {
                   <div class="card-header">
                     <h5>Modificar Cultivo</h5>
                   </div>
-				  <form class="form theme-form" role="form" method="post" action="modificarCultivo.php?id=<?php echo $id?>">
+				          <form class="form theme-form" role="form" method="post" action="modificarCultivo.php?id=<?php echo $id?>">
                     <div class="card-body">
                       <div class="row">
                         <div class="col">
-							<div class="form-group row">
-								<label class="col-sm-3 col-form-label">Nombre</label>
-								<div class="col-sm-9"><input name="nombre" type="text" maxlength="99" class="form-control" value="<?php echo $data['nombre']; ?>" required="required"></div>
-							</div>
-              <div class="form-group row">
-								<label class="col-sm-3 col-form-label">Nombre Corto</label>
-								<div class="col-sm-9"><input name="nombre_corto" type="text" maxlength="99" class="form-control" value="<?php echo $data['nombre_corto']; ?>" required="required"></div>
-							</div>
-              <div class="form-group row">
-								<label class="col-sm-3 col-form-label">Precio</label>
-								<div class="col-sm-9"><input name="precio" type="text" maxlength="99" class="form-control" value="<?php echo $data['precio']; ?>" required="required"></div>
-							</div>
-              <div class="form-group row">
-                        <label class="col-sm-3 col-form-label">Icono</label>
-                        <div class="col-sm-9">
-                          <div class="btn-group btn-group-toggle" data-toggle="buttons"><?php
-                            foreach ($aIconos as $icono) {
-                              $checked = "";
-                              if($data['icono'] == $icono){
-                                $checked = "active";
+                        <div class="form-group row">
+                          <label class="col-sm-3 col-form-label">Nombre</label>
+                          <div class="col-sm-9"><input name="nombre" type="text" maxlength="99" class="form-control" value="<?php echo $data['nombre']; ?>" required="required"></div>
+                        </div>
+                        <div class="form-group row">
+                          <label class="col-sm-3 col-form-label">Nombre Corto</label>
+                          <div class="col-sm-9"><input name="nombre_corto" type="text" maxlength="99" class="form-control" value="<?php echo $data['nombre_corto']; ?>" required="required"></div>
+                        </div>
+                        <div class="form-group row">
+                          <label class="col-sm-3 col-form-label">Precio</label>
+                          <div class="col-sm-9"><input name="precio" type="text" maxlength="99" class="form-control" value="<?php echo $data['precio']; ?>" required="required"></div>
+                        </div>
+                        <!-- <div class="form-group row">
+                          <label class="col-sm-3 col-form-label">Icono</label>
+                          <div class="col-sm-9"><?php
+                            $valor_defecto = $data['icono'];?>
+                            <input type="hidden" id="icono_cargado" name="icono_cargado" list="icono_cargado" value="<?=$valor_defecto?>">
+                              <div class="btn-group btn-group-toggle" data-toggle="buttons"><?php
+                                foreach ($aIconos as $icono) {
+                                  $checked = "";
+                                  if($data['icono'] == $icono){
+                                    $checked = "active";
+                                  }?>
+                                  <label class="btn btn-outline-primary <?=$checked;?>">
+                                    <input type="radio" value="<?=$icono?>" name="icon" id="icon" autocomplete="off">
+                                    <i class="<?=$icono?>" aria-hidden="true"></i>
+                                  </label><?php
+                                }?>
+                              </div>
+                            </div>
+                          </div>
+                        </div> -->
+                        <div class="form-group row">
+                          <label class="col-sm-3 col-form-label">Icono</label>
+                          <div class="col-sm-9">
+                            <div class="btn-group btn-group-toggle" data-toggle="buttons"><?php
+                              foreach ($aIconos as $icono) {
+                                $class = $checked = "";
+                                if($data['icono'] == $icono){
+                                  $checked = "checked";
+                                  $class = "active";
+                                }?>
+                                <label class="btn btn-outline-primary <?=$class;?>">
+                                  <input type="radio" value="<?=$icono?>" name="icon" id="icon" <?=$checked;?>>
+                                  <i class="<?=$icono?>" aria-hidden="true"></i>
+                                </label><?php
                               }?>
-                              <label class="btn btn-outline-primary <?=$checked;?>">
-                                <input type="radio" value="<?=$icono?>" name="icon" id="icon" autocomplete="off">
-                                <i class="<?=$icono?>" aria-hidden="true"></i>
-                              </label><?php
-                            }?>
+                            </div>
                           </div>
                         </div>
-                      </div>
-                      <div class="form-group row">
-                        <label class="col-sm-3 col-form-label">Color del icono</label>
-                        <div class="col-sm-9"><?php
-                          $valor_defecto = $data['color'];        
-                        ?><input type="color" id="basic-color" name="basic-color" list="basic-colors" value="<?=$valor_defecto?>">
-                          <datalist id="basic-colors">
-                              <?php foreach ($aColores as $codigo => $nombre): ?>
-                                  <option value="<?=$codigo?>" <?php if ($data['color'] == $codigo) echo "selected"; ?> autocomplete="off"><?=$nombre?></option>
-                              <?php endforeach; ?>
-                          </datalist>
-                        </div>
-                      </div>
-                            
+                        <div class="form-group row">
+                          <label class="col-sm-3 col-form-label">Color del icono</label>
+                          <div class="col-sm-9"><?php
+                            $valor_defecto = $data['color'];?>
+                            <input type="color" id="basic-color" name="basic-color" list="basic-colors" value="<?=$valor_defecto?>">
+                            <datalist id="basic-colors"><?php
+                              foreach ($aColores as $codigo => $nombre): ?>
+                                <option value="<?=$codigo?>" <?php if ($data['color'] == $codigo) echo "selected"; ?> autocomplete="off"><?=$nombre?></option><?php
+                              endforeach; ?>
+                            </datalist>
+                          </div>
                         </div>
                       </div>
                     </div>
                     <div class="card-footer">
                       <div class="col-sm-9 offset-sm-3">
                         <button class="btn btn-primary" type="submit">Modificar</button>
-						<a onclick="document.location.href='listarCultivos.php'" class="btn btn-light">Volver</a>
+                        <a href='listarCultivos.php' class="btn btn-light">Volver</a>
                       </div>
                     </div>
                   </form>
@@ -154,7 +180,7 @@ if ( !empty($_POST)) {
           <!-- Container-fluid Ends-->
         </div>
         <!-- footer start-->
-		<?php include("footer.php"); ?>
+        <?php include("footer.php"); ?>
       </div>
     </div>
     <!-- latest jquery-->
