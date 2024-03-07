@@ -256,10 +256,13 @@ Database::disconnect();
                               <th style="text-align: center;vertical-align: middle;" rowspan="2">Comprobante</th>
                               <th style="text-align: center;vertical-align: middle;" rowspan="2">Campaña</th>
                               <th style="text-align: center;vertical-align: middle;" rowspan="2">Cantidad pedida</th>
-                              <th style="text-align: center;vertical-align: middle;"class="borderRetiroLeft borderRetiroRight" colspan="2">Cta Cte Retiros</th>
-                              <th style="text-align: center;vertical-align: middle;" class="borderPagoLeft borderPagoRight" colspan="2">Cta Cte Pagos</th>
+                              <th style="text-align: center;vertical-align: middle;"class="borderRetiroLeft borderRetiroRight" colspan="2">Retiros</th>
+                              <th style="text-align: center;vertical-align: middle;" class="borderPagoLeft borderPagoRight" colspan="2">Pagos</th>
+                              <th style="text-align: center;vertical-align: middle;" class="borderPagoLeft borderPagoRight" colspan="2">Bandejas</th>
                             </tr>
                             <tr>
+                              <th style="text-align: center;vertical-align: middle;">Cantidad</th>
+                              <th style="text-align: center;vertical-align: middle;">Saldo</th>
                               <th style="text-align: center;vertical-align: middle;">Cantidad</th>
                               <th style="text-align: center;vertical-align: middle;">Saldo</th>
                               <th style="text-align: center;vertical-align: middle;">Cantidad</th>
@@ -270,6 +273,8 @@ Database::disconnect();
                           <tfoot>
                             <tr>
                               <th class="text-right" colspan="3">Totales</th>
+                              <th class="text-right"></th>
+                              <th class="text-right"></th>
                               <th class="text-right"></th>
                               <th class="text-right"></th>
                               <th class="text-right"></th>
@@ -792,31 +797,43 @@ Database::disconnect();
               {"data": "campana"},
               {
                 render: function(data, type, row, meta) {
-                  return row.cantidad_pedido;
+                  return Intl.NumberFormat("de-DE").format(row.cantidad_pedido)
                 },
                 className: "dt-body-right",
               },
               {
                 render: function(data, type, row, meta) {
-                  return row.cantidad_retiro;
+                  return Intl.NumberFormat("de-DE").format(row.cantidad_retiro)
                 },
                 className: "dt-body-right borderRetiroLeft",
               },
               {
                 render: function(data, type, row, meta) {
-                  return row.saldo_retiro;
+                  return Intl.NumberFormat("de-DE").format(row.saldo_retiro)
                 },
                 className: "dt-body-right borderRetiroRight",
               },
               {
                 render: function(data, type, row, meta) {
-                  return row.cantidad_pago;
+                  return Intl.NumberFormat("de-DE").format(row.cantidad_pago)
                 },
                 className: "dt-body-right borderPagoLeft",
               },
               {
                 render: function(data, type, row, meta) {
-                  return row.saldo_pago;
+                  return Intl.NumberFormat("de-DE").format(row.saldo_pago)
+                },
+                className: "dt-body-right borderPagoRight",
+              },
+              {
+                render: function(data, type, row, meta) {
+                  return Intl.NumberFormat("de-DE").format(row.cantidad_pago)
+                },
+                className: "dt-body-right borderPagoLeft",
+              },
+              {
+                render: function(data, type, row, meta) {
+                  return Intl.NumberFormat("de-DE").format(row.saldo_pago)
                 },
                 className: "dt-body-right borderPagoRight",
               },
@@ -836,11 +853,13 @@ Database::disconnect();
               console.log(ultimosSaldos);
               // Update footer
               //$(api.column(3).footer()).html(new Intl.NumberFormat('es-AR', {currency: 'ARS', style: 'currency'}).format(total_cantidad));
-              $(api.column(3).footer()).html(totales.totalPedido);
-              $(api.column(4).footer()).html(totales.totalRetiro);
-              $(api.column(5).footer()).html(ultimosSaldos.saldoRetiro);
-              $(api.column(6).footer()).html(totales.totalPago);
-              $(api.column(7).footer()).html(ultimosSaldos.saldoPago);
+              $(api.column(3).footer()).html(Intl.NumberFormat("de-DE").format(totales.totalPedido));
+              $(api.column(4).footer()).html(Intl.NumberFormat("de-DE").format(totales.totalRetiro));
+              $(api.column(5).footer()).html(Intl.NumberFormat("de-DE").format(ultimosSaldos.saldoRetiro));
+              $(api.column(6).footer()).html(Intl.NumberFormat("de-DE").format(totales.totalPago));
+              $(api.column(7).footer()).html(Intl.NumberFormat("de-DE").format(ultimosSaldos.saldoPago));
+              $(api.column(8).footer()).html(Intl.NumberFormat("de-DE").format(totales.totalPago));
+              $(api.column(9).footer()).html(Intl.NumberFormat("de-DE").format(ultimosSaldos.saldoPago));
 
               $('[title]').tooltip();
             }

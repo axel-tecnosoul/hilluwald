@@ -4,7 +4,9 @@ if(empty($_SESSION['user'])){
 	header("Location: index.php");
 	die("Redirecting to index.php"); 
 }
-include_once("funciones.php");?>
+include_once("funciones.php");
+$hasta=$hoy=date("Y-m-d");
+$desde=date("Y-m-d",strtotime($hoy." -1 year"))?>
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -52,7 +54,7 @@ include_once("funciones.php");?>
                 <div class="col-2">
                   <div class="bookmark pull-right">
                     <ul>
-                      <li><a  target="_blank" data-container="body" data-toggle="popover" data-placement="top" title="" data-original-title="<?php echo date('d-m-Y');?>"><i data-feather="calendar"></i></a></li>
+                      <li><a  target="_blank" data-container="body" data-toggle="popover" data-placement="top" title="" data-original-title="<?=$hoy?>"><i data-feather="calendar"></i></a></li>
                     </ul>
                   </div>
                 </div>
@@ -78,7 +80,7 @@ include_once("funciones.php");?>
                       <table class="table">
                         <tr>
                           <td class="text-right border-0 p-1">Desde: </td>
-                          <td class="border-0 p-1"><input type="date" id="desde" value="<?=date("Y-m-d")?>" class="form-control form-control-sm filtraTabla"></td>
+                          <td class="border-0 p-1"><input type="date" id="desde" value="<?=$desde?>" class="form-control form-control-sm filtraTabla"></td>
                           <td rowspan="2" style="vertical-align: middle;" class="text-right border-0 p-1">Cliente:</td>
                           <td rowspan="2" style="vertical-align: middle;" class="border-0 p-1">
                             <select id="id_cliente" class="form-control form-control-sm filtraTabla selectpicker" data-style="multiselect" data-live-search="true" data-selected-text-format="count > 1" data-actions-box="true" multiple><?php
@@ -102,7 +104,7 @@ include_once("funciones.php");?>
                         </tr>
                         <tr>
                           <td class="text-right border-0 p-1">Hasta: </td>
-                          <td class="border-0 p-1"><input type="date" id="hasta" value="<?=date("Y-m-d")?>" class="form-control form-control-sm filtraTabla"></td>
+                          <td class="border-0 p-1"><input type="date" id="hasta" value="<?=$hasta?>" class="form-control form-control-sm filtraTabla"></td>
                         </tr>
                       </table>
                     </div>
@@ -113,18 +115,19 @@ include_once("funciones.php");?>
                             <th>ID</th>
                             <th>Fecha</th>
                             <th>Cliente</th>
-                            <th>Factuacion</th>
-                            <th>Modalidad Pago</th>
-                            <th>Total</th>
+                            <th>Campaña</th>
+                            <!-- <th>Pago Completo</th>
+                            <th>Retiro Completo</th> -->
                             <th>Opciones</th>
+                            <th class="none"></th>
                           </tr>
                         </thead>
-                        <tfoot>
+                        <!-- <tfoot>
                           <tr>
                             <th colspan="6">Total</th>
                             <th></th>
                           </tr>
-                        </tfoot>
+                        </tfoot> -->
                         <tbody></tbody>
                       </table>
                     </div>
@@ -216,7 +219,6 @@ include_once("funciones.php");?>
     function getPedidos(){
       let desde=$("#desde").val();
       let hasta=$("#hasta").val();
-      let tipo_comprobante=$("#tipo_comprobante").val();
       let id_cliente=$("#id_cliente").val();
 
       let id_perfil="<?=$_SESSION["user"]["id_perfil"]?>";
@@ -227,7 +229,7 @@ include_once("funciones.php");?>
         //dom: 'rtip',
         serverSide: true,
         processing: true,
-        ajax:{url:'ajaxListarPedidos.php?desde='+desde+'&hasta='+hasta+'&tipo_comprobante='+tipo_comprobante+'&id_cliente='+id_cliente},
+        ajax:{url:'ajaxListarPedidos.php?desde='+desde+'&hasta='+hasta+'&id_cliente='+id_cliente},
 				stateSave: true,
 				responsive: true,
 				language: {
@@ -256,25 +258,10 @@ include_once("funciones.php");?>
           /*{render: function(data, type, row, meta) {
             return row.fecha_hora+"hs";
           }},*/
-          {"data": "cliente"},
-          {render: function(data, type, row, meta) {
-            //let estado=row.estado;
-            let clase="";
-            /*if(estado=="A"){
-              clase="badge badge-success";
-            }
-            if(estado=="R" || estado=="E"){
-              clase="badge badge-danger";
-            }*/
-            return '<span class="'+clase+'">'+row.facturacion+'</span>';
-          }},
-          {"data": "modalidad_pago"},
-          {
-            render: function(data, type, row, meta) {
-              return new Intl.NumberFormat('es-AR', {currency: 'ARS', style: 'currency'}).format(row.total);
-            },
-            className: 'dt-body-right text-right',
-          },
+          {"data": "razon_social"},
+          {"data": "campana"},
+          /*{"data": "pago_completo"},
+          {"data": "retiro_completo"},*/
           {render: function(data, type, row, meta) {
             let btnVer='<a href="verPedido.php?id='+row.id_pedido+'"><img src="img/eye.png" width="24" height="15" border="0" alt="Ver Pedido" title="Ver Pedido"></a>&nbsp;&nbsp;'
             let btnImprimir='<a href="remito.php?id='+row.id_pedido+'" target="_blank"><img src="img/print.png" width="30" height="20" border="0" alt="Imprimir Remito" title="Imprimir Remito"></a>&nbsp;&nbsp;'
@@ -286,7 +273,11 @@ include_once("funciones.php");?>
               btnAnular='<a href="#" title="Eliminar" onclick="openModalEliminarPedido('+row.id_pedido+')"><img src="img/icon_baja.png" width="24" height="25" border="0" alt="Eliminar"></a>&nbsp;&nbsp;'
             }
             return btnVer+btnImprimir+btnAnular;
-          }}
+          }},
+          {
+            "data": "detalle_cultivos",
+            className: 'bg-secondary',
+          },
         ],
         initComplete: function(settings, json){
           let total_facturas_recibos=json.queryInfo.total_facturas_recibos
