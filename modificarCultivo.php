@@ -18,12 +18,6 @@ if ( null==$id ) {
 if ( !empty($_POST)) {
   // var_dump($_POST);
   // die;
-
-  if(!isset($_POST['icon'])){
-    $icono = $_POST['icono_cargado'];
-  }else{
-    $icono = $_POST['icon'];
-  }
   
   // insert data
   $pdo = Database::connect();
@@ -31,7 +25,7 @@ if ( !empty($_POST)) {
   
   $sql = "UPDATE cultivos set nombre = ?, nombre_corto = ?, precio = ?, icono = ?, color =?, id_usuario = ? where id = ?";
   $q = $pdo->prepare($sql);
-  $q->execute(array($_POST['nombre'], $_POST['nombre_corto'],$_POST['precio'],$icono,$_POST['basic-color'],$_SESSION['user']['id'],$_GET['id']));
+  $q->execute(array($_POST['nombre'], $_POST['nombre_corto'],$_POST['precio'],$_POST['icon'],$_POST['basic-color'],$_SESSION['user']['id'],$_GET['id']));
   
   Database::disconnect();
   
