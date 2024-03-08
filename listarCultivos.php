@@ -68,33 +68,39 @@ if(empty($_SESSION['user']))
                             <th>Nombre</th>
                             <th>Nombre Corto</th>
                             <th>Precio</th>
-                            <th>Usuario</th>
+                            <th>Icono</th>
                             <th>Opciones</th>
                           </tr>
                         </thead>
-                        <tbody>
-                          <?php 
-							include 'database.php';
-							$pdo = Database::connect();
-							$sql = " SELECT c.id, c.nombre, c.nombre_corto, c.precio, c.id_usuario, c.fecha_hora_alta, u.usuario FROM cultivos c left join usuarios u on u.id = c.id_usuario WHERE 1 ";
-							
-							foreach ($pdo->query($sql) as $row) {
-								echo '<tr>';
-								echo '<td>'. $row['id'] . '</td>';
-								echo '<td>'. $row['nombre'] . '</td>';
-								echo '<td>'. $row['nombre_corto'] . '</td>';
-								echo '<td>$'. $row['precio'] . '</td>';
-								echo '<td>'. $row['usuario'] . '</td>';
-								echo '<td>';
-									echo '<a href="modificarCultivo.php?id='.$row[0].'"><img src="img/icon_modificar.png" width="24" height="25" border="0" alt="Modificar" title="Modificar"></a>';
-									echo '&nbsp;&nbsp;';
-									echo '<a href="#" data-toggle="modal" data-target="#eliminarModal_'.$row[0].'"><img src="img/icon_baja.png" width="24" height="25" border="0" alt="Eliminar" title="Eliminar"></a>';
-									echo '&nbsp;&nbsp;';
-								echo '</td>';
-								echo '</tr>';
-						   }
-						   Database::disconnect();
-						  ?>
+                        <tbody><?php
+                          include 'database.php';
+                          $pdo = Database::connect();
+                          $sql = " SELECT c.id, c.nombre, c.nombre_corto, c.precio, c.id_usuario, c.fecha_hora_alta, u.usuario, c.icono, c.color FROM cultivos c left join usuarios u on u.id = c.id_usuario WHERE 1 ";
+                          
+                          foreach ($pdo->query($sql) as $row) {?>
+                            <tr>
+                              <td><?=$row['id']?></td>
+                              <td><?=$row['nombre']?></td>
+                              <td><?=$row['nombre_corto']?></td>
+                              <td>$<?=$row['precio']?></td>
+                              <td><?php
+                                if($row["icono"]){
+                                  $style="";
+                                  if($row["color"]){
+                                    $style="color:".$row["color"];
+                                  }?>
+                                  <i class="<?=$row["icono"]?>" style=<?=$style?>></i><?php
+                                }?>
+                              </td>
+                              <td>
+                                <a href="modificarCultivo.php?id=<?=$row["id"]?>"><img src="img/icon_modificar.png" width="24" height="25" border="0" alt="Modificar" title="Modificar"></a>
+                                &nbsp;&nbsp;
+                                <a href="#" data-toggle="modal" data-target="#eliminarModal_<?=$row["id"]?>"><img src="img/icon_baja.png" width="24" height="25" border="0" alt="Eliminar" title="Eliminar"></a>
+                                &nbsp;&nbsp;
+                              </td>
+                            </tr><?php
+                          }
+                          Database::disconnect();?>
                         </tbody>
                       </table>
                     </div>

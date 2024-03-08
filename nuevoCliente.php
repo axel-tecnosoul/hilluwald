@@ -23,7 +23,7 @@ if ( !empty($_POST)) {
 <html lang="en">
   <head>
     <?php include('head_forms.php');?>
-	<link rel="stylesheet" type="text/css" href="assets/css/select2.css">
+	  <link rel="stylesheet" type="text/css" href="assets/css/select2.css">
   </head>
   <body class="light-only">
     <!-- Loader ends-->
@@ -84,7 +84,7 @@ if ( !empty($_POST)) {
                           <div class="form-group row">
                             <label class="col-sm-3 col-form-label">Condicion Fiscal</label>
                             <div class="col-sm-9">
-                              <select name="cond_fiscal" class="form-control" required>
+                              <select name="cond_fiscal" class="js-example-basic-single" style="width: 100%;" required>
                                 <option value="">- Seleccione -</option><?php
                                 foreach ($aCondicionesFiscales as $value) {?>
                                   <option><?=$value?></option><?php
