@@ -142,10 +142,10 @@
                                   <tbody>
                                     <tr id='addr0' data-id="0" style="display: none;">
                                       <td data-name="nombre_apellido">
-                                        <input type="text" class="form-control" placeholder="Nombre y Apellido" name="nombre_apellido[]" id="nombre-0"/>
+                                        <input type="text" class="form-control" placeholder="Nombre y Apellido" name="nombre_apellido[]" id="nombre-0" data-required="1"/>
                                       </td>
                                       <td data-name="DNI">
-                                        <input type="text" class="form-control" placeholder="DNI" name="dni[]" id="dni-0"/>
+                                        <input type="text" class="form-control" placeholder="DNI" name="dni[]" id="dni-0" data-required="1"/>
                                       </td>
                                       <td data-name="eliminar">
                                         <span name="eliminar[]" title="Eliminar" class="btn btn-sm row-remove text-center" onClick="eliminarFila(this);">
@@ -184,13 +184,13 @@
                                   <tbody>
                                     <tr id='addr0' data-id="0" style="display: none;">
                                       <td data-name="descripcion">
-                                        <input type="text" class="form-control" placeholder="Descripcion" name="descripcion[]" id="descripcion-0"/>
+                                        <input type="text" class="form-control" placeholder="Descripcion" name="descripcion[]" id="descripcion-0" data-required="1"/>
                                       </td>
                                       <td data-name="patente">
-                                        <input type="text" class="form-control" placeholder="Patente" name="patente[]" id="patente-0"/>
+                                        <input type="text" class="form-control" placeholder="Patente" name="patente[]" id="patente-0" data-required="1"/>
                                       </td>
                                       <td data-name="patente2">
-                                        <input type="text" class="form-control" placeholder="Patente" name="patente2[]" id="patente2-0"/>
+                                        <input type="text" class="form-control" placeholder="Patente" name="patente2[]" id="patente2-0" data-required="0"/>
                                       </td>
                 
                                       <td data-name="eliminar">
@@ -242,13 +242,8 @@
     <script src="assets/js/sidebar-menu.js"></script>
     <script src="assets/js/config.js"></script>
     <!-- Plugins JS start-->
-    <script src="assets/js/typeahead/handlebars.js"></script>
-    <script src="assets/js/typeahead/typeahead.bundle.js"></script>
-    <script src="assets/js/typeahead/typeahead.custom.js"></script>
     <script src="assets/js/chat-menu.js"></script>
     <script src="assets/js/tooltip-init.js"></script>
-    <script src="assets/js/typeahead-search/handlebars.js"></script>
-    <script src="assets/js/typeahead-search/typeahead-custom.js"></script>
     <!-- Plugins JS Ends-->
     <!-- Theme js-->
     <script src="assets/js/script.js"></script>
@@ -304,7 +299,9 @@
             var c = $(cur_td).find($(children[0]).prop('tagName')).clone();//.val("")
             
             var id=$(c).attr("id");
-            $(c).attr("required",true);
+            if($(c).data("required")==1){
+              $(c).attr("required",true);
+            }
             ultimoRegistro=id;
             if(id!=undefined){
               //console.log("id1: ");
@@ -372,7 +369,11 @@
             var c = $(cur_td).find($(children[0]).prop('tagName')).clone();//.val("")
             
             var id=$(c).attr("id");
-            $(c).attr("required",true);
+
+            //console.log($(c));
+            if($(c).data("required")==1){
+              $(c).attr("required",true);
+            }
             ultimoRegistro=id;
             if(id!=undefined){
               //console.log("id1: ");

@@ -213,16 +213,15 @@
 
                                     <td data-name="nombre_apellido">
                                       <input type="hidden" class="form-control" name="id_chofer[]" value="<?= $valor['id']; ?>"id="id_chofer-<?=$clave?>">
-                                      <input type="text" class="form-control" placeholder="Nombre y Apellido" name="nombre_apellido[]" value="<?=$valor['nombre_apellido']?>" id="nombre_apellido-<?=$clave?>"/>
+                                      <input type="text" class="form-control" placeholder="Nombre y Apellido" name="nombre_apellido[]" value="<?=$valor['nombre_apellido']?>" id="nombre_apellido-<?=$clave?>" data-required="1"/>
                                     </td>
                                     <td data-name="DNI">
-                                      <input type="text" class="form-control" placeholder="DNI" name="dni[]" value="<?=$valor['dni']?>" id="dni-<?=$clave?>"/>
+                                      <input type="text" class="form-control" placeholder="DNI" name="dni[]" value="<?=$valor['dni']?>" id="dni-<?=$clave?>" data-required="1"/>
                                     </td>
                                     <td data-name="activo">
                                       <select name="chofer_activo[]" class="form-control" id="chofer_activo-<?=$clave?>" class="js-example-basic-single">
-                                      <option value="">Seleccione...</option>
-                                      <option value="1" <?php if ($valor['chofer_activo']==1) echo " selected ";?>>Si</option>
-                                      <option value="0" <?php if ($valor['chofer_activo']==0) echo " selected ";?>>No</option>
+                                        <option value="1" <?php if ($valor['chofer_activo']==1) echo " selected ";?>>Si</option>
+                                        <option value="0" <?php if ($valor['chofer_activo']==0) echo " selected ";?>>No</option>
                                       </select>
                                     </td>
                                   </tr><?php
@@ -264,13 +263,13 @@
                                     } ?>
                                   <tr id='addr<?=$clave?>' data-id="<?=$clave?>" style="<?=$style?>">
                                     <td data-name="descripcion">
-                                      <input type="text" class="form-control" placeholder="Descripcion" name="descripcion[]" value="<?=$valor['descripcion']?>" id="descripcion-<?=$clave?>"/>
+                                      <input type="text" class="form-control" placeholder="Descripcion" name="descripcion[]" value="<?=$valor['descripcion']?>" id="descripcion-<?=$clave?>" data-required="1"/>
                                     </td>
                                     <td data-name="patente">
-                                      <input type="text" class="form-control" placeholder="Patente" name="patente[]" value="<?=$valor['patente']?>" id="patente-<?=$clave?>"/>
+                                      <input type="text" class="form-control" placeholder="Patente" name="patente[]" value="<?=$valor['patente']?>" id="patente-<?=$clave?>" data-required="1"/>
                                     </td>
                                     <td data-name="patente2">
-                                      <input type="text" class="form-control" placeholder="Patente" name="patente2[]" value="<?=$valor['patente2']?>" id="patente2-<?=$clave?>"/>
+                                      <input type="text" class="form-control" placeholder="Patente" name="patente2[]" value="<?=$valor['patente2']?>" id="patente2-<?=$clave?>" data-required="0"/>
                                     </td>
                 
                                     <td data-name="activo">
@@ -327,13 +326,8 @@
     <script src="assets/js/sidebar-menu.js"></script>
     <script src="assets/js/config.js"></script>
     <!-- Plugins JS start-->
-    <script src="assets/js/typeahead/handlebars.js"></script>
-    <script src="assets/js/typeahead/typeahead.bundle.js"></script>
-    <script src="assets/js/typeahead/typeahead.custom.js"></script>
     <script src="assets/js/chat-menu.js"></script>
     <script src="assets/js/tooltip-init.js"></script>
-    <script src="assets/js/typeahead-search/handlebars.js"></script>
-    <script src="assets/js/typeahead-search/typeahead-custom.js"></script>
     <!-- Plugins JS Ends-->
     <!-- Theme js-->
     <script src="assets/js/script.js"></script>
@@ -389,7 +383,9 @@
             var c = $(cur_td).find($(children[0]).prop('tagName')).clone();//.val("")
             
             var id=$(c).attr("id");
-            $(c).attr("required",true);
+            if($(c).data("required")==1){
+              $(c).attr("required",true);
+            }
             ultimoRegistro=id;
             if(id!=undefined){
               //console.log("id1: ");
@@ -457,7 +453,9 @@
             var c = $(cur_td).find($(children[0]).prop('tagName')).clone();//.val("")
             
             var id=$(c).attr("id");
-            $(c).attr("required",true);
+            if($(c).data("required")==1){
+              $(c).attr("required",true);
+            }
             ultimoRegistro=id;
             if(id!=undefined){
               //console.log("id1: ");

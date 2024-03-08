@@ -29,13 +29,13 @@ $anio_actual = date("Y");
 $anio_inicial = $anio_actual - 2;
 $anio_final = $anio_actual + 2;
 
-$sql = " SELECT c.id, c.nombre, c.icono, c.color FROM cultivos c INNER JOIN pedidos_detalle pd ON pd.id_cultivo=c.id INNER JOIN pedidos p ON pd.id_pedido=p.id WHERE p.anulado=0 AND p.id_cliente=".$id." GROUP BY c.id";
+$sql = " SELECT c.id, c.nombre, c.nombre_corto, c.icono, c.color FROM cultivos c INNER JOIN pedidos_detalle pd ON pd.id_cultivo=c.id INNER JOIN pedidos p ON pd.id_pedido=p.id WHERE p.anulado=0 AND p.id_cliente=".$id." GROUP BY c.id";
 //$sql = " SELECT c.id, c.nombre FROM cultivos c";
 $aCultivosPedidos=[];
 foreach ($pdo->query($sql) as $row) {
   $aCultivosPedidos[]=[
     "id_cultivo"=>$row["id"],
-    "nombre"=>$row["nombre"],
+    "nombre"=>$row["nombre_corto"],
     "icono"=>$row["icono"],
     "color"=>$row["color"],
   ];
@@ -103,6 +103,9 @@ Database::disconnect();
     }
     .input-error {
       border: 1px solid red !important;
+    }
+    .select2-container--default .select2-results__option[aria-disabled=true] {
+      display: none;
     }
   </style>
   <body class="light-only">
@@ -493,9 +496,9 @@ Database::disconnect();
                           <select name="id_chofer" id="id_chofer" class="js-example-basic-single" required="required" style="width: 100%;">
                             <option value="">- Seleccione -</option><?php
                             $pdo = Database::connect();
-                            $sql = " SELECT id, nombre_apellido FROM choferes";
+                            $sql = " SELECT id, nombre_apellido, id_transporte FROM choferes";
                             foreach ($pdo->query($sql) as $row) {?>
-                              <option value="<?=$row["id"]?>"><?=$row["nombre_apellido"]?></option><?php
+                              <option value="<?=$row["id"]?>" data-id-transporte="<?=$row["id_transporte"]?>"><?=$row["nombre_apellido"]?></option><?php
                             }
                             Database::disconnect();?>
                           </select>
@@ -505,9 +508,14 @@ Database::disconnect();
                           <select name="id_vehiculo" id="id_vehiculo" class="js-example-basic-single" required="required" style="width: 100%;">
                             <option value="">- Seleccione -</option><?php
                             $pdo = Database::connect();
-                            $sql = " SELECT id, descripcion FROM vehiculos";
-                            foreach ($pdo->query($sql) as $row) {?>
-                              <option value="<?=$row["id"]?>"><?=$row["descripcion"]?></option><?php
+                            $sql = " SELECT id, descripcion, patente, patente2, id_transporte FROM vehiculos";
+                            foreach ($pdo->query($sql) as $row) {
+                              $patente=$row["patente"];
+                              if(!is_null($row["patente2"])){
+                                $patente.=" - ".$row["patente2"];
+                              }
+                              $mostrar=$row["descripcion"]." (".$patente.")"?>
+                              <option value="<?=$row["id"]?>" data-id-transporte="<?=$row["id_transporte"]?>"><?=$mostrar?></option><?php
                             }
                             Database::disconnect();?>
                           </select>
@@ -704,6 +712,42 @@ Database::disconnect();
               event.preventDefault(); // Evitar el envío del formulario
           }
         });
+
+        $("#id_transporte").on("change",function(){
+          let id_transporte=$(this).val();
+          getChoferes(id_transporte);
+          getVehiculos(id_transporte);
+        })
+
+        function getChoferes(id_transporte){
+          let selectChofer=$("#id_chofer")
+          selectChofer.find("option").each(function(){
+            $(this).attr("disabled",true);
+            if(this.value=="" || this.dataset.idTransporte==id_transporte){
+              $(this).attr("disabled",false);
+            }
+            
+          })
+          
+          // Destruir y volver a aplicar Select2
+          selectChofer.select2('destroy');
+          selectChofer.select2();
+        }
+
+        function getVehiculos(id_transporte){
+          let selectChofer=$("#id_vehiculo")
+          selectChofer.find("option").each(function(){
+            $(this).attr("disabled",true);
+            if(this.value=="" || this.dataset.idTransporte==id_transporte){
+              $(this).attr("disabled",false);
+            }
+            
+          })
+          
+          // Destruir y volver a aplicar Select2
+          selectChofer.select2('destroy');
+          selectChofer.select2();
+        }
 
         /*$('.tablas_cta_cte').DataTable({
           stateSave: true,
@@ -902,10 +946,6 @@ Database::disconnect();
             };
         }
 
-        // Inicializar DataTable
-        /*$(document).ready(function() {
-            $('#remitosTable').DataTable();
-        });*/
       });
 		
 		</script>
