@@ -33,9 +33,13 @@ $sql = " SELECT c.id, c.nombre, c.nombre_corto, c.icono, c.color FROM cultivos c
 //$sql = " SELECT c.id, c.nombre FROM cultivos c";
 $aCultivosPedidos=[];
 foreach ($pdo->query($sql) as $row) {
+  $nombre=$row["nombre_corto"];
+  if(empty($nombre)){
+    $nombre=$row["nombre"];
+  }
   $aCultivosPedidos[]=[
     "id_cultivo"=>$row["id"],
-    "nombre"=>$row["nombre_corto"],
+    "nombre"=>$nombre,
     "icono"=>$row["icono"],
     "color"=>$row["color"],
   ];
@@ -63,6 +67,10 @@ Database::disconnect();
     .pagos{
       background-color: #007bff!important;
       color: #fff!important;
+    }
+    .bandejas {
+      background-color: #ffc107!important;
+      color: #000!important;
     }
     .tablas_cta_cte th, .tablas_cta_cte td {
       border: 1px solid #dee2e6;
@@ -160,6 +168,8 @@ Database::disconnect();
                         <button class="btn retiros" style="text-transform: none;" title="Nuevo Retiro" data-toggle="modal" data-target="#nuevoRetiro"><i class="fa fa-plus"></i> Retiro</button><!-- nuevoRetiro.php -->
                         
                         <button class="btn pagos" style="text-transform: none;" title="Nuevo Pago" data-toggle="modal" data-target="#nuevoPago"><i class="fa fa-plus"></i> Pago</button><!-- nuevoPago.php -->
+
+                        <button class="btn bandejas" style="text-transform: none;" title="Nueva devolucion de bandejas" data-toggle="modal" data-target="#nuevaDevolucionBandejas"><i class="fa fa-plus"></i> Bandejas</button><!-- nuevoPago.php -->
 
                       </div>
                     </div>
@@ -376,7 +386,7 @@ Database::disconnect();
           </div>
 
           <!-- MODAL PARA NUEVO PEDIDO -->
-          <div class="modal fade" id="nuevoPedido" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+          <div class="modal fade" id="nuevoPedido" role="dialog" tabindex="-1" aria-labelledby="myLargeModalLabel" aria-hidden="true">
             <div class="modal-dialog modal-lg">
               <div class="modal-content">
                 <div class="card">
@@ -404,7 +414,7 @@ Database::disconnect();
                       </div>
                       <div class="row">
                         <div class="col-sm-12">
-                          <table class="table table-striped">
+                          <table class="table table-striped table-bordered">
                             <tr>
                               <th>Cultivo</th>
                               <th>Cantidad</th>
@@ -440,7 +450,7 @@ Database::disconnect();
           <!-- FIN MODAL PARA NUEVO PEDIDO -->
 
           <!-- MODAL PARA NUEVO RETIRO -->
-          <div class="modal fade" id="nuevoRetiro" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+          <div class="modal fade" id="nuevoRetiro" role="dialog" tabindex="-1" aria-labelledby="myLargeModalLabel" aria-hidden="true">
             <div class="modal-dialog modal-lg">
               <div class="modal-content">
                 <div class="card">
@@ -467,7 +477,7 @@ Database::disconnect();
                           </select>
                         </div>
                         <div class="form-group col-4">
-                          <label for="id_cliente_retira">Cliente</label>
+                          <label for="id_cliente_retira">Razon social</label>
                           <select name="id_cliente_retira" id="id_cliente_retira" style="width: 100%;" required class="js-example-basic-single"><?php
                             $pdo = Database::connect();
                             $sql = " SELECT id, razon_social FROM clientes";
@@ -493,7 +503,7 @@ Database::disconnect();
                         </div>
                         <div class="form-group col-4">
                           <label for="id_chofer">Chofer</label>
-                          <select name="id_chofer" id="id_chofer" class="js-example-basic-single" required="required" style="width: 100%;">
+                          <select name="id_chofer" id="id_chofer" class="js-example-basic-single" required disabled style="width: 100%;">
                             <option value="">- Seleccione -</option><?php
                             $pdo = Database::connect();
                             $sql = " SELECT id, nombre_apellido, id_transporte FROM choferes";
@@ -505,7 +515,7 @@ Database::disconnect();
                         </div>
                         <div class="form-group col-4">
                           <label for="id_vehiculo">Vehiculo</label>
-                          <select name="id_vehiculo" id="id_vehiculo" class="js-example-basic-single" required="required" style="width: 100%;">
+                          <select name="id_vehiculo" id="id_vehiculo" class="js-example-basic-single" required disabled style="width: 100%;">
                             <option value="">- Seleccione -</option><?php
                             $pdo = Database::connect();
                             $sql = " SELECT id, descripcion, patente, patente2, id_transporte FROM vehiculos";
@@ -522,11 +532,44 @@ Database::disconnect();
                         </div>
                       </div>
                       <div class="row">
+                        <div class="form-group col-4">
+                          <label>Lote</label>
+                          <select name="id_lote" id="id_lote" class="js-example-basic-single" required style="width: 100%;">
+                            <option value="">- Seleccione -</option><?php
+                            $pdo = Database::connect();
+                            $sql = " SELECT l.id, nombre, direccion, localidad, provincia FROM lotes l INNER JOIN localidades l2 ON l.id_localidad=l2.id INNER JOIN provincias p ON l2.id_provincia=p.id WHERE l.id_cliente=".$id;
+                            foreach ($pdo->query($sql) as $row) {
+                              $mostrar=$row["nombre"]." (".$row["direccion"]." ".$row["localidad"]." ".$row["provincia"].")"?>
+                              <option value="<?=$row["id"]?>"><?=$mostrar?></option><?php
+                            }
+                            Database::disconnect();?>
+                          </select>
+                        </div>
+                        <div class="form-group col-4">
+                          <label for="id_plantador">Plantador</label>
+                          <select name="id_plantador" id="id_plantador" class="js-example-basic-single" required style="width: 100%;">
+                            <option value="">- Seleccione -</option><?php
+                            /*$pdo = Database::connect();
+                            $sql = " SELECT id, nombre_apellido, id_transporte FROM plantadores";
+                            foreach ($pdo->query($sql) as $row) {?>
+                              <option value="<?=$row["id"]?>" data-id-transporte="<?=$row["id_transporte"]?>"><?=$row["nombre_apellido"]?></option><?php
+                            }
+                            Database::disconnect();*/?>
+                          </select>
+                        </div>
+                        <div class="form-group col-4">
+                          <label for="id_vehiculo">Patente 2</label>
+                          <input type="text" name="patente2" id="patente2" class="form-control" style="width: 100%;">
+                            
+                          </input>
+                        </div>
+                      </div>
+                      <div class="row">
                         <div class="col">
                           <div class="form-group row">
                             <!-- <label class="col-sm-12 col-form-label">Cultivos</label> -->
                             <div class="col-sm-12">
-                              <table class="table table-striped">
+                              <table class="table table-striped table-bordered">
                                 <tr>
                                   <th align="center">Cultivo</th>
                                   <th align="center">Cantidad</th>
@@ -564,7 +607,7 @@ Database::disconnect();
           <!-- FIN MODAL PARA NUEVO RETIRO -->
 
           <!-- MODAL PARA NUEVO PAGO -->
-          <div class="modal fade" id="nuevoPago" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+          <div class="modal fade" id="nuevoPago" role="dialog" tabindex="-1" aria-labelledby="myLargeModalLabel" aria-hidden="true">
             <div class="modal-dialog modal-lg">
               <div class="modal-content">
                 <div class="card">
@@ -721,32 +764,42 @@ Database::disconnect();
 
         function getChoferes(id_transporte){
           let selectChofer=$("#id_chofer")
-          selectChofer.find("option").each(function(){
-            $(this).attr("disabled",true);
-            if(this.value=="" || this.dataset.idTransporte==id_transporte){
-              $(this).attr("disabled",false);
-            }
+          if(id_transporte>0){
+            selectChofer.attr("disabled",false)
+            selectChofer.find("option").each(function(){
+              $(this).attr("disabled",true);
+              if(this.value=="" || this.dataset.idTransporte==id_transporte){
+                $(this).attr("disabled",false);
+              }
+              
+            })
             
-          })
-          
-          // Destruir y volver a aplicar Select2
-          selectChofer.select2('destroy');
-          selectChofer.select2();
+            // Destruir y volver a aplicar Select2
+            selectChofer.select2('destroy');
+            selectChofer.select2();
+          }else{
+            selectChofer.attr("disabled",true)
+          }
         }
 
         function getVehiculos(id_transporte){
-          let selectChofer=$("#id_vehiculo")
-          selectChofer.find("option").each(function(){
-            $(this).attr("disabled",true);
-            if(this.value=="" || this.dataset.idTransporte==id_transporte){
-              $(this).attr("disabled",false);
-            }
+          let selectVehiculo=$("#id_vehiculo")
+          if(id_transporte>0){
+            selectVehiculo.attr("disabled",false)
+            selectVehiculo.find("option").each(function(){
+              $(this).attr("disabled",true);
+              if(this.value=="" || this.dataset.idTransporte==id_transporte){
+                $(this).attr("disabled",false);
+              }
+              
+            })
             
-          })
-          
-          // Destruir y volver a aplicar Select2
-          selectChofer.select2('destroy');
-          selectChofer.select2();
+            // Destruir y volver a aplicar Select2
+            selectVehiculo.select2('destroy');
+            selectVehiculo.select2();
+          }else{
+            selectVehiculo.attr("disabled",true)
+          }
         }
 
         /*$('.tablas_cta_cte').DataTable({
