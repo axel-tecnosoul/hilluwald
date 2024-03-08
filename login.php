@@ -16,6 +16,11 @@ if(!empty($_POST)){
     $check_pass = $_POST['pass'];
     if($check_pass === $row['clave']){
       $login_ok = true;
+
+      $sql = "UPDATE usuarios set fecha_hora_ultimo_ingreso = NOW() where id = ?";
+      $q = $db->prepare($sql);
+      $q->execute(array($row['id']));
+
     }
   }
   if($login_ok){

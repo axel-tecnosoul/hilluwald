@@ -12,9 +12,9 @@ $columns = $_GET['columns'];
 
 //$data_columns = ["","p.cb","p.codigo","c.categoria","p.descripcion","CONCAT(pr.nombre,' ',pr.apellido)","p.precio","p.activo"];//PARA EL ORDENAMIENTO
 
-$data_columns = $fields = ['p.id','date_format(p.fecha,"%d/%m/%Y")','c.razon_social','p.campana','p.pago_completo','p.retiro_completo',"GROUP_CONCAT('+',FORMAT(pd.cantidad_plantines,0,'de_DE'),' ',cu.nombre SEPARATOR '<br>') AS detalle_cultivos"];//,'p.estado'
+$data_columns = $fields = ['p.id','date_format(p.fecha,"%d/%m/%Y")','p.campana','pd.cantidad_plantines'];//,'p.estado'
 
-$from="FROM pedidos p INNER JOIN pedidos_detalle pd ON pd.id_pedido=p.id LEFT JOIN clientes c ON c.id = p.id_cliente INNER JOIN cultivos cu ON pd.id_cultivo=cu.id";
+$from="FROM pedidos p INNER JOIN pedidos_detalle pd ON pd.id_pedido=p.id";
 
 $orderBy = " ORDER BY ";
 foreach ($_GET['order'] as $order) {
@@ -39,6 +39,12 @@ if($id_cliente!=0 and $id_cliente!=""){
   $filtroCliente=" AND p.id_cliente IN ($id_cliente)";
 }
 
+$id_cultivo=$_GET["id_cultivo"];
+$filtroCultivo="";
+if($id_cultivo!=0 and $id_cultivo!=""){
+  $filtroCultivo=" AND pd.id_cultivo IN ($id_cultivo)";
+}
+
 /*$tipo_comprobante=$_GET["tipo_comprobante"];
 $filtroTipoComprobante="";
 if($tipo_comprobante!=""){
@@ -51,11 +57,10 @@ if($tipo_comprobante!=""){
 $orderBy = substr($orderBy, 0, -2);
 //var_dump($orderBy);
 $where = "p.anulado = 0";
-if ($_SESSION['user']['id_perfil'] != 1) {
+/*if ($_SESSION['user']['id_perfil'] != 1) {
   $where.=" and a.id = ".$_SESSION['user']['id_sucursal']; 
-}
-$group_by=" GROUP BY p.id";
-$whereFiltered=$where.$filtroDesde.$filtroHasta.$filtroCliente;//.$filtroTipoComprobante;
+}*/
+$whereFiltered=$where.$filtroDesde.$filtroHasta.$filtroCliente.$filtroCultivo;//.$filtroTipoComprobante;
 
 foreach ($columns as $k => $column) {
     if ($search = $column['search']['value']) {
@@ -77,9 +82,6 @@ if ( $globalSearchValue = $globalSearch['value'] ) {
   }
   $where .= '('.implode(' OR ', $aWhere).')';
 }
-
-$where.=$group_by;
-$whereFiltered.=$group_by;
 
 $length = $_GET['length'];
 $start = $_GET['start'];
@@ -123,24 +125,13 @@ if ($st) {
 
       //['p.id','date_format(p.fecha_hora,"%d/%m/%Y %H:%i")','p.facturacion','c.razon_social','p.total'];//,'p.estado'
 
-      $pago_completo="No";
-      if($row['pago_completo']==1){
-        $pago_completo="Si";
-      }
-      $retiro_completo="No";
-      if($row['retiro_completo']==1){
-        $retiro_completo="Si";
-      }
-
       $aPedidos[]=[
         "id_pedido"=>$row['id'],
         "fecha"=>$row[1],// AS fecha_hora
         //"tipo_comprobante"=>$tipo_cbte=get_nombre_comprobante($row["tipo_comprobante"]),
-        "razon_social"=>$row["razon_social"],
+        "tipo_comprobante"=>"Pedido",
         "campana"=>$row["campana"],
-        "pago_completo"=>$pago_completo,
-        "retiro_completo"=>$retiro_completo,
-        "detalle_cultivos"=>$row["detalle_cultivos"]
+        "cantidad"=>$row['cantidad_plantines'],
         //"estado"=>$row['estado']
       ];
     }

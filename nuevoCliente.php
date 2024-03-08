@@ -50,7 +50,7 @@
 <html lang="en">
   <head>
     <?php include('head_forms.php');?>
-	<link rel="stylesheet" type="text/css" href="assets/css/select2.css">
+	  <link rel="stylesheet" type="text/css" href="assets/css/select2.css">
   </head>
   <body class="light-only">
     <!-- Loader ends-->
