@@ -274,7 +274,6 @@
                 
                                     <td data-name="activo">
                                       <select name="vehiculo_activo[]" class="form-control" id="vehiculo_activo-<?=$clave?>" class="js-example-basic-single">
-                                      <option value="">Seleccione...</option>
                                       <option value="1" <?php if ($valor['vehiculo_activo']==1) echo " selected ";?>>Si</option>
                                       <option value="0" <?php if ($valor['vehiculo_activo']==0) echo " selected ";?>>No</option>
                                       </select>
