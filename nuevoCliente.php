@@ -1,24 +1,51 @@
 <?php
-require("config.php");
-if(empty($_SESSION['user'])){
-  header("Location: index.php");
-  die("Redirecting to index.php"); 
-}
-require 'database.php';
+    require("config.php");
+    if(empty($_SESSION['user']['id'])){
+      header("Location: index.php");
+      die("Redirecting to index.php"); 
+    }
+	
+	require 'database.php';
 
-if ( !empty($_POST)) {
-  // insert data
-  $pdo = Database::connect();
-  $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+	if ( !empty($_POST)) {
+    var_dump($_POST);
+     die;
 
-  $sql = "INSERT INTO clientes (razon_social, cuit, cond_fiscal, direccion, email, telefono, fecha_alta, activo, id_usuario, fecha_hora_alta) VALUES (?,?,?,?,?,?,?,1,?,NOW())";
-  $q = $pdo->prepare($sql);
-  $q->execute(array($_POST['razon_social'],str_replace("-","",$_POST['cuit']),$_POST['cond_fiscal'],$_POST['direccion'],$_POST['email'],$_POST['telefono'],$_POST['fecha_alta'],$_SESSION["user"]["id"]));
+		// insert data
+		$pdo = Database::connect();
+		$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+		
+		$sql = "INSERT INTO clientes(razon_social, direccion, telefono, email, cuit, cond_fiscal, fecha_hora, id_usuario, fecha_hora_alta) VALUES (?,?,?,?,?,now())";
+		$q = $pdo->prepare($sql);
+		$q->execute(array($_POST['razon_social'], $_POST['direccion'],$_POST['telefono'],$_POST['email'],$_POST['cuit'],$_POST['cond_fiscal'],$_POST['fecha_hora'],$_SESSION['user']['id']));
+    $idCliente = $pdo->lastInsertId();
 
-  Database::disconnect();
+    foreach($_POST["nombre_lotes"] as $key => $nombre_lotes){
+      if($key==0){
+        continue;
+      }
+      
+      $sql = "INSERT INTO lotes (id_cliente, nombre, direccion, id_localidad, id_usuario, fecha_hora_alta) VALUES (?,?,?,?,?,now()) ";
+      $q = $pdo->prepare($sql);
+      $q->execute(array($idCliente,$nombre_lotes,$_POST["direccion"][$key],$_SESSION['user']['id']));
+    }
+    
+    foreach($_POST["nombre_plantadores"] as $key => $nombre_plantadores){
+      if($key==0){
+        continue;
+      }
 
-  header("Location: listarClientes.php");
-}?>
+      $sql = "INSERT INTO plantadores (id_cliente,nombre, dni, telefono, id_usuario, fecha_hora_alta) VALUES (?,?,?,?,?,now()) ";
+      $q = $pdo->prepare($sql);
+      $q->execute(array($idCliente,$nombre_plantadores,$_POST["dni"][$key],$_POST["telefono"][$key],$_SESSION['user']['id']));
+    }
+		
+		Database::disconnect();
+		
+		header("Location: listarClientes.php");
+	}
+	
+?>
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -33,7 +60,7 @@ if ( !empty($_POST)) {
 	  
       <!-- Page Header Start-->
       <div class="page-body-wrapper">
-		    <?php include('menu.php');?>
+		<?php include('menu.php');?>
         <!-- Page Sidebar Start-->
         <!-- Right sidebar Ends-->
         <div class="page-body">
@@ -65,65 +92,178 @@ if ( !empty($_POST)) {
           <div class="container-fluid">
             <div class="row">
               <div class="col-sm-12">
-                <div class="card">
-                  <div class="card-header">
-                    <h5>Nuevo Cliente</h5>
-                  </div>
-				          <form class="form theme-form" role="form" method="post" action="nuevoCliente.php">
-                    <div class="card-body">
-                      <div class="row">
-                        <div class="col">
-                          <div class="form-group row">
-                            <label class="col-sm-3 col-form-label">Razon Social</label>
-                            <div class="col-sm-9"><input name="razon_social" type="text" maxlength="99" class="form-control" required></div>
-                          </div>
-                          <div class="form-group row">
-                            <label class="col-sm-3 col-form-label">CUIT</label>
-                            <div class="col-sm-9"><input name="cuit" type="text" maxlength="25" class="form-control" value="" required></div>
-                          </div>
-                          <div class="form-group row">
-                            <label class="col-sm-3 col-form-label">Condicion Fiscal</label>
-                            <div class="col-sm-9">
-                              <select name="cond_fiscal" class="form-control" required>
-                                <option value="">- Seleccione -</option><?php
-                                foreach ($aCondicionesFiscales as $value) {?>
-                                  <option><?=$value?></option><?php
-                                }?>
-                              </select>
+                  <div class="card">
+                    <div class="card-header">
+                      <h5>Nuevo Cliente</h5>
+                    </div>
+                    <form class="form theme-form" role="form" method="post" action="nuevoCliente.php">
+                      <div class="card-body">
+                        <div class="row">
+                          <div class="col">
+                            <div class="form-group row">
+                              <div class="form-group col-4">
+                                <label for="razon_social">Razon Social</label>
+                                <input type="text" class="form-control" id="razon_social" name="razon_social" aria-describedby="Razon Social" placeholder="Ingrese la Razon Social">
+                                <!-- <small id="razon_social" class="form-text text-muted">Razon Social</small> -->
+                              </div>
+
+                              <div class="form-group col-4">
+                                <label for="direccion_cliente">Direccion</label>
+                                <input type="text" class="form-control" id="direccion_cliente" name="direccion_cliente" aria-describedby="direccion_cliente" placeholder="Introduzca la Direccion">
+                                <!-- <small id="direccion" class="form-text text-muted">We'll never share your text with anyone else.</small> -->
+                              </div>
+
+                              <div class="form-group col-4">
+                                <label for="telefono_cliente">Telefono</label>
+                                <input type="text" class="form-control" id="telefono_cliente" name="telefono_cliente" aria-describedby="telefono_cliente" placeholder="Introduzca el Telefono">
+                                <!-- <small id="direccion" class="form-text text-muted">We'll never share your text with anyone else.</small> -->
+                              </div>
+
+                              <div class="form-group col-4">
+                                <label for="email">E-mail</label>
+                                <input type="email" class="form-control" id="email" name="email" aria-describedby="email" placeholder="Introduzca el email">
+                                <!-- <small id="direccion" class="form-text text-muted">We'll never share your text with anyone else.</small> -->
+                              </div>
+
+                              <div class="form-group col-4">
+                                <label for="cuit">CUIT</label>
+                                <input type="text" class="form-control" id="cuit" name="cuit" aria-describedby="cuit" placeholder="Introduzca el CUIT">
+                                <!-- <small id="cuit" class="form-text text-muted">We'll never share your text with anyone else.</small> -->
+                              </div>
+                              
+                              <div class="form-group col-4">
+                                <label for="cond_fiscal">Condicion Fiscal</label>
+                                <input type="text" class="form-control" id="cond_fiscal" name="cond_fiscal" aria-describedby="cond_fiscal" placeholder="Introduzca la Condicion Fiscal">
+                                <!-- <small id="cuit" class="form-text text-muted">We'll never share your text with anyone else.</small> -->
+                              </div>
+                              <div class="form-group col-4">
+                                <label for="fecha_alta">Fecha Alta</label>
+                                <input type="date" class="form-control" id="fecha_alta" name="fecha_alta" aria-describedby="fecha_alta" placeholder="Introduzca la Fecha Alta">
+                                <!-- <small id="cuit" class="form-text text-muted">We'll never share your text with anyone else.</small> -->
+                              </div>
                             </div>
-                          </div>
-                          <div class="form-group row">
-                            <label class="col-sm-3 col-form-label">Direccion</label>
-                            <div class="col-sm-9"><input name="direccion" type="text" maxlength="199" class="form-control" required></div>
-                          </div>
-                          <div class="form-group row">
-                            <label class="col-sm-3 col-form-label">Email</label>
-                            <div class="col-sm-9"><input name="email" type="email" maxlength="99" class="form-control"></div>
-                          </div>
-                          <div class="form-group row">
-                            <label class="col-sm-3 col-form-label">Teléfono</label>
-                            <div class="col-sm-9"><input name="telefono" type="text" maxlength="99" class="form-control" required></div>
-                          </div>
-                          <div class="form-group row">
-                            <label class="col-sm-3 col-form-label">Fecha de alta</label>
-                            <div class="col-sm-9"><input name="fecha_alta" type="date" maxlength="99" class="form-control"></div>
-                          </div>
+                          </div><!-- .col -->
+                        </div><!-- .row -->
+                    
+                        <div class="row">
+                          <div class="col-sm-6">
+                            <div class="card-header">
+                                <h4 class="text-center">Lotes</h4>
+                            </div>
+                            <div class="card-body pt-0">
+                              <div class="form-group row">
+                                <table class="table-detalle table table-bordered table-hover text-center" id="tableLotes">
+                                  <thead>
+                                    <tr>
+                                      <th>Nombre</th>
+                                      <th>Direccion</th>
+                                      <th>Localidad</th>
+                                      <th>Activo</th>
+                                    </tr>
+                                  </thead>
+                                  <tbody>
+                                    <tr id='addr0' data-id="0" style="display: none;">
+                                      <td data-name="nombre_lotes">
+                                        <input type="text" class="form-control" placeholder="Nombre" name="nombre_lotes[]" id="nombre_lotes-0"/>
+                                      </td>
+                                      <td data-name="direccion">
+                                        <input type="text" class="form-control" placeholder="Direccion" name="direccion[]" id="direccion-0"/>
+                                      </td>
+                                      <td data-name="localidad">
+                                          <select name="id_localidad[]" id="id_localidad-0" class="js-example-basic-single col-sm-12 form-control" required="required">
+                                            <option value="">Seleccione...</option><?php
+                                            $pdo = Database::connect();
+                                            $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+                                            $sqlZon = "SELECT `id`, `localidad` FROM `localidades` WHERE 1";
+                                            $q = $pdo->prepare($sqlZon);
+                                            $q->execute();
+                                            while ($fila = $q->fetch(PDO::FETCH_ASSOC)) {
+                                              echo "<option value='".$fila['id']."'";
+                                              echo ">".$fila['localidad']."</option>";
+                                            }
+                                            Database::disconnect();?>
+                                          </select>
+                                      </td>
+
+                                      <td data-name="eliminar">
+                                        <span name="eliminar[]" title="Eliminar" class="btn btn-sm row-remove text-center" onClick="eliminarFila(this);">
+                                          <img src="img/icon_baja.png" width="24" height="25" border="0" alt="Eliminar" title="Eliminar">
+                                        </span>
+                                      </td>
+                                    </tr>
+                                  </tbody>
+                                  <tfoot>
+                                    <tr>
+                                      <td colspan="3" align='right'>
+                                        <input type="button" class="btn btn-dark" id="addRowLotes" value="Agregar Lotes">
+                                      </td>
+                                    </tr>
+                                  </tfoot>
+                                </table>
+                              </div><!--.form-group-->
+                            </div><!--.card-body-->
+                          </div><!--.col-sm-6-->
+
+                          <div class="col-sm-6">
+                            <div class="card-header">
+                                <h4 class="text-center">Plantadores</h4>
+                            </div>
+                            <div class="card-body pt-0">
+                              <div class="form-group row">
+                                <table class="table-detalle table table-bordered table-hover text-center" id="tablePlantadores">
+                                  <thead>
+                                    <tr>
+                                      <th>Nombre</th>
+                                      <th>DNI</th>
+                                      <th>Telefono</th>
+                                      <th>Eliminar</th>
+                                    </tr>
+                                  </thead>
+                                  <tbody>
+                                    <tr id='addr0' data-id="0" style="display: none;">
+                                      <td data-name="nombre_plantadores">
+                                        <input type="text" class="form-control" placeholder="Nombre" name="nombre_plantadores[]" id="nombre_plantadores-0"/>
+                                      </td>
+                                      <td data-name="dni">
+                                        <input type="text" class="form-control" placeholder="DNI" name="dni[]" id="dni-0"/>
+                                      </td>
+                                      <td data-name="telefono">
+                                        <input type="text" class="form-control" placeholder="Telefono" name="telefono[]" id="telefono-0"/>
+                                      </td>
+                
+                                      <td data-name="eliminar">
+                                        <span name="eliminar[]" title="Eliminar" class="btn btn-sm row-remove text-center" onClick="eliminarFila(this);">
+                                          <img src="img/icon_baja.png" width="24" height="25" border="0" alt="Eliminar" title="Eliminar">
+                                        </span>
+                                      </td>
+                                    </tr>
+                                  </tbody>
+                                  <tfoot>
+                                    <tr>
+                                      <td colspan="4" align='right'>
+                                        <input type="button" class="btn btn-dark " id="addRowPlantadores" value="Agregar Plantadores">
+                                      </td>
+                                    </tr>
+                                  </tfoot>
+                                </table>
+                              </div>  
+                            </div><!--.card-body-->
+                          </div><!--col-sm-6-->
+                        </div>
+                      </div><!-- .card-body -->
+                      <div class="card-footer">
+                        <div class="col-sm-12 offset-sm-4">
+                          <button class="btn btn-primary" type="submit">Crear</button>
+						              <a href="listarClientes.php" class="btn btn-light">Volver</a>
                         </div>
                       </div>
-                    </div>
-                    <div class="card-footer">
-                      <div class="col-sm-9 offset-sm-3">
-                        <button class="btn btn-primary" type="submit">Crear</button>
-						            <a href="listarClientes.php" class="btn btn-light">Volver</a>
-                      </div>
-                    </div>
-                  </form>
+                    </form><!--form -->
+                  </div>
                 </div>
               </div>
-            </div>
-          </div>
-          <!-- Container-fluid Ends-->
-        </div>
+            </div><!--.row-->
+          </div><!-- Container-fluid Ends-->
+        </div><!--.page-body-->
         <!-- footer start-->
 		    <?php include("footer.php"); ?>
       </div>
@@ -151,7 +291,163 @@ if ( !empty($_POST)) {
     <!-- Theme js-->
     <script src="assets/js/script.js"></script>
     <!-- Plugin used-->
-	  <script src="assets/js/select2/select2.full.min.js"></script>
+	<script src="assets/js/select2/select2.full.min.js"></script>
     <script src="assets/js/select2/select2-custom.js"></script>
+    <script type="text/javascript">
+
+      $(document).ready(function(){
+          $("#addRowLotes").on('click', function(event) {
+            event.preventDefault();
+            addRowLotes();
+          }).click();
+
+          $("#addRowPlantadores").on('click', function(event) {
+            event.preventDefault();
+            addRowPlantadores();
+          }).click();
+      });
+
+      function eliminarFila(t){
+        var fila=$(t).closest("tr");
+        fila.remove();
+      }
+
+      function addRowLotes(){
+        //alert("hola");
+        var newid = 0;
+        var primero="";
+        var ultimoRegistro=0;
+        $.each($("#tableLotes tr"), function() {
+          if (parseInt($(this).data("id")) > newid) {
+            newid = parseInt($(this).data("id"));
+          }
+        });
+        //debugger;
+        newid++;
+        //console.log(newid);
+        var tr = $("<tr></tr>", {
+          "id": "addr"+newid,
+          "data-id": newid
+        });
+        //console.log(newid);
+        var p=0;
+        $.each($("#tableLotes tbody tr:nth(0) td"),function(){//loop through each td and create new elements with name of newid
+          var cur_td = $(this); 
+          var children = cur_td.children();
+          if($(this).data("name")!=undefined){// add new td and element if it has a name
+            var td = $("<td></td>", {
+              "data-name": $(cur_td).data("name"),
+              "class": this.className
+            });
+            var c = $(cur_td).find($(children[0]).prop('tagName')).clone();//.val("")
+            
+            var id=$(c).attr("id");
+            $(c).attr("required",true);
+            ultimoRegistro=id;
+            if(id!=undefined){
+              //console.log("id1: ");
+              //console.log(id);
+              id=id.split("-");
+              c.attr("id", id[0]+"-"+newid);//modificamos el id de cada input
+              if(p==0){
+                primero=c;
+                p++;
+              }
+            }
+            c.appendTo($(td));
+            td.appendTo($(tr));
+            
+          }else {
+            //console.log("<td></td>",{'text':$('#tab_logic tr').length})
+            var td = $("<td></td>", {
+              'text': $('#tableLotes tr').length
+            }).appendTo($(tr));
+          }
+        });
+        //console.log($(tr).find($("input[name='detalledireccion[]']")));
+        //console.log(tr);//.find($("input"))
+        $(tr).appendTo($('#tableLotes'));// add the new row
+        if(newid>0){
+          primero.focus();
+          var sel2=$("#id_categoria-"+newid)
+          //console.log(sel2);
+          
+          sel2.select2();//llamamos para inicializar select2
+          sel2.select2('destroy');//como no se iniciliaza bien lo destruimos para que elimine las clases que arrastra de la clonacion
+          sel2.select2();//volvemos a inicializar y ahora si se inicializa bien
+          
+        }
+        return tr.attr("id");
+      }
+
+      function addRowPlantadores(){
+        //alert("hola");
+        var newid = 0;
+        var primero="";
+        var ultimoRegistro=0;
+        $.each($("#tablePlantadores tr"), function() {
+          if (parseInt($(this).data("id")) > newid) {
+            newid = parseInt($(this).data("id"));
+          }
+        });
+        //debugger;
+        newid++;
+        //console.log(newid);
+        var tr = $("<tr></tr>", {
+          "id": "addr"+newid,
+          "data-id": newid
+        });
+        //console.log(newid);
+        var p=0;
+        $.each($("#tablePlantadores tbody tr:nth(0) td"),function(){//loop through each td and create new elements with name of newid
+          var cur_td = $(this); 
+          var children = cur_td.children();
+          if($(this).data("name")!=undefined){// add new td and element if it has a name
+            var td = $("<td></td>", {
+              "data-name": $(cur_td).data("name"),
+              "class": this.className
+            });
+            var c = $(cur_td).find($(children[0]).prop('tagName')).clone();//.val("")
+            
+            var id=$(c).attr("id");
+            $(c).attr("required",true);
+            ultimoRegistro=id;
+            if(id!=undefined){
+              //console.log("id1: ");
+              //console.log(id);
+              id=id.split("-");
+              c.attr("id", id[0]+"-"+newid);//modificamos el id de cada input
+              if(p==0){
+                primero=c;
+                p++;
+              }
+            }
+            c.appendTo($(td));
+            td.appendTo($(tr));
+            
+          }else {
+            //console.log("<td></td>",{'text':$('#tab_logic tr').length})
+            var td = $("<td></td>", {
+              'text': $('#tablePlantadores tr').length
+            }).appendTo($(tr));
+          }
+        });
+        //console.log($(tr).find($("input[name='detalledireccion[]']")));
+        //console.log(tr);//.find($("input"))
+        $(tr).appendTo($('#tablePlantadores'));// add the new row
+        if(newid>0){
+          primero.focus();
+          var sel2=$("#id_categoria-"+newid)
+          //console.log(sel2);
+          
+          sel2.select2();//llamamos para inicializar select2
+          sel2.select2('destroy');//como no se iniciliaza bien lo destruimos para que elimine las clases que arrastra de la clonacion
+          sel2.select2();//volvemos a inicializar y ahora si se inicializa bien
+          
+        }
+        return tr.attr("id");
+      }
+
+    </script>
   </body>
 </html>
