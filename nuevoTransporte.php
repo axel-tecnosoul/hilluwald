@@ -3,8 +3,6 @@
     if(empty($_SESSION['user']['id'])){
       header("Location: index.php");
       die("Redirecting to index.php"); 
-    }else{
-      var_dump($_SESSION['user']['id']);
     }
 	
 	require 'database.php';
