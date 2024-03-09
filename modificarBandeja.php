@@ -110,8 +110,8 @@ if ( !empty($_POST)) {
                           </div>
                           <div class="form-group row">
                             <label class="col-sm-3 col-form-label">Activo</label>
-                            <div class="col-sm-9">
-                              <select name="activo"  id="activo" class="js-example-basic-single">
+                            <div class="col-sm-2">
+                              <select name="activo"  id="activo" class="js-example-basic-simple form-control">
                                 <option value="1" <?php if ($data['activo']==1) echo " selected ";?>>Si</option>
                                 <option value="0" <?php if ($data['activo']==0) echo " selected ";?>>No</option>
                               </select>
