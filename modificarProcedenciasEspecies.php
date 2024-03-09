@@ -68,7 +68,7 @@ if ( !empty($_POST)) {
                     <h3><?php include("title.php"); ?></h3>
                     <ol class="breadcrumb">
                       <li class="breadcrumb-item"><a href="#"><i data-feather="home"></i></a></li>
-                      <li class="breadcrumb-item">Modificar Procedencias de Especies</li>
+                      <li class="breadcrumb-item">Modificar Procedencia de Especies</li>
                     </ol>
                   </div>
                 </div>
@@ -76,7 +76,7 @@ if ( !empty($_POST)) {
                 <div class="col-2">
                   <div class="bookmark pull-right">
                     <ul>
-                      <li><a  target="_blank" data-container="body" data-toggle="popover" data-placement="top" title="" data-original-title="<?php echo date('d-m-Y');?>"><i data-feather="calendar"></i></a></li>
+                      <li><a  target="_blank" data-container="body" data-toggle="popover" data-placement="top" title="" data-original-title="<?=date('d-m-Y');?>"><i data-feather="calendar"></i></a></li>
                     </ul>
                   </div>
                 </div>
@@ -90,25 +90,25 @@ if ( !empty($_POST)) {
               <div class="col-sm-12">
                 <div class="card">
                   <div class="card-header">
-                    <h5>Modificar Procedencias de Especies</h5>
+                    <h5>Modificar Procedencia de Especies</h5>
                   </div>
-				          <form class="form theme-form" role="form" method="post" action="modificarProcedenciasEspecies.php?id=<?php echo $id?>">
+				          <form class="form theme-form" role="form" method="post" action="modificarProcedenciasEspecies.php?id=<?=$id?>">
                     <div class="card-body">
                       <div class="row">
                         <div class="col">
                         <div class="form-group row">
                           <label class="col-sm-3 col-form-label">Procedencias</label>
-                          <div class="col-sm-9"><input name="procedencia" type="text" maxlength="99" class="form-control" value="<?php echo $data['procedencia']; ?>" required="required"></div>
+                          <div class="col-sm-9"><input name="procedencia" type="text" maxlength="99" class="form-control" value="<?=$data['procedencia']; ?>" required="required"></div>
                         </div>
                         <div class="form-group row">
-                            <label class="col-sm-3 col-form-label">Activo</label>
-                            <div class="col-sm-9">
-                              <select name="activo"  id="activo" class="js-example-basic-single">
-                                <option value="1" <?php if ($data['activo']==1) echo " selected ";?>>Si</option>
-                                <option value="0" <?php if ($data['activo']==0) echo " selected ";?>>No</option>
-                              </select>
-                            </div>
+                          <label class="col-sm-3 col-form-label">Activo</label>
+                          <div class="col-sm-9">
+                            <select name="activo"  id="activo" class="js-example-basic-single col-sm-12">
+                              <option value="1" <?php if ($data['activo']==1) echo " selected ";?>>Si</option>
+                              <option value="0" <?php if ($data['activo']==0) echo " selected ";?>>No</option>
+                            </select>
                           </div>
+                        </div>
                       </div>
                     </div>
                     <div class="card-footer">

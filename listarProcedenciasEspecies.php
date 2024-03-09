@@ -57,7 +57,7 @@ if(empty($_SESSION['user']))
               <div class="col-sm-12">
                 <div class="card">
                   <div class="card-header">
-                    <h5>Procedencias Especies&nbsp;<a href="nuevoProcedenciasEspecies.php"><img src="img/icon_alta.png" width="24" height="25" border="0" alt="Nuevo" title="Nuevo"></a></h5><span>
+                    <h5>Procedencias de Especies&nbsp;<a href="nuevoProcedenciasEspecies.php"><img src="img/icon_alta.png" width="24" height="25" border="0" alt="Nuevo" title="Nuevo"></a></h5><span>
                   </div>
                   <div class="card-body">
                     <div class="dt-ext table-responsive">
