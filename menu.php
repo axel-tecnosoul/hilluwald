@@ -20,6 +20,8 @@
           <li><a href="listarBandejas.php"><i class="fa fa-circle"></i>Bandejas</a></li>
           <li><a href="listarCultivos.php"><i class="fa fa-circle"></i>Cultivos</a></li>
           <li><a href="listarTransportes.php"><i class="fa fa-circle"></i>Transportes</a></li>
+          <li><a href="listarProcedenciasEspecies.php"><i class="fa fa-circle"></i>Procedencias de Especies</a></li>
+          <li><a href="listarEspecies.php"><i class="fa fa-circle"></i>Especies</a></li>
           <li><a href="listarUsuarios.php"><i class="fa fa-circle"></i>Usuarios</a></li>
         </ul>
       </li>
