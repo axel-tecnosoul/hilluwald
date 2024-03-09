@@ -157,7 +157,7 @@
                                     <tr>
                                       <th>Nombre</th>
                                       <th>Direccion</th>
-                                      <th>Localidad</th>
+                                      <th>Localidades</th>
                                       <th>Activo</th>
                                     </tr>
                                   </thead>
@@ -174,12 +174,12 @@
                                             <option value="">Seleccione...</option><?php
                                             $pdo = Database::connect();
                                             $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-                                            $sqlZon = "SELECT `id`, `localidad` FROM `localidades` WHERE 1";
+                                            $sqlZon = "SELECT l.id, l.localidad, p.provincia FROM `localidades` l left join provincias p on l.id = p.id  WHERE 1";
                                             $q = $pdo->prepare($sqlZon);
                                             $q->execute();
                                             while ($fila = $q->fetch(PDO::FETCH_ASSOC)) {
                                               echo "<option value='".$fila['id']."'";
-                                              echo ">".$fila['localidad']."</option>";
+                                              echo ">".$fila['localidad'] . " - " . $fila['provincia']."</option>";
                                             }
                                             Database::disconnect();?>
                                           </select>
@@ -194,7 +194,7 @@
                                   </tbody>
                                   <tfoot>
                                     <tr>
-                                      <td colspan="3" align='right'>
+                                      <td colspan="4" align='right'>
                                         <input type="button" class="btn btn-dark" id="addRowLotes" value="Agregar Lotes">
                                       </td>
                                     </tr>
@@ -369,7 +369,7 @@
         $(tr).appendTo($('#tableLotes'));// add the new row
         if(newid>0){
           primero.focus();
-          var sel2=$("#id_categoria-"+newid)
+          var sel2=$("#id_localidad-"+newid)
           //console.log(sel2);
           
           sel2.select2();//llamamos para inicializar select2
