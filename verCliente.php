@@ -177,8 +177,8 @@ Database::disconnect();
 
                   <div class="card-body">
                     <ul class="nav nav-tabs border-tab" id="pills-tab" role="tablist" style="margin-top: -20px;">
-
-                      <li class="nav-item"><a class="nav-link active" id="pills-contacto-tab" data-toggle="pill" href="#pills-contacto" role="tab" aria-controls="pills-contacto" aria-selected="true"><i class="icofont icofont-ui-user"></i>Datos</a></li><?php
+                    
+                      <li class="nav-item"><a class="nav-link active" id="pills-resumen-tab" data-toggle="pill" href="#pills-resumen" role="tab" aria-controls="pills-resumen" aria-selected="true"><i class="fa fa-columns"></i>Resumen</a></li><?php
                       
                       foreach ($aCultivosPedidos as $cultivo_pedido) {?>
                         <li class="nav-item">
@@ -195,11 +195,17 @@ Database::disconnect();
                         </li><?php
                       }?>
 
+                      <li class="nav-item"><a class="nav-link" id="pills-contacto-tab" data-toggle="pill" href="#pills-contacto" role="tab" aria-controls="pills-contacto" aria-selected="true"><i class="icofont icofont-ui-user"></i>Datos</a></li>
+
                     </ul>
 
                     <div class="tab-content" id="pills-tabContent">
+
+                      <div class="tab-pane fade show active" id="pills-resumen" role="tabpanel" aria-labelledby="pills-resumen-tab">
+
+                      </div>
                       
-                      <div class="tab-pane fade show active" id="pills-contacto" role="tabpanel" aria-labelledby="pills-contacto-tab">
+                      <div class="tab-pane fade show" id="pills-contacto" role="tabpanel" aria-labelledby="pills-contacto-tab">
 
                         <div class="form-group row">
                           <label class="col-sm-3 col-form-label">Razon Social</label>
