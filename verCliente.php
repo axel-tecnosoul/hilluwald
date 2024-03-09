@@ -178,7 +178,7 @@ Database::disconnect();
                   <div class="card-body">
                     <ul class="nav nav-tabs border-tab" id="pills-tab" role="tablist" style="margin-top: -20px;">
                     
-                      <li class="nav-item"><a class="nav-link active" id="pills-resumen-tab" data-toggle="pill" href="#pills-resumen" role="tab" aria-controls="pills-resumen" aria-selected="true"><i class="fa fa-columns"></i>Resumen</a></li><?php
+                      <li class="nav-item"><a class="nav-link active" id="pills-resumen-tab" data-toggle="pill" href="#pills-resumen" role="tab" aria-controls="pills-resumen" aria-selected="true"><i class="fa fa-server"></i>Resumen</a></li><?php
                       
                       foreach ($aCultivosPedidos as $cultivo_pedido) {?>
                         <li class="nav-item">
