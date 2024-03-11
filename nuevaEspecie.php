@@ -1,30 +1,26 @@
 <?php
-    require("config.php");
-    if(empty($_SESSION['user']))
-    {
-        header("Location: index.php");
-        die("Redirecting to index.php"); 
-    }
-	
-	require 'database.php';
-	
-	if ( !empty($_POST)) {
-		// var_dump($_POST);
-    // die;
-		// insert data
-		$pdo = Database::connect();
-		$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-		
-		$sql = "INSERT INTO especies(especie, id_usuario, fecha_hora_alta) VALUES (?,?,now())";
-		$q = $pdo->prepare($sql);
-		$q->execute(array($_POST['especie'],$_SESSION['user']['id']));
-		
-		Database::disconnect();
-		
-		header("Location: listarEspecies.php");
-	}
-	
-?>
+require("config.php");
+if(empty($_SESSION['user'])){
+  header("Location: index.php");
+  die("Redirecting to index.php"); 
+}
+require 'database.php';
+
+if ( !empty($_POST)) {
+  //var_dump($_POST);
+  //die;
+  // insert data
+  $pdo = Database::connect();
+  $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+  
+  $sql = "INSERT INTO especies (especie, icono, color, id_usuario, fecha_hora_alta) VALUES (?,?,?,?,now())";
+  $q = $pdo->prepare($sql);
+  $q->execute(array($_POST['especie'],$_POST['icon'],$_POST['basic-color'],$_SESSION['user']['id']));
+  
+  Database::disconnect();
+  
+  header("Location: listarEspecies.php");
+}?>
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -35,11 +31,11 @@
     <!-- Loader ends-->
     <!-- page-wrapper Start-->
     <div class="page-wrapper">
-	  <?php include('header.php');?>
+	    <?php include('header.php');?>
 	  
       <!-- Page Header Start-->
       <div class="page-body-wrapper">
-		<?php include('menu.php');?>
+		    <?php include('menu.php');?>
         <!-- Page Sidebar Start-->
         <!-- Right sidebar Ends-->
         <div class="page-body">
@@ -81,6 +77,30 @@
                         <label class="col-sm-3 col-form-label">Especie</label>
                         <div class="col-sm-9"><input name="especie" type="text" maxlength="99" class="form-control" value="" required="required"></div>
                       </div>
+                      <div class="form-group row">
+                        <label class="col-sm-3 col-form-label">Icono</label>
+                        <div class="col-sm-9">
+                          <div class="btn-group btn-group-toggle" data-toggle="buttons"><?php
+                            foreach ($aIconos as $icono) {?>
+                              <label class="btn btn-outline-primary">
+                                <input type="radio" value="<?=$icono?>" name="icon" id="icon">
+                                <i class="<?=$icono?>" aria-hidden="true"></i>
+                              </label><?php
+                            }?>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="form-group row">
+                        <label class="col-sm-3 col-form-label">Color del icono</label>
+                        <div class="col-sm-9">
+                          <input type="color" id="basic-color" name="basic-color" list="basic-colors">
+                          <datalist id="basic-colors"><?php
+                            foreach ($aColores as $codigo => $nombre): ?>
+                              <option value="<?=$codigo?>" <?php if ($data['color'] == $codigo) echo "selected"; ?> autocomplete="off"><?=$nombre?></option><?php
+                            endforeach; ?>
+                          </datalist>
+                        </div>
+                      </div>
                     </div>
                     <div class="card-footer">
                       <div class="col-sm-9 offset-sm-3">
@@ -96,7 +116,7 @@
           <!-- Container-fluid Ends-->
         </div>
         <!-- footer start-->
-		<?php include("footer.php"); ?>
+		    <?php include("footer.php"); ?>
       </div>
     </div>
     <!-- latest jquery-->
@@ -122,7 +142,7 @@
     <!-- Theme js-->
     <script src="assets/js/script.js"></script>
     <!-- Plugin used-->
-	<script src="assets/js/select2/select2.full.min.js"></script>
+	  <script src="assets/js/select2/select2.full.min.js"></script>
     <script src="assets/js/select2/select2-custom.js"></script>
   </body>
 </html>

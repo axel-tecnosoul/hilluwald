@@ -15,9 +15,11 @@
 		$pdo = Database::connect();
 		$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 		
-		$sql = "INSERT INTO cultivos(nombre, nombre_corto, precio, icono, color, id_usuario, fecha_hora_alta) VALUES (?,?,?,?,?,?,now())";
+		//$sql = "INSERT INTO cultivos_test (material, id_especie, id_procedencia, id_usuario, fecha_hora_alta) VALUES (?,?,?,?,now())";
+    $sql = "INSERT INTO cultivos (material, id_especie, id_procedencia, nombre_corto, id_usuario) VALUES (?,?,?,?,?)";
 		$q = $pdo->prepare($sql);
-		$q->execute(array($_POST['nombre'],$_POST['nombre_corto'], $_POST['precio'],$_POST['icon'],$_POST['basic-color'],$_SESSION['user']['id']));
+		//$q->execute(array($_POST['material'],$_POST['nombre_corto'], $_POST['precio'],$_POST['icon'],$_POST['basic-color'],$_SESSION['user']['id']));
+    $q->execute(array($_POST['material'],$_POST['id_especie'], $_POST['id_procedencia'], $_POST['nombre_corto'],$_SESSION['user']['id']));
 		
 		Database::disconnect();
 		
@@ -79,7 +81,7 @@
                     <div class="card-body">
                       <div class="form-group row">
                         <label class="col-sm-3 col-form-label">Material</label>
-                        <div class="col-sm-9"><input name="nombre" type="text" maxlength="99" class="form-control" value="" required="required"></div>
+                        <div class="col-sm-9"><input name="material" type="text" maxlength="99" class="form-control" value="" required="required"></div>
                       </div>
                       <div class="form-group row">
                         <label class="col-sm-3 col-form-label">Procedencia</label>
@@ -116,6 +118,10 @@
                             Database::disconnect();?>
                           </select>
                         </div>
+                      </div>
+                      <div class="form-group row">
+                        <label class="col-sm-3 col-form-label">Nombre Corto</label>
+                        <div class="col-sm-9"><input name="nombre_corto" type="text" maxlength="99" class="form-control" value="" required="required"></div>
                       </div>
                     </div>
                     <div class="card-footer">

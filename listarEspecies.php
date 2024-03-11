@@ -73,12 +73,20 @@ if(empty($_SESSION['user']))
                         <tbody><?php
                           include 'database.php';
                           $pdo = Database::connect();
-                          $sql = " SELECT id, especie, activo, id_usuario, fecha_hora_alta FROM especies  WHERE 1 ";
+                          $sql = " SELECT id, especie, activo, id_usuario, fecha_hora_alta, icono, color FROM especies  WHERE 1 ";
                           
                           foreach ($pdo->query($sql) as $row) {?>
                             <tr>
                               <td><?=$row['id']?></td>
-                              <td><?=$row['especie']?></td><?php
+                              <td><?=$row['especie']?></td><td><?php
+                                if($row["icono"]){
+                                  $style="";
+                                  if($row["color"]){
+                                    $style="color:".$row["color"];
+                                  }?>
+                                  <i class="<?=$row["icono"]?>" style=<?=$style?>></i><?php
+                                }?>
+                              </td><?php
                               if ($row["activo"] == 1) {
                                 echo '<td>Si</td>';
                               } else {
