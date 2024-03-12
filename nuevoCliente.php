@@ -164,13 +164,13 @@
                                   <tbody>
                                     <tr id='addr0' data-id="0" style="display: none;">
                                       <td data-name="nombre_lotes">
-                                        <input type="text" class="form-control" placeholder="Nombre" name="nombre_lotes[]" id="nombre_lotes-0"/>
+                                        <input type="text" class="form-control" placeholder="Nombre" name="nombre_lotes[]" id="nombre_lotes-0" data-required="1"/>
                                       </td>
                                       <td data-name="direccion">
-                                        <input type="text" class="form-control" placeholder="Direccion" name="direccion[]" id="direccion-0"/>
+                                        <input type="text" class="form-control" placeholder="Direccion" name="direccion[]" id="direccion-0" data-required="1"/>
                                       </td>
                                       <td data-name="localidad">
-                                          <select name="id_localidad[]" id="id_localidad-0" class="js-example-basic-single col-sm-12 form-control" required="required">
+                                          <select name="id_localidad[]" id="id_localidad-0" class="js-example-basic-single col-sm-12 form-control" data-required="1">
                                             <option value="">Seleccione...</option><?php
                                             $pdo = Database::connect();
                                             $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
@@ -184,7 +184,6 @@
                                             Database::disconnect();?>
                                           </select>
                                       </td>
-
                                       <td data-name="eliminar">
                                         <span name="eliminar[]" title="Eliminar" class="btn btn-sm row-remove text-center" onClick="eliminarFila(this);">
                                           <img src="img/icon_baja.png" width="24" height="25" border="0" alt="Eliminar" title="Eliminar">
@@ -222,15 +221,14 @@
                                   <tbody>
                                     <tr id='addr0' data-id="0" style="display: none;">
                                       <td data-name="nombre_plantadores">
-                                        <input type="text" class="form-control" placeholder="Nombre" name="nombre_plantadores[]" id="nombre_plantadores-0"/>
+                                        <input type="text" class="form-control" placeholder="Nombre" name="nombre_plantadores[]" id="nombre_plantadores-0" data-required="1"/>
                                       </td>
                                       <td data-name="dni">
-                                        <input type="text" class="form-control" placeholder="DNI" name="dni[]" id="dni-0"/>
+                                        <input type="text" class="form-control" placeholder="DNI" name="dni[]" id="dni-0" data-required="1"/>
                                       </td>
                                       <td data-name="telefono">
-                                        <input type="text" class="form-control" placeholder="Telefono" name="telefono[]" id="telefono-0"/>
+                                        <input type="text" class="form-control" placeholder="Telefono" name="telefono[]" id="telefono-0" data-required="1"/>
                                       </td>
-                
                                       <td data-name="eliminar">
                                         <span name="eliminar[]" title="Eliminar" class="btn btn-sm row-remove text-center" onClick="eliminarFila(this);">
                                           <img src="img/icon_baja.png" width="24" height="25" border="0" alt="Eliminar" title="Eliminar">
@@ -337,7 +335,9 @@
             var c = $(cur_td).find($(children[0]).prop('tagName')).clone();//.val("")
             
             var id=$(c).attr("id");
-            $(c).attr("required",true);
+            if($(c).data("required")==1){
+              $(c).attr("required",true);
+            }
             ultimoRegistro=id;
             if(id!=undefined){
               //console.log("id1: ");
@@ -363,7 +363,7 @@
         //console.log(tr);//.find($("input"))
         $(tr).appendTo($('#tableLotes'));// add the new row
         if(newid>0){
-          primero.focus();
+          //primero.focus();
           var sel2=$("#id_localidad-"+newid)
           console.log(sel2);
           
@@ -407,7 +407,9 @@
             var c = $(cur_td).find($(children[0]).prop('tagName')).clone();//.val("")
             
             var id=$(c).attr("id");
-            $(c).attr("required",true);
+            if($(c).data("required")==1){
+              $(c).attr("required",true);
+            }
             ultimoRegistro=id;
             if(id!=undefined){
               //console.log("id1: ");
@@ -433,7 +435,7 @@
         //console.log(tr);//.find($("input"))
         $(tr).appendTo($('#tablePlantadores'));// add the new row
         if(newid>0){
-          primero.focus();
+          //primero.focus();
           var sel2=$("#id_categoria-"+newid)
           //console.log(sel2);
           sel2.css("width","100%");
