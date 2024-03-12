@@ -183,7 +183,7 @@
                                             <option value="">Seleccione...</option><?php
                                             $pdo = Database::connect();
                                             $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-                                            $sqlZon = "SELECT l.id, l.localidad, p.provincia FROM `localidades` l left join provincias p on l.id = p.id  WHERE 1";
+                                            $sqlZon = "SELECT l.id, l.localidad, p.provincia FROM `localidades` l left join provincias p on l.id_provincia = p.id  WHERE 1";
                                             $q = $pdo->prepare($sqlZon);
                                             $q->execute();
                                             while ($fila = $q->fetch(PDO::FETCH_ASSOC)) {
