@@ -34,7 +34,7 @@ if(empty($_SESSION['user']))
                     <h3><?php include("title.php"); ?></h3>
                     <ol class="breadcrumb">
                       <li class="breadcrumb-item"><a href="#"><i data-feather="home"></i></a></li>
-                      <li class="breadcrumb-item">Procedencias de Especies</li>
+                      <li class="breadcrumb-item">Cultivos</li>
                     </ol>
                   </div>
                 </div>
@@ -57,7 +57,7 @@ if(empty($_SESSION['user']))
               <div class="col-sm-12">
                 <div class="card">
                   <div class="card-header">
-                    <h5>Procedencias de Especies&nbsp;<a href="nuevoProcedenciasEspecies.php"><img src="img/icon_alta.png" width="24" height="25" border="0" alt="Nuevo" title="Nuevo"></a></h5><span>
+                    <h5>Cultivos&nbsp;<a href="nuevoCultivo.php"><img src="img/icon_alta.png" width="24" height="25" border="0" alt="Nuevo" title="Nuevo"></a></h5><span>
                   </div>
                   <div class="card-body">
                     <div class="dt-ext table-responsive">
@@ -65,33 +65,40 @@ if(empty($_SESSION['user']))
                         <thead>
                           <tr>
                             <th>ID</th>
-                            <th>Procedencia</th>
-                            <th>Activo</th>
+                            <th>Nombre</th>
+                            <th>Nombre Corto</th>
+                            <th>Precio</th>
+                            <th>Icono</th>
                             <th>Opciones</th>
                           </tr>
                         </thead>
                         <tbody><?php
                           include 'database.php';
                           $pdo = Database::connect();
-                          $sql = " SELECT id, procedencia, activo, id_usuario, fecha_hora_alta FROM procedencias_especies  WHERE 1 ";
+                          $sql = " SELECT c.id, c.nombre, c.nombre_corto, c.precio, c.id_usuario, c.fecha_hora_alta, u.usuario, c.icono, c.color FROM cultivos c left join usuarios u on u.id = c.id_usuario WHERE 1 ";
                           
-                          foreach ($pdo->query($sql) as $row) {
-                            echo '<tr>';
-                            echo '<td>'. $row["id"] . '</td>';
-                            echo '<td>'. $row["procedencia"] . '</td>';
-                            if ($row["activo"] == 1) {
-                              echo '<td>Si</td>';
-                            } else {
-                              echo '<td>No</td>';
-                            }
-                            echo '<td>';
-                            echo '<a href="modificarProcedenciasEspecies.php?id='.$row["id"].'"><img src="img/icon_modificar.png" width="24" height="25" border="0" alt="Modificar" title="Modificar"></a>';
-                            echo '&nbsp;&nbsp;';
-                            echo '<a href="#" title="Eliminar" onclick="openModalEliminar('.$row["id"].')"><img src="img/icon_baja.png" width="24" height="25" border="0" alt="Eliminar"></a>';
-                            echo '&nbsp;&nbsp;';
-                            //echo '&nbsp;&nbsp;';
-                            echo '</td>';
-                            echo '</tr>';
+                          foreach ($pdo->query($sql) as $row) {?>
+                            <tr>
+                              <td><?=$row['id']?></td>
+                              <td><?=$row['nombre']?></td>
+                              <td><?=$row['nombre_corto']?></td>
+                              <td>$<?=$row['precio']?></td>
+                              <td><?php
+                                if($row["icono"]){
+                                  $style="";
+                                  if($row["color"]){
+                                    $style="color:".$row["color"];
+                                  }?>
+                                  <i class="<?=$row["icono"]?>" style=<?=$style?>></i><?php
+                                }?>
+                              </td>
+                              <td>
+                                <a href="modificarCultivo.php?id=<?=$row["id"]?>"><img src="img/icon_modificar.png" width="24" height="25" border="0" alt="Modificar" title="Modificar"></a>
+                                &nbsp;&nbsp;
+                                <a href="#" data-toggle="modal" data-target="#eliminarModal_<?=$row["id"]?>"><img src="img/icon_baja.png" width="24" height="25" border="0" alt="Eliminar" title="Eliminar"></a>
+                                &nbsp;&nbsp;
+                              </td>
+                            </tr><?php
                           }
                           Database::disconnect();?>
                         </tbody>
@@ -110,21 +117,30 @@ if(empty($_SESSION['user']))
         <?php include("footer.php"); ?>
       </div>
     </div>
-	<div class="modal fade" id="eliminarModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+	<?php 
+	$pdo = Database::connect();
+	$sql = " SELECT id, nombre, precio, id_usuario, fecha_hora_alta FROM `cultivos` WHERE 1 ";
+	foreach ($pdo->query($sql) as $row) {
+	?>
+	<div class="modal fade" id="eliminarModal_<?php echo $row[0];?>" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
 	  <div class="modal-dialog" role="document">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="exampleModalLabel">Confirmación</h5>
-          <button class="close" type="button" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
-          </div>
-          <div class="modal-body">¿Está seguro que desea eliminar la Procedencias de Especies?</div>
-          <div class="modal-footer">
-            <a id="btnEliminar" class="btn btn-primary">Eliminar</a>
-            <button class="btn btn-light" type="button" data-dismiss="modal" aria-label="Close">Volver</button>
-          </div>
-        </div>
-      </div>
-    </div>
+		<div class="modal-content">
+		  <div class="modal-header">
+			<h5 class="modal-title" id="exampleModalLabel">Confirmación</h5>
+			<button class="close" type="button" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+		  </div>
+		  <div class="modal-body">¿Está seguro que desea eliminar la Cultivo?</div>
+		  <div class="modal-footer">
+			<a href="eliminarCultivo.php?id=<?php echo $row[0];?>" class="btn btn-primary">Eliminar</a>
+			<a onclick="document.location.href='listarcultivos.php'" class="btn btn-light">Volver</a>
+		  </div>
+		</div>
+	  </div>
+	</div>
+	<?php 
+	}
+	Database::disconnect();
+	?>
     <!-- latest jquery-->
     <script src="assets/js/jquery-3.2.1.min.js"></script>
     <!-- Bootstrap js-->
@@ -189,11 +205,6 @@ if(empty($_SESSION['user']))
 				}}
 			});
 		});
-
-    function openModalEliminar(idProcedenciasEspecies){
-      $('#eliminarModal').modal("show");
-      document.getElementById("btnEliminar").href="eliminarProcedenciasEspecies.php?id="+idProcedenciasEspecies;
-    }
 		
 		</script>
 		<script src="https://cdn.datatables.net/plug-ins/1.10.15/i18n/Spanish.json"></script>

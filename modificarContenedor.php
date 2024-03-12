@@ -12,7 +12,7 @@ if ( !empty($_GET['id'])) {
 }
 
 if ( null==$id ) {
-  header("Location: listarBandejas.php");
+  header("Location: listarContenedores.php");
 }
 
 if ( !empty($_POST)) {
@@ -21,19 +21,19 @@ if ( !empty($_POST)) {
   $pdo = Database::connect();
   $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
   
-  $sql = "UPDATE bandejas set cantidad_orificios = ?, alto = ?, ancho = ?, activo = ?, id_usuario = ? where id = ?";
+  $sql = "UPDATE contenedores set id_tipo_contenedor = ?, cantidad_orificios = ?, alto = ?, ancho = ?, activo = ?, id_usuario = ? where id = ?";
   $q = $pdo->prepare($sql);
-  $q->execute(array($_POST['cantidad_orificios'],$_POST['alto'], $_POST['ancho'], $_POST['activo'], $_SESSION["user"]["id"], $_GET['id']));
+  $q->execute(array($_POST['id_tipo_contenedor'],$_POST['cantidad_orificios'],$_POST['alto'], $_POST['ancho'], $_POST['activo'], $_SESSION["user"]["id"], $_GET['id']));
   
   Database::disconnect();
   
-  header("Location: listarBandejas.php");
+  header("Location: listarContenedores.php");
 
 } else {
   
   $pdo = Database::connect();
   $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-  $sql = "SELECT cantidad_orificios, alto, ancho, activo FROM bandejas WHERE id = ? ";
+  $sql = "SELECT id_tipo_contenedor, cantidad_orificios, alto, ancho, activo FROM contenedores WHERE id = ? ";
   $q = $pdo->prepare($sql);
   $q->execute(array($id));
   $data = $q->fetch(PDO::FETCH_ASSOC);
@@ -85,7 +85,7 @@ if ( !empty($_POST)) {
                     <h3><?php include("title.php"); ?></h3>
                     <ol class="breadcrumb">
                       <li class="breadcrumb-item"><a href="#"><i data-feather="home"></i></a></li>
-                      <li class="breadcrumb-item">Modificar Bandeja</li>
+                      <li class="breadcrumb-item">Modificar Contenedor</li>
                     </ol>
                   </div>
                 </div>
@@ -107,12 +107,33 @@ if ( !empty($_POST)) {
               <div class="col-sm-12">
                 <div class="card">
                   <div class="card-header">
-                    <h5>Modificar Bandeja</h5>
+                    <h5>Modificar Contenedor</h5>
                   </div>
-				          <form class="form theme-form" role="form" method="post" action="modificarBandeja.php?id=<?php echo $id?>">
+				          <form class="form theme-form" role="form" method="post" action="modificarContenedor.php?id=<?php echo $id?>">
                     <div class="card-body">
                       <div class="row">
                         <div class="col">
+                          <div class="form-group row">
+                            <label class="col-sm-3 col-form-label">Tipo</label>
+                            <div class="col-sm-9">
+                              <select name="id_tipo_contenedor" class="form-control" required>
+                                <option value="">Seleccione...</option><?php
+                                $pdo = Database::connect();
+                                $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+                                $sqlZon = "SELECT id, tipo FROM tipos_contenedores";
+                                $q = $pdo->prepare($sqlZon);
+                                $q->execute();
+                                while ($fila = $q->fetch(PDO::FETCH_ASSOC)) {
+                                  echo "<option value='".$fila['id']."'";
+                                  if($fila["id"]==$data["id_tipo_contenedor"]){
+                                    echo " selected";
+                                  }
+                                  echo ">".$fila['tipo']."</option>";
+                                }
+                                Database::disconnect();?>
+                              </select>
+                            </div>
+                          </div>
                           <div class="form-group row">
                             <label class="col-sm-3 col-form-label">Cantidad de Orificios</label>
                             <div class="col-sm-9"><input name="cantidad_orificios" type="text" maxlength="99" class="form-control" value="<?=$data['cantidad_orificios']?>" required></div>
@@ -145,7 +166,7 @@ if ( !empty($_POST)) {
                     <div class="card-footer">
                       <div class="col-sm-9 offset-sm-3">
                         <button class="btn btn-primary" type="submit">Modificar</button>
-						            <a href='listarBandejas.php' class="btn btn-light">Volver</a>
+						            <a href='listarContenedores.php' class="btn btn-light">Volver</a>
                       </div>
                     </div>
                   </form>

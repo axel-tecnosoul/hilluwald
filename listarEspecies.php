@@ -73,25 +73,32 @@ if(empty($_SESSION['user']))
                         <tbody><?php
                           include 'database.php';
                           $pdo = Database::connect();
-                          $sql = " SELECT id, especie, activo, id_usuario, fecha_hora_alta FROM especies  WHERE 1 ";
+                          $sql = " SELECT id, especie, activo, id_usuario, fecha_hora_alta, icono, color FROM especies  WHERE 1 ";
                           
-                          foreach ($pdo->query($sql) as $row) {
-                            echo '<tr>';
-                            echo '<td>'. $row["id"] . '</td>';
-                            echo '<td>'. $row["especie"] . '</td>';
-                            if ($row["activo"] == 1) {
-                              echo '<td>Si</td>';
-                            } else {
-                              echo '<td>No</td>';
-                            }
-                            echo '<td>';
-                            echo '<a href="modificarEspecie.php?id='.$row["id"].'"><img src="img/icon_modificar.png" width="24" height="25" border="0" alt="Modificar" title="Modificar"></a>';
-                            echo '&nbsp;&nbsp;';
-                            echo '<a href="#" title="Eliminar" onclick="openModalEliminar('.$row["id"].')"><img src="img/icon_baja.png" width="24" height="25" border="0" alt="Eliminar"></a>';
-                            echo '&nbsp;&nbsp;';
-                            //echo '&nbsp;&nbsp;';
-                            echo '</td>';
-                            echo '</tr>';
+                          foreach ($pdo->query($sql) as $row) {?>
+                            <tr>
+                              <td><?=$row['id']?></td>
+                              <td><?=$row['especie']?></td><td><?php
+                                if($row["icono"]){
+                                  $style="";
+                                  if($row["color"]){
+                                    $style="color:".$row["color"];
+                                  }?>
+                                  <i class="<?=$row["icono"]?>" style=<?=$style?>></i><?php
+                                }?>
+                              </td><?php
+                              if ($row["activo"] == 1) {
+                                echo '<td>Si</td>';
+                              } else {
+                                echo '<td>No</td>';
+                              }?>
+                              <td>
+                                <a href="modificarEspecie.php?id=<?=$row["id"]?>"><img src="img/icon_modificar.png" width="24" height="25" border="0" alt="Modificar" title="Modificar"></a>
+                                &nbsp;&nbsp;
+                                <a href="#" data-toggle="modal" data-target="#eliminarModal_<?=$row["id"]?>"><img src="img/icon_baja.png" width="24" height="25" border="0" alt="Eliminar" title="Eliminar"></a>
+                                &nbsp;&nbsp;
+                              </td>
+                            </tr><?php
                           }
                           Database::disconnect();?>
                         </tbody>

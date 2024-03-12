@@ -8,17 +8,23 @@
 	require 'database.php';
 
 	if ( !empty($_POST)) {
-    // var_dump($_POST);
-    // die;
+    //var_dump($_POST);
+    //die;
 
 		// insert data
 		$pdo = Database::connect();
 		$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 		
-		$sql = "INSERT INTO clientes(razon_social, direccion, telefono, email, cuit, cond_fiscal, fecha_alta, id_usuario, fecha_hora_alta) VALUES (?,?,?,?,?,?,?,?,now())";
+		$sql = "INSERT INTO clientes(razon_social, direccion, telefono, email, cuit, cond_fiscal, id_usuario, fecha_hora_alta) VALUES (?,?,?,?,?,?,?,now())";
 		$q = $pdo->prepare($sql);
-		$q->execute(array($_POST['razon_social'], $_POST['direccion_cliente'],$_POST['telefono_cliente'],$_POST['email'],$_POST['cuit'],$_POST['cond_fiscal'],$_POST['fecha_alta'],$_SESSION['user']['id']));
+		$q->execute(array($_POST['razon_social'], $_POST['direccion_cliente'],$_POST['telefono_cliente'],$_POST['email'],$_POST['cuit'],$_POST['cond_fiscal'],$_SESSION['user']['id']));
     $idCliente = $pdo->lastInsertId();
+
+    foreach ($_POST["sucursales"] as $key => $id_sucursal) {
+      $sql = "INSERT INTO cliente_sucursal (id_cliente, id_sucursal) VALUES (?,?)";
+      $q = $pdo->prepare($sql);
+      $q->execute(array($idCliente,$id_sucursal));
+    }
 
     foreach($_POST["nombre_lotes"] as $key => $nombre_lotes){
       if($key==0){
@@ -115,7 +121,7 @@
 
                               <div class="form-group col-4">
                                 <label for="telefono_cliente">Telefono</label>
-                                <input type="text" class="form-control" id="telefono_cliente" name="telefono_cliente" aria-describedby="telefono_cliente" placeholder="Introduzca el Telefono">
+                                <input type="number" class="form-control" id="telefono_cliente" name="telefono_cliente" aria-describedby="telefono_cliente" placeholder="Introduzca el Telefono">
                                 <!-- <small id="direccion" class="form-text text-muted">We'll never share your text with anyone else.</small> -->
                               </div>
 
@@ -141,14 +147,20 @@
 
                               <div class="form-group col-4">
                                 <label for="cuit">CUIT</label>
-                                <input type="text" class="form-control" id="cuit" name="cuit" aria-describedby="cuit" placeholder="Introduzca el CUIT">
+                                <input type="number" class="form-control" id="cuit" name="cuit" aria-describedby="cuit" placeholder="Introduzca el CUIT">
                                 <!-- <small id="cuit" class="form-text text-muted">We'll never share your text with anyone else.</small> -->
                               </div>
                               
                               <div class="form-group col-4">
-                                <label for="fecha_alta">Fecha Alta</label>
-                                <input type="date" class="form-control" id="fecha_alta" name="fecha_alta" aria-describedby="fecha_alta" placeholder="Introduzca la Fecha Alta">
-                                <!-- <small id="cuit" class="form-text text-muted">We'll never share your text with anyone else.</small> -->
+                                <label for="sucursales">Sucursales</label>
+                                <select name="sucursales[]" class="js-example-basic-single col-12" multiple>
+                                  <option value="">- Seleccione -</option><?php
+                                  $pdo = Database::connect();
+                                  $sql = " SELECT id, nombre FROM sucursales";
+                                  foreach ($pdo->query($sql) as $row) {?>
+                                    <option value="<?=$row["id"]?>"><?=$row["nombre"]?></option><?php
+                                  }?>
+                                </select>
                               </div>
                             </div>
                           </div><!-- .col -->
@@ -173,27 +185,26 @@
                                   <tbody>
                                     <tr id='addr0' data-id="0" style="display: none;">
                                       <td data-name="nombre_lotes">
-                                        <input type="text" class="form-control" placeholder="Nombre" name="nombre_lotes[]" id="nombre_lotes-0"/>
+                                        <input type="text" class="form-control" placeholder="Nombre" name="nombre_lotes[]" id="nombre_lotes-0" data-required="1"/>
                                       </td>
                                       <td data-name="direccion">
-                                        <input type="text" class="form-control" placeholder="Direccion" name="direccion[]" id="direccion-0"/>
+                                        <input type="text" class="form-control" placeholder="Direccion" name="direccion[]" id="direccion-0" data-required="1"/>
                                       </td>
                                       <td data-name="localidad">
-                                          <select name="id_localidad[]" id="id_localidad-0" class="js-example-basic-single col-sm-12 ">
-                                            <option value="">Seleccione...</option><?php
-                                            $pdo = Database::connect();
-                                            $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-                                            $sqlZon = "SELECT l.id, l.localidad, p.provincia FROM `localidades` l left join provincias p on l.id = p.id  WHERE 1";
-                                            $q = $pdo->prepare($sqlZon);
-                                            $q->execute();
-                                            while ($fila = $q->fetch(PDO::FETCH_ASSOC)) {
-                                              echo "<option value='".$fila['id']."'";
-                                              echo ">".$fila['localidad'] . " - " . $fila['provincia']."</option>";
-                                            }
-                                            Database::disconnect();?>
-                                          </select>
+                                        <select name="id_localidad[]" id="id_localidad-0" class="js-example-basic-single col-sm-12 form-control" data-required="1">
+                                          <option value="">Seleccione...</option><?php
+                                          $pdo = Database::connect();
+                                          $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+                                          $sqlZon = "SELECT l.id, l.localidad, p.provincia FROM `localidades` l left join provincias p on l.id_provincia = p.id  WHERE 1";
+                                          $q = $pdo->prepare($sqlZon);
+                                          $q->execute();
+                                          while ($fila = $q->fetch(PDO::FETCH_ASSOC)) {
+                                            echo "<option value='".$fila['id']."'";
+                                            echo ">".$fila['localidad'] . " - " . $fila['provincia']."</option>";
+                                          }
+                                          Database::disconnect();?>
+                                        </select>
                                       </td>
-
                                       <td data-name="eliminar">
                                         <span name="eliminar[]" title="Eliminar" class="btn btn-sm row-remove text-center" onClick="eliminarFila(this);">
                                           <img src="img/icon_baja.png" width="24" height="25" border="0" alt="Eliminar" title="Eliminar">
@@ -231,15 +242,14 @@
                                   <tbody>
                                     <tr id='addr0' data-id="0" style="display: none;">
                                       <td data-name="nombre_plantadores">
-                                        <input type="text" class="form-control" placeholder="Nombre" name="nombre_plantadores[]" id="nombre_plantadores-0"/>
+                                        <input type="text" class="form-control" placeholder="Nombre" name="nombre_plantadores[]" id="nombre_plantadores-0" data-required="1"/>
                                       </td>
                                       <td data-name="dni">
-                                        <input type="text" class="form-control" placeholder="DNI" name="dni[]" id="dni-0"/>
+                                        <input type="text" class="form-control" placeholder="DNI" name="dni[]" id="dni-0" data-required="1"/>
                                       </td>
                                       <td data-name="telefono">
-                                        <input type="text" class="form-control" placeholder="Telefono" name="telefono[]" id="telefono-0"/>
+                                        <input type="text" class="form-control" placeholder="Telefono" name="telefono[]" id="telefono-0" data-required="1"/>
                                       </td>
-                
                                       <td data-name="eliminar">
                                         <span name="eliminar[]" title="Eliminar" class="btn btn-sm row-remove text-center" onClick="eliminarFila(this);">
                                           <img src="img/icon_baja.png" width="24" height="25" border="0" alt="Eliminar" title="Eliminar">
@@ -289,13 +299,8 @@
     <script src="assets/js/sidebar-menu.js"></script>
     <script src="assets/js/config.js"></script>
     <!-- Plugins JS start-->
-    <script src="assets/js/typeahead/handlebars.js"></script>
-    <script src="assets/js/typeahead/typeahead.bundle.js"></script>
-    <script src="assets/js/typeahead/typeahead.custom.js"></script>
     <script src="assets/js/chat-menu.js"></script>
     <script src="assets/js/tooltip-init.js"></script>
-    <script src="assets/js/typeahead-search/handlebars.js"></script>
-    <script src="assets/js/typeahead-search/typeahead-custom.js"></script>
     <!-- Plugins JS Ends-->
     <!-- Theme js-->
     <script src="assets/js/script.js"></script>
@@ -351,7 +356,9 @@
             var c = $(cur_td).find($(children[0]).prop('tagName')).clone();//.val("")
             
             var id=$(c).attr("id");
-            $(c).attr("required",true);
+            if($(c).data("required")==1){
+              $(c).attr("required",true);
+            }
             ultimoRegistro=id;
             if(id!=undefined){
               //console.log("id1: ");
@@ -377,13 +384,15 @@
         //console.log(tr);//.find($("input"))
         $(tr).appendTo($('#tableLotes'));// add the new row
         if(newid>0){
-          primero.focus();
+          //primero.focus();
           var sel2=$("#id_localidad-"+newid)
-          //console.log(sel2);
+          console.log(sel2);
           
           sel2.select2();//llamamos para inicializar select2
-          sel2.select2('destroy');//como no se iniciliaza bien lo destruimos para que elimine las clases que arrastra de la clonacion
-          sel2.select2();//volvemos a inicializar y ahora si se inicializa bien
+          //lo destruimos para que elimine las clases que arrastra de la clonacion y volvemos a inicializar
+          sel2.select2('destroy');
+          sel2.select2();
+          sel2.css('width', '100%');
           
         }
         return tr.attr("id");
@@ -419,7 +428,9 @@
             var c = $(cur_td).find($(children[0]).prop('tagName')).clone();//.val("")
             
             var id=$(c).attr("id");
-            $(c).attr("required",true);
+            if($(c).data("required")==1){
+              $(c).attr("required",true);
+            }
             ultimoRegistro=id;
             if(id!=undefined){
               //console.log("id1: ");
@@ -445,11 +456,11 @@
         //console.log(tr);//.find($("input"))
         $(tr).appendTo($('#tablePlantadores'));// add the new row
         if(newid>0){
-          primero.focus();
+          //primero.focus();
           var sel2=$("#id_categoria-"+newid)
           //console.log(sel2);
-          
-          sel2.select2();//llamamos para inicializar select2
+          sel2.css("width","100%");
+          //sel2.select2();//llamamos para inicializar select2
           sel2.select2('destroy');//como no se iniciliaza bien lo destruimos para que elimine las clases que arrastra de la clonacion
           sel2.select2();//volvemos a inicializar y ahora si se inicializa bien
           

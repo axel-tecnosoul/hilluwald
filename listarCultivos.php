@@ -65,33 +65,25 @@ if(empty($_SESSION['user']))
                         <thead>
                           <tr>
                             <th>ID</th>
-                            <th>Nombre</th>
-                            <th>Nombre Corto</th>
-                            <th>Precio</th>
-                            <th>Icono</th>
+                            <th>Material</th>
+                            <th>Procedencia</th>
+                            <th>Especie</th>
+                            <th>Nombre corto</th>
                             <th>Opciones</th>
                           </tr>
                         </thead>
                         <tbody><?php
                           include 'database.php';
                           $pdo = Database::connect();
-                          $sql = " SELECT c.id, c.nombre, c.nombre_corto, c.precio, c.id_usuario, c.fecha_hora_alta, u.usuario, c.icono, c.color FROM cultivos c left join usuarios u on u.id = c.id_usuario WHERE 1 ";
+                          $sql = "SELECT c.id,c.material,p.procedencia,e.especie,c.nombre_corto FROM cultivos c INNER JOIN procedencias_especies p ON c.id_procedencia=p.id INNER JOIN especies e ON c.id_especie=e.id WHERE 1 ";
                           
                           foreach ($pdo->query($sql) as $row) {?>
                             <tr>
                               <td><?=$row['id']?></td>
-                              <td><?=$row['nombre']?></td>
+                              <td><?=$row['material']?></td>
+                              <td><?=$row['procedencia']?></td>
+                              <td><?=$row['especie']?></td>
                               <td><?=$row['nombre_corto']?></td>
-                              <td>$<?=$row['precio']?></td>
-                              <td><?php
-                                if($row["icono"]){
-                                  $style="";
-                                  if($row["color"]){
-                                    $style="color:".$row["color"];
-                                  }?>
-                                  <i class="<?=$row["icono"]?>" style=<?=$style?>></i><?php
-                                }?>
-                              </td>
                               <td>
                                 <a href="modificarCultivo.php?id=<?=$row["id"]?>"><img src="img/icon_modificar.png" width="24" height="25" border="0" alt="Modificar" title="Modificar"></a>
                                 &nbsp;&nbsp;

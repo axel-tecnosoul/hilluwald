@@ -23,9 +23,9 @@ if ( !empty($_POST)) {
   $pdo = Database::connect();
   $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
   
-  $sql = "UPDATE especies set especie = ?, activo = ?, id_usuario = ? where id = ?";
+  $sql = "UPDATE especies set especie = ?, icono = ?, color = ?, activo = ?, id_usuario = ? where id = ?";
   $q = $pdo->prepare($sql);
-  $q->execute(array($_POST['especie'],$_POST['activo'], $_SESSION['user']['id'],$_GET['id']));
+  $q->execute(array($_POST['especie'],$_POST['icon'],$_POST['basic-color'],$_POST['activo'], $_SESSION['user']['id'],$_GET['id']));
   
   Database::disconnect();
   
@@ -35,7 +35,7 @@ if ( !empty($_POST)) {
   
   $pdo = Database::connect();
   $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-  $sql = "SELECT id, especie, activo, id_usuario FROM especies WHERE id = ? ";
+  $sql = "SELECT id, especie, icono, color, activo, id_usuario FROM especies WHERE id = ? ";
   $q = $pdo->prepare($sql);
   $q->execute(array($id));
   $data = $q->fetch(PDO::FETCH_ASSOC);
@@ -90,7 +90,7 @@ if ( !empty($_POST)) {
               <div class="col-sm-12">
                 <div class="card">
                   <div class="card-header">
-                    <h5>Modificar  de Especie</h5>
+                    <h5>Modificar Especie</h5>
                   </div>
 				          <form class="form theme-form" role="form" method="post" action="modificarEspecie.php?id=<?php echo $id?>">
                     <div class="card-body">
@@ -101,12 +101,43 @@ if ( !empty($_POST)) {
                           <div class="col-sm-9"><input name="especie" type="text" maxlength="99" class="form-control" value="<?php echo $data['especie']; ?>" required="required"></div>
                         </div>
                         <div class="form-group row">
-                          <label class="col-sm-3 col-form-label">Activo</label>
-                          <div class="col-sm-2">
-                            <select name="activo"  id="activo" class="js-example-basic-simple form-control">
-                              <option value="1" <?php if ($data['activo']==1) echo " selected ";?>>Si</option>
-                              <option value="0" <?php if ($data['activo']==0) echo " selected ";?>>No</option>
-                            </select>
+                          <label class="col-sm-3 col-form-label">Icono</label>
+                          <div class="col-sm-9">
+                            <div class="btn-group btn-group-toggle" data-toggle="buttons"><?php
+                              foreach ($aIconos as $icono) {
+                                $class = $checked = "";
+                                if($data['icono'] == $icono){
+                                  $checked = "checked";
+                                  $class = "active";
+                                }?>
+                                <label class="btn btn-outline-primary <?=$class;?>">
+                                  <input type="radio" value="<?=$icono?>" name="icon" id="icon" <?=$checked;?>>
+                                  <i class="<?=$icono?>" aria-hidden="true"></i>
+                                </label><?php
+                              }?>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="form-group row">
+                          <label class="col-sm-3 col-form-label">Color del icono</label>
+                          <div class="col-sm-9"><?php
+                            $valor_defecto = $data['color'];?>
+                            <input type="color" id="basic-color" name="basic-color" list="basic-colors" value="<?=$valor_defecto?>">
+                            <datalist id="basic-colors"><?php
+                              foreach ($aColores as $codigo => $nombre): ?>
+                                <option value="<?=$codigo?>" <?php if ($data['color'] == $codigo) echo "selected"; ?> autocomplete="off"><?=$nombre?></option><?php
+                              endforeach; ?>
+                            </datalist>
+                          </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-sm-3 col-form-label">Activo</label>
+                            <div class="col-sm-9">
+                              <select name="activo" id="activo" class="js-example-basic-hide-search col-sm-12">
+                                <option value="1" <?php if ($data['activo']==1) echo " selected ";?>>Si</option>
+                                <option value="0" <?php if ($data['activo']==0) echo " selected ";?>>No</option>
+                              </select>
+                            </div>
                           </div>
                         </div>
                       </div>

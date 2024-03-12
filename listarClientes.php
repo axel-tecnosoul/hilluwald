@@ -79,14 +79,13 @@ if(empty($_SESSION['user'])){
                             <th>Opciones</th>
                             <th class="none">Direccion</th>
                             <th class="none">E-Mail</th>
-                            <th class="none">Fecha Alta</th>
                           </tr>
                         </thead>
                         <tbody><?php
                         
                           include 'database.php';
                           $pdo = Database::connect();
-                          $sql = " SELECT id, razon_social, direccion, cuit, cond_fiscal, email, activo, date_format(fecha_alta,'%d/%m/%Y') AS fecha_alta, telefono FROM clientes WHERE 1 ";
+                          $sql = " SELECT id, razon_social, direccion, cuit, cond_fiscal, email, activo, telefono FROM clientes WHERE 1 ";
                           
                           foreach ($pdo->query($sql) as $row) {
                             echo '<tr>';
@@ -111,7 +110,6 @@ if(empty($_SESSION['user'])){
                             echo '</td>';
                             echo '<td>'. $row["direccion"] . '</td>';
                             echo '<td>'. $row["email"] . '</td>';
-                            echo '<td>'. $row["fecha_alta"] . '</td>';
                             echo '</tr>';
                           }
                           Database::disconnect();?>

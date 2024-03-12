@@ -270,7 +270,7 @@
                                         <option value="">Seleccione...</option><?php
                                         $pdo = Database::connect();
                                         $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-                                        $sqlZon = "SELECT l.id, l.localidad, p.provincia FROM `localidades` l left join provincias p on l.id = p.id  WHERE 1";
+                                        $sqlZon = "SELECT l.id, l.localidad, p.provincia FROM `localidades` l left join provincias p on l.id_provincia = p.id  WHERE 1";
                                         $q = $pdo->prepare($sqlZon);
                                         $q->execute();
                                         while ($fila = $q->fetch(PDO::FETCH_ASSOC)) {
@@ -478,7 +478,8 @@
         $(tr).appendTo($('#tableLotes'));// add the new row
         if(newid>0){
           primero.focus();
-          var sel2=$("#nombre_lotes-"+newid)
+          $("#lotes_activo-"+newid).val(1)
+          var sel2=$("#id_localidad-"+newid)
           //console.log(sel2);
           
           sel2.select2();//llamamos para inicializar select2
@@ -548,6 +549,8 @@
         $(tr).appendTo($('#tablePlantadores'));// add the new row
         if(newid>0){
           primero.focus();
+          $("#plantadores_activo-"+newid).val(1)
+
           var sel2=$("#nombre_plantadores-"+newid)
           //console.log(sel2);
           

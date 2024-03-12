@@ -17,7 +17,8 @@
     <li><a class="sidebar-header" href="#"><i data-feather="database"></i><span>Maestros</span><i class="fa fa-angle-right pull-right"></i></a>
         <ul class="sidebar-submenu">
           <li><a href="listarSucursales.php"><i class="fa fa-circle"></i>Sucursales</a></li>
-          <li><a href="listarBandejas.php"><i class="fa fa-circle"></i>Bandejas</a></li>
+          <li><a href="listarContenedores.php"><i class="fa fa-circle"></i>Contenedores</a></li>
+          <li><a href="listarTiposContenedores.php"><i class="fa fa-circle"></i>Tipo de Contenedores</a></li>
           <li><a href="listarCultivos.php"><i class="fa fa-circle"></i>Cultivos</a></li>
           <li><a href="listarTransportes.php"><i class="fa fa-circle"></i>Transportes</a></li>
           <li><a href="listarProcedenciasEspecies.php"><i class="fa fa-circle"></i>Procedencias de Especies</a></li>

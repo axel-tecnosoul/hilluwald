@@ -7,19 +7,17 @@ if(empty($_SESSION['user'])){
 require 'database.php';
 
 if ( !empty($_POST)) {
-  //var_dump($_POST);
-  //die;
   // insert data
   $pdo = Database::connect();
   $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-  
-  $sql = "INSERT INTO especies (especie, icono, color, id_usuario, fecha_hora_alta) VALUES (?,?,?,?,now())";
+
+  $sql = "INSERT INTO contenedores (id_tipo_contenedor, cantidad_orificios, ancho, alto, activo, id_usuario, fecha_hora_alta) VALUES (?,?,?,?,1,?,NOW())";
   $q = $pdo->prepare($sql);
-  $q->execute(array($_POST['especie'],$_POST['icon'],$_POST['basic-color'],$_SESSION['user']['id']));
-  
+  $q->execute(array($_POST['id_tipo_contenedor'], $_POST['cantidad_orificios'], $_POST['ancho'] ,$_POST['alto'],$_SESSION["user"]["id"]));
+
   Database::disconnect();
-  
-  header("Location: listarEspecies.php");
+
+  header("Location: listarContenedores.php");
 }?>
 <!DOCTYPE html>
 <html lang="en">
@@ -31,7 +29,7 @@ if ( !empty($_POST)) {
     <!-- Loader ends-->
     <!-- page-wrapper Start-->
     <div class="page-wrapper">
-	    <?php include('header.php');?>
+	  <?php include('header.php');?>
 	  
       <!-- Page Header Start-->
       <div class="page-body-wrapper">
@@ -47,7 +45,7 @@ if ( !empty($_POST)) {
                     <h3><?php include("title.php"); ?></h3>
                     <ol class="breadcrumb">
                       <li class="breadcrumb-item"><a href="#"><i data-feather="home"></i></a></li>
-                      <li class="breadcrumb-item">Nueva Especie</li>
+                      <li class="breadcrumb-item">Nuevo Contenedor</li>
                     </ol>
                   </div>
                 </div>
@@ -69,43 +67,49 @@ if ( !empty($_POST)) {
               <div class="col-sm-12">
                 <div class="card">
                   <div class="card-header">
-                    <h5>Nueva Especie</h5>
+                    <h5>Nuevo Contenedor</h5>
                   </div>
-				          <form class="form theme-form" role="form" method="post" action="nuevaEspecie.php">
+				          <form class="form theme-form" role="form" method="post" action="nuevoContenedor.php">
                     <div class="card-body">
-                      <div class="form-group row">
-                        <label class="col-sm-3 col-form-label">Especie</label>
-                        <div class="col-sm-9"><input name="especie" type="text" maxlength="99" class="form-control" value="" required="required"></div>
-                      </div>
-                      <div class="form-group row">
-                        <label class="col-sm-3 col-form-label">Icono</label>
-                        <div class="col-sm-9">
-                          <div class="btn-group btn-group-toggle" data-toggle="buttons"><?php
-                            foreach ($aIconos as $icono) {?>
-                              <label class="btn btn-outline-primary">
-                                <input type="radio" value="<?=$icono?>" name="icon" id="icon">
-                                <i class="<?=$icono?>" aria-hidden="true"></i>
-                              </label><?php
-                            }?>
+                      <div class="row">
+                        <div class="col">
+                          <div class="form-group row">
+                            <label class="col-sm-3 col-form-label">Tipo</label>
+                            <div class="col-sm-9">
+                              <select name="id_tipo_contenedor" class="form-control" required>
+                                <option value="">Seleccione...</option><?php
+                                $pdo = Database::connect();
+                                $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+                                $sqlZon = "SELECT id, tipo FROM tipos_contenedores";
+                                $q = $pdo->prepare($sqlZon);
+                                $q->execute();
+                                while ($fila = $q->fetch(PDO::FETCH_ASSOC)) {
+                                  echo "<option value='".$fila['id']."'";
+                                  echo ">".$fila['tipo']."</option>";
+                                }
+                                Database::disconnect();?>
+                              </select>
+                            </div>
                           </div>
-                        </div>
-                      </div>
-                      <div class="form-group row">
-                        <label class="col-sm-3 col-form-label">Color del icono</label>
-                        <div class="col-sm-9">
-                          <input type="color" id="basic-color" name="basic-color" list="basic-colors">
-                          <datalist id="basic-colors"><?php
-                            foreach ($aColores as $codigo => $nombre): ?>
-                              <option value="<?=$codigo?>" <?php if ($data['color'] == $codigo) echo "selected"; ?> autocomplete="off"><?=$nombre?></option><?php
-                            endforeach; ?>
-                          </datalist>
+                          <div class="form-group row">
+                            <label class="col-sm-3 col-form-label">Cantidad de Orificios</label>
+                            <div class="col-sm-9"><input name="cantidad_orificios" type="text" maxlength="99" class="form-control" required></div>
+                          </div>
+                          <div class="form-group row">
+                            <label class="col-sm-3 col-form-label">Ancho</label>
+                            <div class="col-sm-9"><input name="ancho" type="number" maxlength="25" class="form-control" value="" required></div>
+                          </div>
+                          <div class="form-group row">
+                            <label class="col-sm-3 col-form-label">Alto</label>
+                            <div class="col-sm-9"><input name="alto" type="number" maxlength="199" class="form-control" required></div>
+                          </div>
                         </div>
                       </div>
                     </div>
                     <div class="card-footer">
                       <div class="col-sm-9 offset-sm-3">
                         <button class="btn btn-primary" type="submit">Crear</button>
-						            <a href="listarEspecies.php" class="btn btn-light">Volver</a>
+						            <a href="listarContenedores.php" class="btn btn-light">Volver</a>
                       </div>
                     </div>
                   </form>

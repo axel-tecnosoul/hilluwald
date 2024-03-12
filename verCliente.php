@@ -17,7 +17,7 @@ if ( null==$id ) {
 
 $pdo = Database::connect();
 $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-$sql = "SELECT id, razon_social, cuit, cond_fiscal, direccion, email, telefono, fecha_alta, activo FROM clientes WHERE id = ? ";
+$sql = "SELECT id, razon_social, cuit, cond_fiscal, direccion, email, telefono, notas, fecha_alta, activo FROM clientes WHERE id = ? ";
 $q = $pdo->prepare($sql);
 $q->execute(array($id));
 $data = $q->fetch(PDO::FETCH_ASSOC);
@@ -29,13 +29,17 @@ $anio_actual = date("Y");
 $anio_inicial = $anio_actual - 2;
 $anio_final = $anio_actual + 2;
 
-$sql = " SELECT c.id, c.nombre, c.nombre_corto, c.icono, c.color FROM cultivos c INNER JOIN pedidos_detalle pd ON pd.id_cultivo=c.id INNER JOIN pedidos p ON pd.id_pedido=p.id WHERE p.anulado=0 AND p.id_cliente=".$id." GROUP BY c.id";
+$sql = " SELECT c.id AS id_cultivo, e.id AS id_especie, pe.id AS id_procedencia, e.especie, pe.procedencia, c.material, c.nombre_corto, e.icono, e.color FROM cultivos c LEFT JOIN procedencias_especies pe ON c.id_procedencia=pe.id LEFT JOIN especies e ON c.id_especie=e.id INNER JOIN pedidos_detalle pd ON pd.id_cultivo=c.id INNER JOIN pedidos p ON pd.id_pedido=p.id WHERE p.anulado=0 AND p.id_cliente=".$id." GROUP BY c.id";
 //$sql = " SELECT c.id, c.nombre FROM cultivos c";
 $aCultivosPedidos=[];
 foreach ($pdo->query($sql) as $row) {
+  $nombre=$row["nombre_corto"];
+  if(empty($nombre)){
+    $nombre=$row["especie"];
+  }
   $aCultivosPedidos[]=[
-    "id_cultivo"=>$row["id"],
-    "nombre"=>$row["nombre_corto"],
+    "id_cultivo"=>$row["id_especie"],
+    "nombre"=>$nombre,
     "icono"=>$row["icono"],
     "color"=>$row["color"],
   ];
@@ -62,6 +66,14 @@ Database::disconnect();
     }
     .pagos{
       background-color: #007bff!important;
+      color: #fff!important;
+    }
+    .contenedores {
+      background-color: #ffc107!important;
+      color: #000!important;
+    }
+    .plantines {
+      background-color: #dc3545!important;
       color: #fff!important;
     }
     .tablas_cta_cte th, .tablas_cta_cte td {
@@ -107,6 +119,13 @@ Database::disconnect();
     .select2-container--default .select2-results__option[aria-disabled=true] {
       display: none;
     }
+
+    .dataTables_wrapper button{
+      font-size: 12px;
+    }
+    .dropdown-menu{
+      padding: 0;
+    }
   </style>
   <body class="light-only">
     <!-- Loader ends-->
@@ -136,7 +155,7 @@ Database::disconnect();
                 <div class="col-2">
                   <div class="bookmark pull-right">
                     <ul>
-                      <li><a  target="_blank" data-container="body" data-toggle="popover" data-placement="top" title="" data-original-title="<?php echo date('d-m-Y');?>"><i data-feather="calendar"></i></a></li>
+                      <li><a  target="_blank" data-container="body" data-toggle="popover" data-placement="top" title="" data-original-title="<?=date('d-m-Y');?>"><i data-feather="calendar"></i></a></li>
                     </ul>
                   </div>
                 </div>
@@ -151,24 +170,45 @@ Database::disconnect();
                 <div class="card">
                   
                   <div class="card-header">
-                    <h5><?php echo $data['razon_social']; ?></h5>
+                    <!-- <h5><?=$data['razon_social']; ?></h5>
                     <div class="row mt-3">
                       <div class="col-12">
                         
-                        <button class="btn pedidos" style="text-transform: none;" title="Nuevo Pedido" data-toggle="modal" data-target="#nuevoPedido"><i class="fa fa-plus"></i> Pedido</button><!-- nuevoPedido.php -->
-                        
-                        <button class="btn retiros" style="text-transform: none;" title="Nuevo Retiro" data-toggle="modal" data-target="#nuevoRetiro"><i class="fa fa-plus"></i> Retiro</button><!-- nuevoRetiro.php -->
-                        
-                        <button class="btn pagos" style="text-transform: none;" title="Nuevo Pago" data-toggle="modal" data-target="#nuevoPago"><i class="fa fa-plus"></i> Pago</button><!-- nuevoPago.php -->
+                        <button class="btn pedidos" style="text-transform: none;" title="Nuevo Pedido" data-toggle="modal" data-target="#nuevoPedido"><i class="fa fa-plus"></i> Pedido</button>
 
+                      </div>
+                    </div> -->
+
+                    <div class="row">
+                      <div class="col-md-4">
+                        <h5><?=$data['razon_social']; ?></h5>
+                        <button class="btn pedidos mt-3" style="text-transform: none;" title="Nuevo Pedido" data-toggle="modal" data-target="#nuevoPedido">
+                          <i class="fa fa-plus"></i> Pedido
+                        </button>
+
+                        <!-- <button class="btn retiros" style="text-transform: none;" title="Nuevo Retiro" data-toggle="modal" data-target="#nuevoRetiro"><i class="fa fa-plus"></i> Retiro</button>
+                        
+                        <button class="btn pagos" style="text-transform: none;" title="Nuevo Pago" data-toggle="modal" data-target="#nuevoPago"><i class="fa fa-plus"></i> Pago</button>
+
+                        <button class="btn contenedores" style="text-transform: none;" title="Nueva devolucion de contenedores" data-toggle="modal" data-target="#nuevaDevolucionContenedores"><i class="fa fa-plus"></i> Contenedores</button> -->
+                      </div>
+                      <div class="col-md-8">
+                        <div class="row">
+                          <div class="col-md-1">
+                            <label for="notas" class="col-form-label">Notas:</label>
+                          </div>
+                          <div class="col-md-11">
+                            <textarea name="notas" id="notas" class="form-control"><?=$data["notas"]?></textarea>
+                          </div>
+                        </div>
                       </div>
                     </div>
                   </div>
 
                   <div class="card-body">
                     <ul class="nav nav-tabs border-tab" id="pills-tab" role="tablist" style="margin-top: -20px;">
-
-                      <li class="nav-item"><a class="nav-link active" id="pills-contacto-tab" data-toggle="pill" href="#pills-contacto" role="tab" aria-controls="pills-contacto" aria-selected="true"><i class="icofont icofont-ui-user"></i>Datos</a></li><?php
+                    
+                      <li class="nav-item"><a class="nav-link active" id="pills-resumen-tab" data-toggle="pill" href="#pills-resumen" role="tab" aria-controls="pills-resumen" aria-selected="true"><i class="fa fa-server"></i>Resumen</a></li><?php
                       
                       foreach ($aCultivosPedidos as $cultivo_pedido) {?>
                         <li class="nav-item">
@@ -185,39 +225,44 @@ Database::disconnect();
                         </li><?php
                       }?>
 
+                      <li class="nav-item"><a class="nav-link" id="pills-contacto-tab" data-toggle="pill" href="#pills-contacto" role="tab" aria-controls="pills-contacto" aria-selected="true"><i class="icofont icofont-ui-user"></i>Datos</a></li>
+
                     </ul>
 
                     <div class="tab-content" id="pills-tabContent">
-                      
-                      <div class="tab-pane fade show active" id="pills-contacto" role="tabpanel" aria-labelledby="pills-contacto-tab">
 
+                      <div class="tab-pane fade show active" id="pills-resumen" role="tabpanel" aria-labelledby="pills-resumen-tab">
+
+                      </div>
+                      
+                      <div class="tab-pane fade show" id="pills-contacto" role="tabpanel" aria-labelledby="pills-contacto-tab">
                         <div class="form-group row">
                           <label class="col-sm-3 col-form-label">Razon Social</label>
-                          <div class="col-sm-9"><input name="razon_social" type="text" maxlength="99" class="form-control" value="<?php echo $data['razon_social']; ?>" readonly="readonly"></div>
+                          <div class="col-sm-9"><input name="razon_social" type="text" maxlength="99" class="form-control" value="<?=$data['razon_social']; ?>" readonly="readonly"></div>
                         </div>
                         <div class="form-group row">
                           <label class="col-sm-3 col-form-label">CUIT</label>
-                          <div class="col-sm-9"><input name="cuit" type="text" maxlength="99" class="form-control" value="<?php echo $data['cuit']; ?>" readonly="readonly"></div>
+                          <div class="col-sm-9"><input name="cuit" type="text" maxlength="99" class="form-control" value="<?=$data['cuit']; ?>" readonly="readonly"></div>
                         </div>
                         <div class="form-group row">
                           <label class="col-sm-3 col-form-label">Condicion fiscal</label>
-                          <div class="col-sm-9"><input name="cond_fiscal" type="text" maxlength="99" class="form-control" value="<?php echo $data['cond_fiscal']; ?>" readonly="readonly"></div>
+                          <div class="col-sm-9"><input name="cond_fiscal" type="text" maxlength="99" class="form-control" value="<?=$data['cond_fiscal']; ?>" readonly="readonly"></div>
                         </div>
                         <div class="form-group row">
                           <label class="col-sm-3 col-form-label">Direccion</label>
-                          <div class="col-sm-9"><input name="direccion" type="text" maxlength="99" class="form-control" value="<?php echo $data['direccion']; ?>" readonly="readonly"></div>
+                          <div class="col-sm-9"><input name="direccion" type="text" maxlength="99" class="form-control" value="<?=$data['direccion']; ?>" readonly="readonly"></div>
                         </div>
                         <div class="form-group row">
                           <label class="col-sm-3 col-form-label">E-Mail</label>
-                          <div class="col-sm-9"><input name="email" type="email" maxlength="99" class="form-control" value="<?php echo $data['email']; ?>" readonly="readonly"></div>
+                          <div class="col-sm-9"><input name="email" type="email" maxlength="99" class="form-control" value="<?=$data['email']; ?>" readonly="readonly"></div>
                         </div>
                         <div class="form-group row">
                           <label class="col-sm-3 col-form-label">Teléfono</label>
-                          <div class="col-sm-9"><input name="telefono" type="text" maxlength="99" class="form-control" value="<?php echo $data['telefono']; ?>" readonly="readonly"></div>
+                          <div class="col-sm-9"><input name="telefono" type="text" maxlength="99" class="form-control" value="<?=$data['telefono']; ?>" readonly="readonly"></div>
                         </div>
                         <div class="form-group row">
                           <label class="col-sm-3 col-form-label">Fecha de alta</label>
-                          <div class="col-sm-9"><input name="fecha_alta" type="text" maxlength="99" class="form-control" value="<?php echo $data['fecha_alta']; ?>" readonly="readonly"></div>
+                          <div class="col-sm-9"><input name="fecha_alta" type="text" maxlength="99" class="form-control" value="<?=$data['fecha_alta']; ?>" readonly="readonly"></div>
                         </div>
                         <div class="form-group row">
                           <label class="col-sm-3 col-form-label">Activo</label>
@@ -229,7 +274,6 @@ Database::disconnect();
                             </select>
                           </div>
                         </div>
-
                       </div>
 
                       <div class="tab-pane fade" id="pills-cta_cte" role="tabpanel" aria-labelledby="pills-cta_cte-tab">
@@ -261,7 +305,7 @@ Database::disconnect();
                               <th style="text-align: center;vertical-align: middle;" rowspan="2">Cantidad pedida</th>
                               <th style="text-align: center;vertical-align: middle;"class="borderRetiroLeft borderRetiroRight" colspan="2">Retiros</th>
                               <th style="text-align: center;vertical-align: middle;" class="borderPagoLeft borderPagoRight" colspan="2">Pagos</th>
-                              <th style="text-align: center;vertical-align: middle;" class="borderPagoLeft borderPagoRight" colspan="2">Bandejas</th>
+                              <th style="text-align: center;vertical-align: middle;" class="borderPagoLeft borderPagoRight" colspan="2">Contenedores</th>
                             </tr>
                             <tr>
                               <th style="text-align: center;vertical-align: middle;">Cantidad</th>
@@ -285,79 +329,6 @@ Database::disconnect();
                               <th class="text-right"></th>
                             </tr>
                           </tfoot>
-
-                          <!-- <tbody>
-                            <tr>
-                              <td>1 02 2024</td>
-                              <td>Pedido N° 1</td>
-                              <td>2024</td>
-                              <td align="right">1.000</td>
-                              <td align="right"></td>
-                              <td align="right">1.000</td>
-                              <td align="right"></td>
-                              <td align="right">1.000</td>
-                            </tr>
-                            <tr>
-                              <td>1 02 2024</td>
-                              <td>Retiro N° 1</td>
-                              <td>2024</td>
-                              <td align="right"></td>
-                              <td align="right">200</td>
-                              <td align="right">800</td>
-                              <td align="right"></td>
-                              <td align="right">1000</td>
-                            </tr>
-                            <tr>
-                              <td>5 02 2024</td>
-                              <td>Pago N° 1</td>
-                              <td>2024</td>
-                              <td align="right"></td>
-                              <td align="right"></td>
-                              <td align="right">800</td>
-                              <td align="right">500</td>
-                              <td align="right">500</td>
-                            </tr>
-                            <tr>
-                              <td>6 02 2024</td>
-                              <td>Pedido N° 2</td>
-                              <td>2024</td>
-                              <td align="right">500</td>
-                              <td align="right"></td>
-                              <td align="right">1.300</td>
-                              <td align="right"></td>
-                              <td align="right">1.000</td>
-                            </tr>
-                            <tr>
-                              <td>6 02 2024</td>
-                              <td>Retiro N° 2</td>
-                              <td>2024</td>
-                              <td align="right"></td>
-                              <td align="right">200</td>
-                              <td align="right">1.100</td>
-                              <td align="right"></td>
-                              <td align="right">1.000</td>
-                            </tr>
-                            <tr>
-                              <td>7 02 2024</td>
-                              <td>Retiro N° 3</td>
-                              <td>2024</td>
-                              <td align="right"></td>
-                              <td align="right">200</td>
-                              <td align="right">900</td>
-                              <td align="right"></td>
-                              <td align="right">1.000</td>
-                            </tr>
-                            <tr>
-                              <td><strong>Totales</strong></td>
-                              <td></td>
-                              <td></td>
-                              <td align="right"><strong>1.500</strong></td>
-                              <td align="right"><strong>600</strong></td>
-                              <td><strong></strong></td>
-                              <td align="right"><strong>500</strong></td>
-                              <td><strong></strong></td>
-                            </tr>
-                          </tbody> -->
                         </table>
                       </div>
 
@@ -376,255 +347,295 @@ Database::disconnect();
           </div>
 
           <!-- MODAL PARA NUEVO PEDIDO -->
-          <div class="modal fade" id="nuevoPedido" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+          <div class="modal fade" id="nuevoPedido" role="dialog" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="myLargeModalLabel" aria-hidden="true">
             <div class="modal-dialog modal-lg">
               <div class="modal-content">
-                <div class="card">
-                  <div class="card-header">
-                    <h5>Nuevo Pedido de <?php echo $data['razon_social']; ?></h5>
-                  </div>
-				          <form class="form theme-form formulario" role="form" method="post" action="nuevoPedido.php?id_cliente=<?=$id?>">
-                    <div class="card-body">
-                      <div class="row">
-                        <div class="form-group col-6">
-                          <label for="fecha_pedido">Fecha</label>
-                          <input name="fecha_pedido" id="fecha_pedido" type="date" class="form-control multiselect" value="<?=$hoy?>" required>
-                        </div>
-                        <div class="form-group col-6">
-                          <label for="campana_pedido">Campaña</label>
-                          <select name="campana_pedido" id="campana_pedido" style="width: 100%;" required class="js-example-basic-single"><?php
-                            // Generar las opciones del select
-                            for ($i = $anio_inicial; $i <= $anio_final; $i++) {
-                              // Si el año es el actual, marcarlo como seleccionado por defecto
-                              $selected = ($i == $anio_actual) ? "selected" : "";
-                              echo "<option value='$i' $selected>$i</option>";
-                            }?>
-                          </select>
-                        </div>
-                      </div>
-                      <div class="row">
-                        <div class="col-sm-12">
-                          <table class="table table-striped">
-                            <tr>
-                              <th>Cultivo</th>
-                              <th>Cantidad</th>
-                            </tr><?php
-                            $pdo = Database::connect();
-                            $sql = " SELECT id, nombre FROM cultivos";
-                            foreach ($pdo->query($sql) as $row) {?>
-                              <tr>
-                                <td><?=$row["nombre"]?></td>
-                                <td>
-                                  <input type="hidden" name="id_cultivo[]" value="<?=$row["id"]?>">
-                                  <input type="number" name="cantidad[]" class="form-control cantidad" placeholder="Cantidad">
-                                </td>
-                              </tr><?php
-                            }
-                            Database::disconnect();?>
-                          </table>
-                          <div class="mensajeError" style="color: red; display: none;">Por favor, ingrese al menos una cantidad.</div>
-                        </div>
-                      </div>
-                    </div>
-                    <div class="card-footer">
-                      <div class="col-sm-9 offset-sm-3">
-                        <button class="btn btn-primary" type="submit">Crear</button>
-						            <button type="button" class="btn btn-light" data-dismiss="modal">Cerrar</button>
-                      </div>
-                    </div>
-                  </form>
+                <div class="modal-header">
+                  <h5 class="modal-title">Nuevo Pedido de <?=$data['razon_social'];?></h5>
+                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                  </button>
                 </div>
+                <form class="form theme-form formulario" role="form" method="post" action="nuevoPedido.php?id_cliente=<?=$id?>">
+                  <div class="modal-body">
+                    <div class="row">
+                      <div class="form-group col-6">
+                        <label for="fecha_pedido">Fecha</label>
+                        <input name="fecha_pedido" id="fecha_pedido" type="date" class="form-control multiselect" value="<?=$hoy?>" required>
+                      </div>
+                      <div class="form-group col-6">
+                        <label for="campana_pedido">Campaña</label>
+                        <select name="campana_pedido" id="campana_pedido" style="width: 100%;" required class="js-example-basic-single"><?php
+                          // Generar las opciones del select
+                          for ($i = $anio_inicial; $i <= $anio_final; $i++) {
+                            // Si el año es el actual, marcarlo como seleccionado por defecto
+                            $selected = ($i == $anio_actual) ? "selected" : "";
+                            echo "<option value='$i' $selected>$i</option>";
+                          }?>
+                        </select>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col-sm-12">
+                        <table class="table table-striped table-bordered">
+                          <tr>
+                            <th>Especie</th>
+                            <th>Procedencia</th>
+                            <th>Material</th>
+                            <th>Cantidad</th>
+                          </tr><?php
+                          $pdo = Database::connect();
+                          $sql = " SELECT id, nombre FROM cultivos";
+                          foreach ($pdo->query($sql) as $row) {?>
+                            <tr>
+                              <td><?=$row["nombre"]?></td>
+                              <td>
+                                <input type="hidden" name="id_cultivo[]" value="<?=$row["id"]?>">
+                                <input type="number" name="cantidad[]" class="form-control cantidad" placeholder="Cantidad">
+                              </td>
+                            </tr><?php
+                          }
+                          Database::disconnect();?>
+                        </table>
+                        <div class="mensajeError" style="color: red; display: none;">Por favor, ingrese al menos una cantidad.</div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="modal-footer">
+                    <div class="col-sm-9 offset-sm-3">
+                      <button class="btn btn-primary" type="submit">Crear</button>
+                      <button type="button" class="btn btn-light" data-dismiss="modal">Cerrar</button>
+                    </div>
+                  </div>
+                </form>
               </div>
             </div>
           </div>
           <!-- FIN MODAL PARA NUEVO PEDIDO -->
 
           <!-- MODAL PARA NUEVO RETIRO -->
-          <div class="modal fade" id="nuevoRetiro" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+          <div class="modal fade" id="nuevoRetiro" role="dialog" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="myLargeModalLabel" aria-hidden="true">
             <div class="modal-dialog modal-lg">
               <div class="modal-content">
-                <div class="card">
-                  <div class="card-header">
-                    <h5>Nuevo Retiro de <?php echo $data['razon_social']; ?></h5>
-                  </div>
-				          <form class="form theme-form formulario" role="form" method="post" action="nuevoRetiro.php?id_cliente=<?=$id?>">
-                    <div class="card-body">
-                      <div class="row">
-                        <div class="form-group col-4">
-                          <label for="fecha_retiro">Fecha</label>
-                          <input name="fecha_retiro" id="fecha_retiro" type="date" class="form-control multiselect" value="<?=$hoy?>" required>
-                        </div>
-                        <div class="form-group col-4">
-                          <label for="campana_retiro">Campaña</label><br>
-                          <select name="campana_retiro" id="campana_retiro" style="width: 100%;" required class="js-example-basic-single"><?php
-                          // data-style="multiselect" data-live-search="true"
-                            // Generar las opciones del select
-                            for ($i = $anio_inicial; $i <= $anio_final; $i++) {
-                              // Si el año es el actual, marcarlo como seleccionado por defecto
-                              $selected = ($i == $anio_actual) ? "selected" : "";
-                              echo "<option value='$i' $selected>$i</option>";
-                            }?>
-                          </select>
-                        </div>
-                        <div class="form-group col-4">
-                          <label for="id_cliente_retira">Cliente</label>
-                          <select name="id_cliente_retira" id="id_cliente_retira" style="width: 100%;" required class="js-example-basic-single"><?php
-                            $pdo = Database::connect();
-                            $sql = " SELECT id, razon_social FROM clientes";
-                            foreach ($pdo->query($sql) as $row) {?>
-                              <option value="<?=$row["id"]?>"><?=$row["razon_social"]?></option><?php
-                            }
-                            Database::disconnect();?>
-                          </select>
-                        </div>
+                <div class="modal-header">
+                  <h5>Nuevo Retiro de <?=$data['razon_social'];?> Pedido N° <span class="idPedido"></span></h5>
+                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                  </button>
+                </div>
+                <form class="form theme-form formulario" role="form" method="post" action="nuevoRetiro.php?id_cliente=<?=$id?>">
+                  <input name="id_pedido_retiro" id="id_pedido_retiro" type="hidden">
+                  <div class="modal-body">
+                    <div class="row">
+                      <div class="form-group col-4">
+                        <label for="fecha_retiro">Fecha</label>
+                        <input name="fecha_retiro" id="fecha_retiro" type="date" class="form-control multiselect" value="<?=$hoy?>" required>
                       </div>
-                      <div class="row">
-                        <div class="form-group col-4">
-                          <label>Transporte</label>
-                          <select name="id_transporte" id="id_transporte" class="js-example-basic-single" required style="width: 100%;">
-                            <option value="">- Seleccione -</option><?php
-                            $pdo = Database::connect();
-                            $sql = " SELECT id, razon_social FROM transportes";
-                            foreach ($pdo->query($sql) as $row) {?>
-                              <option value="<?=$row["id"]?>"><?=$row["razon_social"]?></option><?php
-                            }
-                            Database::disconnect();?>
-                          </select>
-                        </div>
-                        <div class="form-group col-4">
-                          <label for="id_chofer">Chofer</label>
-                          <select name="id_chofer" id="id_chofer" class="js-example-basic-single" required="required" style="width: 100%;">
-                            <option value="">- Seleccione -</option><?php
-                            $pdo = Database::connect();
-                            $sql = " SELECT id, nombre_apellido, id_transporte FROM choferes";
-                            foreach ($pdo->query($sql) as $row) {?>
-                              <option value="<?=$row["id"]?>" data-id-transporte="<?=$row["id_transporte"]?>"><?=$row["nombre_apellido"]?></option><?php
-                            }
-                            Database::disconnect();?>
-                          </select>
-                        </div>
-                        <div class="form-group col-4">
-                          <label for="id_vehiculo">Vehiculo</label>
-                          <select name="id_vehiculo" id="id_vehiculo" class="js-example-basic-single" required="required" style="width: 100%;">
-                            <option value="">- Seleccione -</option><?php
-                            $pdo = Database::connect();
-                            $sql = " SELECT id, descripcion, patente, patente2, id_transporte FROM vehiculos";
-                            foreach ($pdo->query($sql) as $row) {
-                              $patente=$row["patente"];
-                              if(!is_null($row["patente2"])){
-                                $patente.=" - ".$row["patente2"];
-                              }
-                              $mostrar=$row["descripcion"]." (".$patente.")"?>
-                              <option value="<?=$row["id"]?>" data-id-transporte="<?=$row["id_transporte"]?>"><?=$mostrar?></option><?php
-                            }
-                            Database::disconnect();?>
-                          </select>
-                        </div>
+                      <div class="form-group col-4">
+                        <label for="campana_retiro">Campaña</label><br>
+                        <select name="campana_retiro" id="campana_retiro" style="width: 100%;" required class="js-example-basic-single"><?php
+                        // data-style="multiselect" data-live-search="true"
+                          // Generar las opciones del select
+                          for ($i = $anio_inicial; $i <= $anio_final; $i++) {
+                            // Si el año es el actual, marcarlo como seleccionado por defecto
+                            $selected = ($i == $anio_actual) ? "selected" : "";
+                            echo "<option value='$i' $selected>$i</option>";
+                          }?>
+                        </select>
                       </div>
-                      <div class="row">
-                        <div class="col">
-                          <div class="form-group row">
-                            <!-- <label class="col-sm-12 col-form-label">Cultivos</label> -->
-                            <div class="col-sm-12">
-                              <table class="table table-striped">
+                      <div class="form-group col-4">
+                        <label for="id_cliente_retira">Razon social</label>
+                        <select name="id_cliente_retira" id="id_cliente_retira" style="width: 100%;" required class="js-example-basic-single"><?php
+                          $pdo = Database::connect();
+                          $sql = " SELECT id, razon_social FROM clientes";
+                          foreach ($pdo->query($sql) as $row) {?>
+                            <option value="<?=$row["id"]?>"><?=$row["razon_social"]?></option><?php
+                          }
+                          Database::disconnect();?>
+                        </select>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="form-group col-4">
+                        <label>Transporte</label>
+                        <select name="id_transporte" id="id_transporte" class="js-example-basic-single" required style="width: 100%;">
+                          <option value="">- Seleccione -</option><?php
+                          $pdo = Database::connect();
+                          $sql = " SELECT id, razon_social FROM transportes";
+                          foreach ($pdo->query($sql) as $row) {?>
+                            <option value="<?=$row["id"]?>"><?=$row["razon_social"]?></option><?php
+                          }
+                          Database::disconnect();?>
+                        </select>
+                      </div>
+                      <div class="form-group col-4">
+                        <label for="id_chofer">Chofer</label>
+                        <select name="id_chofer" id="id_chofer" class="js-example-basic-single" required disabled style="width: 100%;">
+                          <option value="">- Seleccione -</option><?php
+                          $pdo = Database::connect();
+                          $sql = " SELECT id, nombre_apellido, id_transporte FROM choferes";
+                          foreach ($pdo->query($sql) as $row) {?>
+                            <option value="<?=$row["id"]?>" data-id-transporte="<?=$row["id_transporte"]?>"><?=$row["nombre_apellido"]?></option><?php
+                          }
+                          Database::disconnect();?>
+                        </select>
+                      </div>
+                      <div class="form-group col-4">
+                        <label for="id_vehiculo">Vehiculo</label>
+                        <select name="id_vehiculo" id="id_vehiculo" class="js-example-basic-single" required disabled style="width: 100%;">
+                          <option value="">- Seleccione -</option><?php
+                          $pdo = Database::connect();
+                          $sql = " SELECT id, descripcion, patente, patente2, id_transporte FROM vehiculos";
+                          foreach ($pdo->query($sql) as $row) {
+                            $patente=$row["patente"];
+                            if(!is_null($row["patente2"])){
+                              $patente.=" - ".$row["patente2"];
+                            }
+                            $mostrar=$row["descripcion"]." (".$patente.")"?>
+                            <option value="<?=$row["id"]?>" data-id-transporte="<?=$row["id_transporte"]?>"><?=$mostrar?></option><?php
+                          }
+                          Database::disconnect();?>
+                        </select>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="form-group col-4">
+                        <label>Lote</label>
+                        <select name="id_lote" id="id_lote" class="js-example-basic-single" required style="width: 100%;">
+                          <option value="">- Seleccione -</option><?php
+                          $pdo = Database::connect();
+                          $sql = " SELECT l.id, nombre, direccion, localidad, provincia FROM lotes l INNER JOIN localidades l2 ON l.id_localidad=l2.id INNER JOIN provincias p ON l2.id_provincia=p.id WHERE l.id_cliente=".$id;
+                          foreach ($pdo->query($sql) as $row) {
+                            $mostrar=$row["nombre"]." (".$row["direccion"]." ".$row["localidad"]." ".$row["provincia"].")"?>
+                            <option value="<?=$row["id"]?>"><?=$mostrar?></option><?php
+                          }
+                          Database::disconnect();?>
+                        </select>
+                      </div>
+                      <div class="form-group col-4">
+                        <label for="id_plantador">Plantador</label>
+                        <select name="id_plantador" id="id_plantador" class="js-example-basic-single" required style="width: 100%;">
+                          <option value="">- Seleccione -</option><?php
+                          /*$pdo = Database::connect();
+                          $sql = " SELECT id, nombre_apellido, id_transporte FROM plantadores";
+                          foreach ($pdo->query($sql) as $row) {?>
+                            <option value="<?=$row["id"]?>" data-id-transporte="<?=$row["id_transporte"]?>"><?=$row["nombre_apellido"]?></option><?php
+                          }
+                          Database::disconnect();*/?>
+                        </select>
+                      </div>
+                      <div class="form-group col-4">
+                        <label for="id_vehiculo">Patente 2</label>
+                        <input type="text" name="patente2" id="patente2" class="form-control" style="width: 100%;">
+                          
+                        </input>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col">
+                        <div class="form-group row">
+                          <!-- <label class="col-sm-12 col-form-label">Cultivos</label> -->
+                          <div class="col-sm-12">
+                            <table class="table table-striped table-bordered">
+                              <tr>
+                                <th align="center">Cultivo</th>
+                                <th align="center">Cantidad</th>
+                              </tr><?php
+                              $pdo = Database::connect();
+                              $sql = " SELECT id, nombre FROM cultivos";
+                              foreach ($pdo->query($sql) as $row) {?>
                                 <tr>
-                                  <th align="center">Cultivo</th>
-                                  <th align="center">Cantidad</th>
+                                  <td><?=$row["nombre"]?></td>
+                                  <td>
+                                    <input type="hidden" name="id_cultivo[]" value="<?=$row["id"]?>">
+                                    <input type="number" name="cantidad[]" class="form-control cantidad" placeholder="Cantidad">
+                                  </td>
                                 </tr><?php
-                                $pdo = Database::connect();
-                                $sql = " SELECT id, nombre FROM cultivos";
-                                foreach ($pdo->query($sql) as $row) {?>
-                                  <tr>
-                                    <td><?=$row["nombre"]?></td>
-                                    <td>
-                                      <input type="hidden" name="id_cultivo[]" value="<?=$row["id"]?>">
-                                      <input type="number" name="cantidad[]" class="form-control cantidad" placeholder="Cantidad">
-                                    </td>
-                                  </tr><?php
-                                }
-                                Database::disconnect();?>
-                              </table>
-                              <div class="mensajeError" style="color: red; display: none;">Por favor, ingrese al menos una cantidad.</div>
-                            </div>
+                              }
+                              Database::disconnect();?>
+                            </table>
+                            <div class="mensajeError" style="color: red; display: none;">Por favor, ingrese al menos una cantidad.</div>
                           </div>
                         </div>
                       </div>
                     </div>
-                    <div class="card-footer">
-                      <div class="col-sm-9 offset-sm-3">
-                        <button class="btn btn-primary" type="submit">Crear</button>
-						            <button type="button" class="btn btn-light" data-dismiss="modal">Cerrar</button>
-                      </div>
+                  </div>
+                  <div class="modal-footer">
+                    <div class="col-sm-9 offset-sm-3">
+                      <button class="btn btn-primary" type="submit">Crear</button>
+                      <button type="button" class="btn btn-light" data-dismiss="modal">Cerrar</button>
                     </div>
-                  </form>
-                </div>
+                  </div>
+                </form>
               </div>
             </div>
           </div>
           <!-- FIN MODAL PARA NUEVO RETIRO -->
 
           <!-- MODAL PARA NUEVO PAGO -->
-          <div class="modal fade" id="nuevoPago" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+          <div class="modal fade" id="nuevoPago" role="dialog" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="myLargeModalLabel" aria-hidden="true">
             <div class="modal-dialog modal-lg">
               <div class="modal-content">
-                <div class="card">
-                  <div class="card-header">
-                    <h5>Nuevo Pedido de <?php echo $data['razon_social']; ?></h5>
-                  </div>
-				          <form class="form theme-form" role="form" method="post" action="nuevoPedido.php?id_cliente=<?=$id?>">
-                    <div class="card-body">
-                      <div class="row">
-                        <div class="col">
-                          <div class="form-group row">
-                            <label class="col-sm-3 col-form-label">Fecha</label>
-                            <div class="col-sm-3"><input name="fecha" type="date" class="form-control" value="<?=$hoy?>" required></div>
-                            <label class="col-sm-3 col-form-label">Campaña</label>
-                            <div class="col-sm-3">
-                              <select name="campana" class="form-control"><?php
-                                // Generar las opciones del select
-                                for ($i = $anio_inicial; $i <= $anio_final; $i++) {
-                                  // Si el año es el actual, marcarlo como seleccionado por defecto
-                                  $selected = ($i == $anio_actual) ? "selected" : "";
-                                  echo "<option value='$i' $selected>$i</option>";
-                                }?>
-                              </select>
-                            </div>
+                <div class="modal-header">
+                  <h5>Nuevo Pedido de <?=$data['razon_social'];?> Pedido N° <span class="idPedido"></span></h5>
+                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                  </button>
+                </div>
+                <form class="form theme-form" role="form" method="post" action="nuevoPedido.php?id_cliente=<?=$id?>">
+                  <input name="id_pedido_pago" id="id_pedido_pago" type="hidden">
+                  <div class="modal-body">
+                    <div class="row">
+                      <div class="col">
+                        <div class="form-group row">
+                          <label class="col-sm-3 col-form-label">Fecha</label>
+                          <div class="col-sm-3"><input name="fecha_pago" id="fecha_pago" type="date" class="form-control" value="<?=$hoy?>" required></div>
+                          <label class="col-sm-3 col-form-label">Campaña</label>
+                          <div class="col-sm-3">
+                            <select name="campana_pago" id="campana_pago" class="form-control"><?php
+                              // Generar las opciones del select
+                              for ($i = $anio_inicial; $i <= $anio_final; $i++) {
+                                // Si el año es el actual, marcarlo como seleccionado por defecto
+                                $selected = ($i == $anio_actual) ? "selected" : "";
+                                echo "<option value='$i' $selected>$i</option>";
+                              }?>
+                            </select>
                           </div>
-                          <div class="form-group row">
-                            <!-- <label class="col-sm-12 col-form-label">Cultivos</label> -->
-                            <div class="col-sm-12">
-                              <table class="table table-striped">
+                        </div>
+                        <div class="form-group row">
+                          <!-- <label class="col-sm-12 col-form-label">Cultivos</label> -->
+                          <div class="col-sm-12">
+                            <table class="table table-striped">
+                              <tr>
+                                <th>Cultivo</th>
+                                <th>Cantidad</th>
+                              </tr><?php
+                              //include 'database.php';
+                              $pdo = Database::connect();
+                              $sql = " SELECT id, nombre FROM cultivos";
+                              foreach ($pdo->query($sql) as $row) {?>
                                 <tr>
-                                  <th>Cultivo</th>
-                                  <th>Cantidad</th>
+                                  <td><?=$row["nombre"]?></td>
+                                  <td>
+                                    <input type="hidden" name="id_cultivo[]" value="<?=$row["id"]?>">
+                                    <input type="number" name="cantidad[]" class="form-control" placeholder="Cantidad">
+                                  </td>
                                 </tr><?php
-                                //include 'database.php';
-                                $pdo = Database::connect();
-                                $sql = " SELECT id, nombre FROM cultivos";
-                                foreach ($pdo->query($sql) as $row) {?>
-                                  <tr>
-                                    <td><?=$row["nombre"]?></td>
-                                    <td>
-                                      <input type="hidden" name="id_cultivo[]" value="<?=$row["id"]?>">
-                                      <input type="number" name="cantidad[]" class="form-control" placeholder="Cantidad">
-                                    </td>
-                                  </tr><?php
-                                }
-                                Database::disconnect();?>
-                              </table>
-                            </div>
+                              }
+                              Database::disconnect();?>
+                            </table>
                           </div>
                         </div>
                       </div>
                     </div>
-                    <div class="card-footer">
-                      <div class="col-sm-9 offset-sm-3">
-                        <button class="btn btn-primary" type="submit">Crear</button>
-						            <button type="button" class="btn btn-light" data-dismiss="modal">Cerrar</button>
-                      </div>
+                  </div>
+                  <div class="modal-footer">
+                    <div class="col-sm-9 offset-sm-3">
+                      <button class="btn btn-primary" type="submit">Crear</button>
+                      <button type="button" class="btn btn-light" data-dismiss="modal">Cerrar</button>
                     </div>
-                  </form>
-                </div>
+                  </div>
+                </form>
               </div>
             </div>
           </div>
@@ -689,6 +700,7 @@ Database::disconnect();
 
     <script>
       $(document).ready(function() {
+        $("#nuevoPedido").modal("show")
 
         $('.formulario').submit(function(event) {
           let inputs_cantidad=$(this).find('input.cantidad')
@@ -721,57 +733,64 @@ Database::disconnect();
 
         function getChoferes(id_transporte){
           let selectChofer=$("#id_chofer")
-          selectChofer.find("option").each(function(){
-            $(this).attr("disabled",true);
-            if(this.value=="" || this.dataset.idTransporte==id_transporte){
-              $(this).attr("disabled",false);
-            }
+          if(id_transporte>0){
+            selectChofer.attr("disabled",false)
+            selectChofer.find("option").each(function(){
+              $(this).attr("disabled",true);
+              if(this.value=="" || this.dataset.idTransporte==id_transporte){
+                $(this).attr("disabled",false);
+              }
+              
+            })
             
-          })
-          
-          // Destruir y volver a aplicar Select2
-          selectChofer.select2('destroy');
-          selectChofer.select2();
+            // Destruir y volver a aplicar Select2
+            selectChofer.select2('destroy');
+            selectChofer.select2();
+          }else{
+            selectChofer.attr("disabled",true)
+          }
         }
 
         function getVehiculos(id_transporte){
-          let selectChofer=$("#id_vehiculo")
-          selectChofer.find("option").each(function(){
-            $(this).attr("disabled",true);
-            if(this.value=="" || this.dataset.idTransporte==id_transporte){
-              $(this).attr("disabled",false);
-            }
+          let selectVehiculo=$("#id_vehiculo")
+          if(id_transporte>0){
+            selectVehiculo.attr("disabled",false)
+            selectVehiculo.find("option").each(function(){
+              $(this).attr("disabled",true);
+              if(this.value=="" || this.dataset.idTransporte==id_transporte){
+                $(this).attr("disabled",false);
+              }
+              
+            })
             
-          })
-          
-          // Destruir y volver a aplicar Select2
-          selectChofer.select2('destroy');
-          selectChofer.select2();
+            // Destruir y volver a aplicar Select2
+            selectVehiculo.select2('destroy');
+            selectVehiculo.select2();
+          }else{
+            selectVehiculo.attr("disabled",true)
+          }
         }
 
-        /*$('.tablas_cta_cte').DataTable({
-          stateSave: true,
-          responsive: true,
-          language: {
-          "decimal": "",
-          "emptyTable": "No hay información",
-          "info": "Mostrando _START_ a _END_ de _TOTAL_ Registros",
-          "infoEmpty": "Mostrando 0 to 0 of 0 Registros",
-          "infoFiltered": "(Filtrado de _MAX_ total registros)",
-          "infoPostFix": "",
-          "thousands": ",",
-          "lengthMenu": "Mostrar _MENU_ Registros",
-          "loadingRecords": "Cargando...",
-          "processing": "Procesando...",
-          "search": "Buscar:",
-          "zeroRecords": "No hay resultados",
-          "paginate": {
-              "first": "Primero",
-              "last": "Ultimo",
-              "next": "Siguiente",
-              "previous": "Anterior"
-          }}
-        });*/
+        $(document).on("click",".btnNuevoRetiro",function(){
+          let modal=$("#nuevoRetiro")
+          modal.modal("show")
+          modal.find("span.idPedido").html(this.dataset.idPedido)
+        })
+        $(document).on("click",".btnNuevoPago",function(){
+          let modal=$("#nuevoPago")
+          modal.modal("show")
+          modal.find("span.idPedido").html(this.dataset.idPedido)
+        })
+        $(document).on("click",".btnNuevaDevolucionContenedores",function(){
+          let modal=$("#nuevaDevolucionContenedores")
+          modal.modal("show")
+          modal.find("span.idPedido").html(this.dataset.idPedido)
+        })
+        $(document).on("click",".btnNuevaDevolucionPlantines",function(){
+          let modal=$("#nuevaDevolucionPlantines")
+          modal.modal("show")
+          modal.find("span.idPedido").html(this.dataset.idPedido)
+        })
 
         $(".nav_id_cultivo").on("click",function(){
           let id_cultivo=this.dataset.id_cultivo
@@ -836,7 +855,35 @@ Database::disconnect();
                 if(tipo_comprobante=="Pago"){
                   clase="pagos";
                 }
-                return '<span class="badge '+clase+'">'+tipo_comprobante+' N° '+row.id_pedido+'</span>';
+                //<span class="badge '+clase+'">'++'</span>
+                //<a class="dropdown-item" href="#">Action</a>
+                //<a class="dropdown-item" href="#">Another action</a>
+                //<a class="dropdown-item" href="#">Something else here</a>
+                if(tipo_comprobante=="Pedido"){
+                  return `
+                    <div class="dropdown">
+                      <button class="btn btn-sm ${clase} dropdown-toggle" type="button" data-toggle="dropdown" aria-expanded="false">
+                        ${tipo_comprobante+' N° '+row.id_pedido}
+                      </button>
+                      <div class="dropdown-menu">
+                        <a href="#" class="dropdown-item retiros btnNuevoRetiro" data-id-pedido="${row.id_pedido}">
+                          <i class="fa fa-plus"></i> Retiro
+                        </a>
+                        <a href="#" class="dropdown-item pagos btnNuevoPago" data-id-pedido="${row.id_pedido}">
+                          <i class="fa fa-plus"></i> Pago
+                        </a>
+                        <a href="#" class="dropdown-item contenedores btnNuevaDevolucionContenedores" data-id-pedido="${row.id_pedido}">
+                          <i class="fa fa-plus"></i> Devolucion de contenedores
+                        </a>
+                        <a href="#" class="dropdown-item plantines btnNuevaDevolucionPlantines" data-id-pedido="${row.id_pedido}">
+                          <i class="fa fa-plus"></i> Devolucion de plantines
+                        </a>
+                      </div>
+                    </div>
+                  `;
+                }else{
+                  return '<button class="btn btn-sm '+clase+'">'+tipo_comprobante+' N° '+row.id_pedido+'</button>'
+                }
               }},
               {"data": "campana"},
               {
@@ -944,6 +991,27 @@ Database::disconnect();
                 saldoRetiro: ultimoRetiro ? ultimoRetiro.saldo_retiro : 0,
                 saldoPago: ultimoPago ? ultimoPago.saldo_pago : 0
             };
+        }
+
+        // Escuchar el evento input del textarea para guardar automáticamente el contenido
+        document.getElementById('notas').addEventListener('input', guardarNotas);
+
+        function guardarNotas() {
+          let idCliente="<?=$id?>";
+          var nota = document.getElementById('notas').value;
+          var xhr = new XMLHttpRequest();
+          xhr.open('POST', 'guardar_nota_cliente.php');
+          xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+          xhr.onload = function() {
+              if (xhr.status === 200) {
+                  console.log('nota guardado exitosamente');
+              } else {
+                  console.log('Error al guardar el nota');
+              }
+          };
+          xhr.send('nota=' + encodeURIComponent(nota)+'&idCliente='+idCliente);
+          /*xhr.send('nota=' + encodeURIComponent(nota));
+          xhr.send('idCliente'+idCliente);*/
         }
 
       });

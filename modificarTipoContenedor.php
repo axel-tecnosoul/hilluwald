@@ -6,20 +6,41 @@ if(empty($_SESSION['user'])){
 }
 require 'database.php';
 
+$id = null;
+if ( !empty($_GET['id'])) {
+  $id = $_REQUEST['id'];
+}
+
+if ( null==$id ) {
+  header("Location: listarTiposContenedores.php");
+}
+
 if ( !empty($_POST)) {
-  //var_dump($_POST);
-  //die;
+  // var_dump($_POST);
+  // die;
+  
   // insert data
   $pdo = Database::connect();
   $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
   
-  $sql = "INSERT INTO especies (especie, icono, color, id_usuario, fecha_hora_alta) VALUES (?,?,?,?,now())";
+  $sql = "UPDATE tipos_contenedores set tipo = ?, id_usuario = ? where id = ?";
   $q = $pdo->prepare($sql);
-  $q->execute(array($_POST['especie'],$_POST['icon'],$_POST['basic-color'],$_SESSION['user']['id']));
+  $q->execute(array($_POST['tipo'],$_SESSION['user']['id'],$_GET['id']));
   
   Database::disconnect();
   
-  header("Location: listarEspecies.php");
+  header("Location: listarTiposContenedores.php");
+
+} else {
+  
+  $pdo = Database::connect();
+  $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+  $sql = "SELECT id, tipo, id_usuario FROM tipos_contenedores WHERE id = ? ";
+  $q = $pdo->prepare($sql);
+  $q->execute(array($id));
+  $data = $q->fetch(PDO::FETCH_ASSOC);
+  
+  Database::disconnect();
 }?>
 <!DOCTYPE html>
 <html lang="en">
@@ -47,7 +68,7 @@ if ( !empty($_POST)) {
                     <h3><?php include("title.php"); ?></h3>
                     <ol class="breadcrumb">
                       <li class="breadcrumb-item"><a href="#"><i data-feather="home"></i></a></li>
-                      <li class="breadcrumb-item">Nueva Especie</li>
+                      <li class="breadcrumb-item">Modificar Tipo de Contenedor</li>
                     </ol>
                   </div>
                 </div>
@@ -55,7 +76,7 @@ if ( !empty($_POST)) {
                 <div class="col-2">
                   <div class="bookmark pull-right">
                     <ul>
-                      <li><a  target="_blank" data-container="body" data-toggle="popover" data-placement="top" title="" data-original-title="<?php echo date('d-m-Y');?>"><i data-feather="calendar"></i></a></li>
+                      <li><a  target="_blank" data-container="body" data-toggle="popover" data-placement="top" title="" data-original-title="<?=date('d-m-Y');?>"><i data-feather="calendar"></i></a></li>
                     </ul>
                   </div>
                 </div>
@@ -69,43 +90,19 @@ if ( !empty($_POST)) {
               <div class="col-sm-12">
                 <div class="card">
                   <div class="card-header">
-                    <h5>Nueva Especie</h5>
+                    <h5>Modificar Tipo de Contenedor</h5>
                   </div>
-				          <form class="form theme-form" role="form" method="post" action="nuevaEspecie.php">
+				          <form class="form theme-form" role="form" method="post" action="modificarTipoContenedor.php?id=<?=$id?>">
                     <div class="card-body">
                       <div class="form-group row">
-                        <label class="col-sm-3 col-form-label">Especie</label>
-                        <div class="col-sm-9"><input name="especie" type="text" maxlength="99" class="form-control" value="" required="required"></div>
-                      </div>
-                      <div class="form-group row">
-                        <label class="col-sm-3 col-form-label">Icono</label>
-                        <div class="col-sm-9">
-                          <div class="btn-group btn-group-toggle" data-toggle="buttons"><?php
-                            foreach ($aIconos as $icono) {?>
-                              <label class="btn btn-outline-primary">
-                                <input type="radio" value="<?=$icono?>" name="icon" id="icon">
-                                <i class="<?=$icono?>" aria-hidden="true"></i>
-                              </label><?php
-                            }?>
-                          </div>
-                        </div>
-                      </div>
-                      <div class="form-group row">
-                        <label class="col-sm-3 col-form-label">Color del icono</label>
-                        <div class="col-sm-9">
-                          <input type="color" id="basic-color" name="basic-color" list="basic-colors">
-                          <datalist id="basic-colors"><?php
-                            foreach ($aColores as $codigo => $nombre): ?>
-                              <option value="<?=$codigo?>" <?php if ($data['color'] == $codigo) echo "selected"; ?> autocomplete="off"><?=$nombre?></option><?php
-                            endforeach; ?>
-                          </datalist>
-                        </div>
+                        <label class="col-sm-3 col-form-label">Tipo</label>
+                        <div class="col-sm-9"><input name="tipo" type="text" maxlength="99" class="form-control" value="<?=$data['tipo']; ?>" required="required"></div>
                       </div>
                     </div>
                     <div class="card-footer">
                       <div class="col-sm-9 offset-sm-3">
-                        <button class="btn btn-primary" type="submit">Crear</button>
-						            <a href="listarEspecies.php" class="btn btn-light">Volver</a>
+                        <button class="btn btn-primary" type="submit">Modificar</button>
+                        <a href='listarTiposContenedores.php' class="btn btn-light">Volver</a>
                       </div>
                     </div>
                   </form>
@@ -116,7 +113,7 @@ if ( !empty($_POST)) {
           <!-- Container-fluid Ends-->
         </div>
         <!-- footer start-->
-		    <?php include("footer.php"); ?>
+        <?php include("footer.php"); ?>
       </div>
     </div>
     <!-- latest jquery-->
@@ -142,7 +139,7 @@ if ( !empty($_POST)) {
     <!-- Theme js-->
     <script src="assets/js/script.js"></script>
     <!-- Plugin used-->
-	  <script src="assets/js/select2/select2.full.min.js"></script>
+	<script src="assets/js/select2/select2.full.min.js"></script>
     <script src="assets/js/select2/select2-custom.js"></script>
   </body>
 </html>

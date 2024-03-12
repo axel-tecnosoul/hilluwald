@@ -51,7 +51,7 @@
                     <h3><?php include("title.php"); ?></h3>
                     <ol class="breadcrumb">
                       <li class="breadcrumb-item"><a href="#"><i data-feather="home"></i></a></li>
-                      <li class="breadcrumb-item">Nuevo Procedencias de Especies</li>
+                      <li class="breadcrumb-item">Nueva Procedencia de Especies</li>
                     </ol>
                   </div>
                 </div>
@@ -73,7 +73,7 @@
               <div class="col-sm-12">
                 <div class="card">
                   <div class="card-header">
-                    <h5>Nuevo Procedencias de Especies</h5>
+                    <h5>Nueva Procedencia de Especies</h5>
                   </div>
 				          <form class="form theme-form" role="form" method="post" action="nuevoProcedenciasEspecies.php">
                     <div class="card-body">

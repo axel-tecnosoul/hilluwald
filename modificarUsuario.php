@@ -95,7 +95,7 @@
                 <div class="col-2">
                   <div class="bookmark pull-right">
                     <ul>
-                      <li><a  target="_blank" data-container="body" data-toggle="popover" data-placement="top" title="" data-original-title="<?php echo date('d-m-Y');?>"><i data-feather="calendar"></i></a></li>
+                      <li><a  target="_blank" data-container="body" data-toggle="popover" data-placement="top" title="" data-original-title="<?=date('d-m-Y');?>"><i data-feather="calendar"></i></a></li>
                     </ul>
                   </div>
                 </div>
@@ -111,93 +111,89 @@
                   <div class="card-header">
                     <h5>Modificar Usuario</h5>
                   </div>
-				  <form class="form theme-form" role="form" method="post" action="modificarUsuario.php?id=<?php echo $id?>">
+				          <form class="form theme-form" role="form" method="post" action="modificarUsuario.php?id=<?=$id?>">
                     <div class="card-body">
                       <div class="row">
                         <div class="col">
-							<div class="form-group row">
-								<label class="col-sm-3 col-form-label">Usuario</label>
-								<div class="col-sm-9"><input name="usuario" type="text" maxlength="99" class="form-control" required="required" value="<?php echo $data['usuario']; ?>"></div>
-							</div>
-							<div class="form-group row">
-								<label class="col-sm-3 col-form-label">Clave</label>
-								<div class="col-sm-9"><input name="clave" type="text" maxlength="99" class="form-control" required="required" value="<?php echo $data['clave']; ?>"></div>
-							</div>
-							<div class="form-group row">
-								<label class="col-sm-3 col-form-label">Nombre y Apellido</label>
-								<div class="col-sm-9"><input name="nombre_apellido" type="text" maxlength="99" class="form-control" required="required" value="<?php echo $data['nombre_apellido']; ?>"></div>
-							</div>
-							<div class="form-group row">
-								<label class="col-sm-3 col-form-label">Email</label>
-								<div class="col-sm-9"><input name="email" type="email" maxlength="99" class="form-control" required="required" value="<?php echo $data['email']; ?>"></div>
-							</div>
-							<div class="form-group row">
-								<label class="col-sm-3 col-form-label">Perfil</label>
-								<div class="col-sm-9">
-								<select name="id_perfil" id="id_perfil" class="js-example-basic-single col-sm-12" required="required" onchange="jsAlmacen();">
-								<option value="">Seleccione...</option>
-								<?php 
-								$pdo = Database::connect();
-								$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-								$sqlZon = "SELECT `id`, `perfil` FROM `perfiles` WHERE 1";
-								$q = $pdo->prepare($sqlZon);
-								$q->execute();
-								while ($fila = $q->fetch(PDO::FETCH_ASSOC)) {
-									echo "<option value='".$fila['id']."'";
-									if ($fila['id'] == $data['id_perfil']) {
-										echo " selected ";
-									}
-									echo ">".$fila['perfil']."</option>";
-								}
-								Database::disconnect();
-								?>
-								</select>
-								</div>
-							</div>
-							<div class="form-group row">
-								<label class="col-sm-3 col-form-label">Sucursales</label>
-								<div class="col-sm-9">
-								<select name="id_sucursal" id="id_sucursal" class="js-example-basic-single col-sm-12" <?php if ($data['id_perfil']==1) echo 'disabled="disabled"'; ?>>
-								<option value="">Seleccione...</option>
-								<?php 
-								$pdo = Database::connect();
-								$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-								$sqlZon = "SELECT `id`, `nombre` FROM `sucursales` WHERE 1";
-								$q = $pdo->prepare($sqlZon);
-								$q->execute();
-								while ($fila = $q->fetch(PDO::FETCH_ASSOC)) {
-									echo "<option value='".$fila['id']."'";
-									if ($fila['id'] == $data['id_sucursal']) {
-										echo " selected ";
-									}
-									echo ">".$fila['nombre']."</option>";
-								}
-								Database::disconnect();
-								?>
-								</select>
-								</div>
-							</div>
-							<div class="form-group row">
-                            	<label class="col-sm-3 col-form-label">Activo</label>
-                            	<div class="col-sm-9"><?php
-									foreach ($aOptionsActivo as $option) {?>
-										<label class="d-block" for="<?=$option["id"]?>">
-										<input type="radio" name="activo" class="radio_animated" id="<?=$option["id"]?>" value="<?=$option["value"]?>" required<?php
-											if($option["checked"]) echo " checked";
-											if($option["disabled"]) echo " disabled";?>
-										>
-										<label for="<?=$option["id"]?>"><?=$option["label"]?></label>
-										</label><?php
-									}?>
-                            	</div>
-                          	</div>
+                          <div class="form-group row">
+                            <label class="col-sm-3 col-form-label">Usuario</label>
+                            <div class="col-sm-9"><input name="usuario" type="text" maxlength="99" class="form-control" required="required" value="<?=$data['usuario']; ?>"></div>
+                          </div>
+                          <div class="form-group row">
+                            <label class="col-sm-3 col-form-label">Clave</label>
+                            <div class="col-sm-9"><input name="clave" type="text" maxlength="99" class="form-control" required="required" value="<?=$data['clave']; ?>"></div>
+                          </div>
+                          <div class="form-group row">
+                            <label class="col-sm-3 col-form-label">Nombre y Apellido</label>
+                            <div class="col-sm-9"><input name="nombre_apellido" type="text" maxlength="99" class="form-control" required="required" value="<?=$data['nombre_apellido']; ?>"></div>
+                          </div>
+                          <div class="form-group row">
+                            <label class="col-sm-3 col-form-label">Email</label>
+                            <div class="col-sm-9"><input name="email" type="email" maxlength="99" class="form-control" required="required" value="<?=$data['email']; ?>"></div>
+                          </div>
+                          <div class="form-group row">
+                            <label class="col-sm-3 col-form-label">Perfil</label>
+                            <div class="col-sm-9">
+                              <select name="id_perfil" id="id_perfil" class="js-example-basic-single col-sm-12" required="required" onchange="jsAlmacen();">
+                                <option value="">Seleccione...</option><?php
+                                $pdo = Database::connect();
+                                $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+                                $sqlZon = "SELECT `id`, `perfil` FROM `perfiles` WHERE 1";
+                                $q = $pdo->prepare($sqlZon);
+                                $q->execute();
+                                while ($fila = $q->fetch(PDO::FETCH_ASSOC)) {
+                                  echo "<option value='".$fila['id']."'";
+                                  if ($fila['id'] == $data['id_perfil']) {
+                                    echo " selected ";
+                                  }
+                                  echo ">".$fila['perfil']."</option>";
+                                }
+                                Database::disconnect();?>
+                              </select>
+                            </div>
+                          </div>
+                          <div class="form-group row">
+                            <label class="col-sm-3 col-form-label">Sucursales</label>
+                            <div class="col-sm-9">
+                              <select name="id_sucursal" id="id_sucursal" class="js-example-basic-single col-sm-12" <?php if ($data['id_perfil']==1) echo 'disabled="disabled"'; ?>>
+                                <option value="">Seleccione...</option><?php
+                                $pdo = Database::connect();
+                                $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+                                $sqlZon = "SELECT `id`, `nombre` FROM `sucursales` WHERE 1";
+                                $q = $pdo->prepare($sqlZon);
+                                $q->execute();
+                                while ($fila = $q->fetch(PDO::FETCH_ASSOC)) {
+                                  echo "<option value='".$fila['id']."'";
+                                  if ($fila['id'] == $data['id_sucursal']) {
+                                    echo " selected ";
+                                  }
+                                  echo ">".$fila['nombre']."</option>";
+                                }
+                                Database::disconnect();?>
+                              </select>
+                            </div>
+                          </div>
+                          <div class="form-group row">
+                            <label class="col-sm-3 col-form-label">Activo</label>
+                            <div class="col-sm-9"><?php
+                              foreach ($aOptionsActivo as $option) {?>
+                                <label class="d-block" for="<?=$option["id"]?>">
+                                <input type="radio" name="activo" class="radio_animated" id="<?=$option["id"]?>" value="<?=$option["value"]?>" required<?php
+                                  if($option["checked"]) echo " checked";
+                                  if($option["disabled"]) echo " disabled";?>
+                                >
+                                <label for="<?=$option["id"]?>"><?=$option["label"]?></label>
+                                </label><?php
+                              }?>
+                            </div>
+                          </div>
                         </div>
                       </div>
                     </div>
                     <div class="card-footer">
                       <div class="col-sm-9 offset-sm-3">
                         <button class="btn btn-primary" type="submit">Modificar</button>
-						<a onclick="document.location.href='listarUsuarios.php'" class="btn btn-light">Volver</a>
+						            <a href='listarUsuarios.php' class="btn btn-light">Volver</a>
                       </div>
                     </div>
                   </form>

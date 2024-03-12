@@ -1,26 +1,30 @@
 <?php
-require("config.php");
-if(empty($_SESSION['user'])){
-  header("Location: index.php");
-  die("Redirecting to index.php"); 
-}
-require 'database.php';
-
-if ( !empty($_POST)) {
-  //var_dump($_POST);
-  //die;
-  // insert data
-  $pdo = Database::connect();
-  $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-  
-  $sql = "INSERT INTO especies (especie, icono, color, id_usuario, fecha_hora_alta) VALUES (?,?,?,?,now())";
-  $q = $pdo->prepare($sql);
-  $q->execute(array($_POST['especie'],$_POST['icon'],$_POST['basic-color'],$_SESSION['user']['id']));
-  
-  Database::disconnect();
-  
-  header("Location: listarEspecies.php");
-}?>
+    require("config.php");
+    if(empty($_SESSION['user']))
+    {
+        header("Location: index.php");
+        die("Redirecting to index.php"); 
+    }
+	
+	require 'database.php';
+	
+	if ( !empty($_POST)) {
+		// var_dump($_POST);
+    // die;
+		// insert data
+		$pdo = Database::connect();
+		$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+		
+		$sql = "INSERT INTO cultivos(nombre, nombre_corto, precio, icono, color, id_usuario, fecha_hora_alta) VALUES (?,?,?,?,?,?,now())";
+		$q = $pdo->prepare($sql);
+		$q->execute(array($_POST['nombre'],$_POST['nombre_corto'], $_POST['precio'],$_POST['icon'],$_POST['basic-color'],$_SESSION['user']['id']));
+		
+		Database::disconnect();
+		
+		header("Location: listarCultivos.php");
+	}
+	
+?>
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -31,11 +35,11 @@ if ( !empty($_POST)) {
     <!-- Loader ends-->
     <!-- page-wrapper Start-->
     <div class="page-wrapper">
-	    <?php include('header.php');?>
+	  <?php include('header.php');?>
 	  
       <!-- Page Header Start-->
       <div class="page-body-wrapper">
-		    <?php include('menu.php');?>
+		<?php include('menu.php');?>
         <!-- Page Sidebar Start-->
         <!-- Right sidebar Ends-->
         <div class="page-body">
@@ -47,7 +51,7 @@ if ( !empty($_POST)) {
                     <h3><?php include("title.php"); ?></h3>
                     <ol class="breadcrumb">
                       <li class="breadcrumb-item"><a href="#"><i data-feather="home"></i></a></li>
-                      <li class="breadcrumb-item">Nueva Especie</li>
+                      <li class="breadcrumb-item">Nuevo Cultivo</li>
                     </ol>
                   </div>
                 </div>
@@ -69,13 +73,21 @@ if ( !empty($_POST)) {
               <div class="col-sm-12">
                 <div class="card">
                   <div class="card-header">
-                    <h5>Nueva Especie</h5>
+                    <h5>Nuevo Cultivo</h5>
                   </div>
-				          <form class="form theme-form" role="form" method="post" action="nuevaEspecie.php">
+				          <form class="form theme-form" role="form" method="post" action="nuevoCultivo.php">
                     <div class="card-body">
                       <div class="form-group row">
-                        <label class="col-sm-3 col-form-label">Especie</label>
-                        <div class="col-sm-9"><input name="especie" type="text" maxlength="99" class="form-control" value="" required="required"></div>
+                        <label class="col-sm-3 col-form-label">Nombres</label>
+                        <div class="col-sm-9"><input name="nombre" type="text" maxlength="99" class="form-control" value="" required="required"></div>
+                      </div>
+                      <div class="form-group row">
+                        <label class="col-sm-3 col-form-label">Nombre Corto</label>
+                        <div class="col-sm-9"><input name="nombre_corto" type="text" maxlength="99" class="form-control" value="" required="required"></div>
+                      </div>
+                      <div class="form-group row">
+                        <label class="col-sm-3 col-form-label">Precio</label>
+                        <div class="col-sm-9"><input name="precio" type="text" maxlength="99" class="form-control" value="" required="required"></div>
                       </div>
                       <div class="form-group row">
                         <label class="col-sm-3 col-form-label">Icono</label>
@@ -83,7 +95,7 @@ if ( !empty($_POST)) {
                           <div class="btn-group btn-group-toggle" data-toggle="buttons"><?php
                             foreach ($aIconos as $icono) {?>
                               <label class="btn btn-outline-primary">
-                                <input type="radio" value="<?=$icono?>" name="icon" id="icon">
+                                <input type="radio" value="<?=$icono?>" name="icon" id="icon" autocomplete="off">
                                 <i class="<?=$icono?>" aria-hidden="true"></i>
                               </label><?php
                             }?>
@@ -95,9 +107,9 @@ if ( !empty($_POST)) {
                         <div class="col-sm-9">
                           <input type="color" id="basic-color" name="basic-color" list="basic-colors">
                           <datalist id="basic-colors"><?php
-                            foreach ($aColores as $codigo => $nombre): ?>
-                              <option value="<?=$codigo?>" <?php if ($data['color'] == $codigo) echo "selected"; ?> autocomplete="off"><?=$nombre?></option><?php
-                            endforeach; ?>
+                            foreach ($aColores as $codigo => $nombre) {?>
+                              <option value="<?=$codigo?>"><?=$nombre?></option><?php
+                            }?>
                           </datalist>
                         </div>
                       </div>
@@ -105,7 +117,7 @@ if ( !empty($_POST)) {
                     <div class="card-footer">
                       <div class="col-sm-9 offset-sm-3">
                         <button class="btn btn-primary" type="submit">Crear</button>
-						            <a href="listarEspecies.php" class="btn btn-light">Volver</a>
+						            <a href="listarCultivos.php" class="btn btn-light">Volver</a>
                       </div>
                     </div>
                   </form>
@@ -116,7 +128,7 @@ if ( !empty($_POST)) {
           <!-- Container-fluid Ends-->
         </div>
         <!-- footer start-->
-		    <?php include("footer.php"); ?>
+		<?php include("footer.php"); ?>
       </div>
     </div>
     <!-- latest jquery-->
@@ -142,7 +154,7 @@ if ( !empty($_POST)) {
     <!-- Theme js-->
     <script src="assets/js/script.js"></script>
     <!-- Plugin used-->
-	  <script src="assets/js/select2/select2.full.min.js"></script>
+	<script src="assets/js/select2/select2.full.min.js"></script>
     <script src="assets/js/select2/select2-custom.js"></script>
   </body>
 </html>
