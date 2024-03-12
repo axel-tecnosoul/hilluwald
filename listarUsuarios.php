@@ -95,7 +95,7 @@ if(empty($_SESSION['user']))
 								echo '<td>';
 									echo '<a href="modificarUsuario.php?id='.$row['id'].'"><img src="img/icon_modificar.png" width="24" height="25" border="0" alt="Modificar" title="Modificar"></a>';
 									echo '&nbsp;&nbsp;';
-									echo '<a href="#" data-toggle="modal" data-original-title="Confirmación" data-target="#eliminarModal_'.$row['id'].'"><img src="img/icon_baja.png" width="24" height="25" border="0" alt="Eliminar" title="Eliminar"></a>';
+									echo '<a href="#" title="Eliminar" onclick="openModalEliminar('.$row["id"].')"><img src="img/icon_baja.png" width="24" height="25" border="0" alt="Eliminar"></a>';
 									echo '&nbsp;&nbsp;';
 								echo '</td>';
 								echo '</tr>';
@@ -118,29 +118,20 @@ if(empty($_SESSION['user']))
         <?php include("footer.php"); ?>
       </div>
     </div>
-	<?php 
-	$pdo = Database::connect();
-	$sql = " SELECT u.`id`, u.`usuario`, p.`perfil`, s.`nombre`, u.`activo` FROM `usuarios` u inner join perfiles p on p.id = u.id_perfil left join sucursales s on s.id = u.id_sucursal WHERE 1 ";
-	foreach ($pdo->query($sql) as $row) {
-	?>
-	<div class="modal fade" id="eliminarModal_<?php echo $row[0];?>" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-	  <div class="modal-dialog" role="document">
-		<div class="modal-content">
-		  <div class="modal-header">
-			<button class="close" type="button" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
-		  </div>
-		  <div class="modal-body">¿Está seguro que desea eliminar el Usuario?</div>
-		  <div class="modal-footer">
-			<a href="eliminarUsuario.php?id=<?php echo $row[0];?>" class="btn btn-primary">Eliminar</a>
-			<a onclick="document.location.href='listarUsuarios.php'" class="btn btn-light">Volver</a>
-		  </div>
-		</div>
-	  </div>
-	</div>
-	<?php 
-	}
-	Database::disconnect();
-	?>
+    <div class="modal fade" id="eliminarModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button class="close" type="button" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+          </div>
+          <div class="modal-body">¿Está seguro que desea eliminar el Usuario?</div>
+          <div class="modal-footer">
+            <a id="btnEliminar" class="btn btn-primary">Eliminar</a>
+            <button class="btn btn-light" type="button" data-dismiss="modal" aria-label="Close">Volver</button>
+          </div>
+        </div>
+      </div>
+    </div>
     <!-- latest jquery-->
     <script src="assets/js/jquery-3.2.1.min.js"></script>
     <!-- Bootstrap js-->
@@ -206,6 +197,10 @@ if(empty($_SESSION['user']))
 			});
 		});
 		
+    function openModalEliminar(idUsuario){
+      $('#eliminarModal').modal("show");
+      document.getElementById("btnEliminar").href="eliminarUsuario.php?id="+idUsuario;
+    }
 		</script>
 		<script src="https://cdn.datatables.net/plug-ins/1.10.15/i18n/Spanish.json"></script>
     <!-- Plugin used-->

@@ -20,12 +20,25 @@
 	$pdo = Database::connect();
 	$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 		
-	$sql = "delete from `sucursales` WHERE id = ?";
-	$q = $pdo->prepare($sql);
-	$q->execute(array($id));
-	
-	Database::disconnect();
+	try {
+		$sql = "DELETE FROM `sucursales` WHERE id = ?";
+		$q = $pdo->prepare($sql);
+		$q->execute(array($id));
 		
-	header("Location: listarSucursales.php");
+		Database::disconnect();
+			
+		header("Location: listarSucursales.php");
+	} catch (PDOException $e) {
+	if($e->getCode()==23000){?>
+	  La Sucursal no se puede eliminar porque está siendo utilizando en otras tablas de la base de datos
+	  <br><br>
+	  <input type='button' onclick='window.location.href="listarSucursales.php"' value='Volver'><?php
+	}else{
+	  echo 'Ha ocurrido un error: <br><br>' . $e->getMessage();?>
+	  <br><br>
+	  <input type='button' onclick='window.location.href="listarSucursales.php"' value='Volver'><?php
+	  //var_dump($e);
+	}
 	
+  }
 ?>

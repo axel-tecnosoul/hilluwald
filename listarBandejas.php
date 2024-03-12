@@ -203,9 +203,9 @@ if(empty($_SESSION['user'])){
 			});
 		});
 
-    function openModalEliminar(idCliente){
+    function openModalEliminar(idBandeja){
       $('#eliminarModal').modal("show");
-      document.getElementById("btnEliminar").href="eliminarCliente.php?id="+idCliente;
+      document.getElementById("btnEliminar").href="eliminarBandeja.php?id="+idBandeja;
     }
 		
 		</script>

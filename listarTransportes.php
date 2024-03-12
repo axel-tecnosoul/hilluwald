@@ -68,6 +68,7 @@ if(empty($_SESSION['user']))
                             <th>Razon Social</th>
                             <th>CUIT</th>
                             <th>Domicilio</th>
+                            <th>Activo</th>
                             <th>Opciones</th>
                           </tr>
                         </thead>
@@ -78,21 +79,25 @@ if(empty($_SESSION['user']))
 							$sql = " SELECT t.id, t.razon_social, t.cuit, t.domicilio, t.id_usuario, t.fecha_hora_alta, t.activo, u.usuario FROM transportes t left join usuarios u on u.id = t.id_usuario WHERE 1 ";
 							
 							foreach ($pdo->query($sql) as $row) {
-                if($row['activo'] == 1){
-                  echo '<tr>';
-                  echo '<td>'. $row['id'] . '</td>';
-                  echo '<td>'. $row['razon_social'] . '</td>';
-                  echo '<td>'. $row['cuit'] . '</td>';
-                  echo '<td>'. $row['domicilio'] . '</td>';
-                  echo '<td>';
-                    echo '<a href="modificarTransporte.php?id='.$row[0].'"><img src="img/icon_modificar.png" width="24" height="25" border="0" alt="Modificar" title="Modificar"></a>';
-                    echo '&nbsp;&nbsp;';
-                    echo '<a href="#" data-toggle="modal" data-target="#eliminarModal_'.$row[0].'"><img src="img/icon_baja.png" width="24" height="25" border="0" alt="Eliminar" title="Eliminar"></a>';
-                    echo '&nbsp;&nbsp;';
-                  echo '</td>';
-                  echo '</tr>';
+                echo '<tr>';
+                echo '<td>'. $row["id"] . '</td>';
+                echo '<td>'. $row["razon_social"] . '</td>';
+                echo '<td>'. $row["cuit"] . '</td>';
+                echo '<td>'. $row["domicilio"] . '</td>';
+                if ($row["activo"] == 1) {
+                  echo '<td>Si</td>';
+                } else {
+                  echo '<td>No</td>';
                 }
-						   }
+                echo '<td>';
+                echo '<a href="modificarTransporte.php?id='.$row["id"].'"><img src="img/icon_modificar.png" width="24" height="25" border="0" alt="Modificar" title="Modificar"></a>';
+                echo '&nbsp;&nbsp;';
+                echo '<a href="#" title="Eliminar" onclick="openModalEliminar('.$row["id"].')"><img src="img/icon_baja.png" width="24" height="25" border="0" alt="Eliminar"></a>';
+                echo '&nbsp;&nbsp;';
+                //echo '&nbsp;&nbsp;';
+                echo '</td>';
+                echo '</tr>';
+              }
 						   Database::disconnect();
 						  ?>
                         </tbody>
@@ -111,30 +116,21 @@ if(empty($_SESSION['user']))
         <?php include("footer.php"); ?>
       </div>
     </div>
-	<?php 
-	$pdo = Database::connect();
-	$sql = " SELECT id, razon_social, cuit, id_usuario, fecha_hora_alta FROM `transportes` WHERE 1 ";
-	foreach ($pdo->query($sql) as $row) {
-	?>
-	<div class="modal fade" id="eliminarModal_<?php echo $row[0];?>" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-	  <div class="modal-dialog" role="document">
-		<div class="modal-content">
-		  <div class="modal-header">
-			<h5 class="modal-title" id="exampleModalLabel">Confirmación</h5>
-			<button class="close" type="button" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
-		  </div>
-		  <div class="modal-body">¿Está seguro que desea eliminar la Transporte?</div>
-		  <div class="modal-footer">
-			<a href="eliminarTransporte.php?id=<?php echo $row[0];?>" class="btn btn-primary">Eliminar</a>
-			<a onclick="document.location.href='listarTransportes.php'" class="btn btn-light">Volver</a>
-		  </div>
-		</div>
-	  </div>
-	</div>
-	<?php 
-	}
-	Database::disconnect();
-	?>
+    <div class="modal fade" id="eliminarModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">Confirmación</h5>
+            <button class="close" type="button" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+            </div>
+          <div class="modal-body">¿Está seguro que desea eliminar la Transporte?</div>
+          <div class="modal-footer">
+            <a id="btnEliminar" class="btn btn-primary">Eliminar</a>
+            <button class="btn btn-light" type="button" data-dismiss="modal" aria-label="Close">Volver</button>
+          </div>
+        </div>
+      </div>
+    </div>
     <!-- latest jquery-->
     <script src="assets/js/jquery-3.2.1.min.js"></script>
     <!-- Bootstrap js-->
@@ -199,6 +195,11 @@ if(empty($_SESSION['user']))
 				}}
 			});
 		});
+
+    function openModalEliminar(idTransporte){
+      $('#eliminarModal').modal("show");
+      document.getElementById("btnEliminar").href="eliminarTransporte.php?id="+idTransporte;
+    }
 		
 		</script>
 		<script src="https://cdn.datatables.net/plug-ins/1.10.15/i18n/Spanish.json"></script>
