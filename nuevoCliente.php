@@ -289,13 +289,8 @@
     <script src="assets/js/sidebar-menu.js"></script>
     <script src="assets/js/config.js"></script>
     <!-- Plugins JS start-->
-    <script src="assets/js/typeahead/handlebars.js"></script>
-    <script src="assets/js/typeahead/typeahead.bundle.js"></script>
-    <script src="assets/js/typeahead/typeahead.custom.js"></script>
     <script src="assets/js/chat-menu.js"></script>
     <script src="assets/js/tooltip-init.js"></script>
-    <script src="assets/js/typeahead-search/handlebars.js"></script>
-    <script src="assets/js/typeahead-search/typeahead-custom.js"></script>
     <!-- Plugins JS Ends-->
     <!-- Theme js-->
     <script src="assets/js/script.js"></script>
@@ -379,11 +374,13 @@
         if(newid>0){
           primero.focus();
           var sel2=$("#id_localidad-"+newid)
-          //console.log(sel2);
+          console.log(sel2);
           
           sel2.select2();//llamamos para inicializar select2
-          sel2.select2('destroy');//como no se iniciliaza bien lo destruimos para que elimine las clases que arrastra de la clonacion
-          sel2.select2();//volvemos a inicializar y ahora si se inicializa bien
+          //lo destruimos para que elimine las clases que arrastra de la clonacion y volvemos a inicializar
+          sel2.select2('destroy');
+          sel2.select2();
+          sel2.css('width', '100%');
           
         }
         return tr.attr("id");
@@ -448,8 +445,8 @@
           primero.focus();
           var sel2=$("#id_categoria-"+newid)
           //console.log(sel2);
-          
-          sel2.select2();//llamamos para inicializar select2
+          sel2.css("width","100%");
+          //sel2.select2();//llamamos para inicializar select2
           sel2.select2('destroy');//como no se iniciliaza bien lo destruimos para que elimine las clases que arrastra de la clonacion
           sel2.select2();//volvemos a inicializar y ahora si se inicializa bien
           

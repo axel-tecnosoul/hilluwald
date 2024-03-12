@@ -78,43 +78,39 @@
 				          <form class="form theme-form" role="form" method="post" action="nuevoCultivo.php">
                     <div class="card-body">
                       <div class="form-group row">
-                        <label class="col-sm-3 col-form-label">Material</label>
+                        <label class="col-sm-3 col-form-label">Nombres</label>
                         <div class="col-sm-9"><input name="nombre" type="text" maxlength="99" class="form-control" value="" required="required"></div>
                       </div>
                       <div class="form-group row">
-                        <label class="col-sm-3 col-form-label">Procedencia</label>
+                        <label class="col-sm-3 col-form-label">Nombre Corto</label>
+                        <div class="col-sm-9"><input name="nombre_corto" type="text" maxlength="99" class="form-control" value="" required="required"></div>
+                      </div>
+                      <div class="form-group row">
+                        <label class="col-sm-3 col-form-label">Precio</label>
+                        <div class="col-sm-9"><input name="precio" type="text" maxlength="99" class="form-control" value="" required="required"></div>
+                      </div>
+                      <div class="form-group row">
+                        <label class="col-sm-3 col-form-label">Icono</label>
                         <div class="col-sm-9">
-                          <select name="id_procedencia" id="id_procedencia" class="js-example-basic-single col-sm-12 form-control" required="required">
-                            <option value="">Seleccione...</option><?php
-                            $pdo = Database::connect();
-                            $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-                            $sqlZon = "SELECT id, procedencia FROM procedencias_especies WHERE activo=1";
-                            $q = $pdo->prepare($sqlZon);
-                            $q->execute();
-                            while ($fila = $q->fetch(PDO::FETCH_ASSOC)) {
-                              echo "<option value='".$fila['id']."'";
-                              echo ">".$fila['procedencia']."</option>";
-                            }
-                            Database::disconnect();?>
-                          </select>
+                          <div class="btn-group btn-group-toggle" data-toggle="buttons"><?php
+                            foreach ($aIconos as $icono) {?>
+                              <label class="btn btn-outline-primary">
+                                <input type="radio" value="<?=$icono?>" name="icon" id="icon" autocomplete="off">
+                                <i class="<?=$icono?>" aria-hidden="true"></i>
+                              </label><?php
+                            }?>
+                          </div>
                         </div>
                       </div>
                       <div class="form-group row">
-                        <label class="col-sm-3 col-form-label">Especie</label>
+                        <label class="col-sm-3 col-form-label">Color del icono</label>
                         <div class="col-sm-9">
-                          <select name="id_especie" id="id_especie" class="js-example-basic-single col-sm-12 form-control" required="required">
-                            <option value="">Seleccione...</option><?php
-                            $pdo = Database::connect();
-                            $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-                            $sqlZon = "SELECT id, especie FROM especies WHERE activo=1";
-                            $q = $pdo->prepare($sqlZon);
-                            $q->execute();
-                            while ($fila = $q->fetch(PDO::FETCH_ASSOC)) {
-                              echo "<option value='".$fila['id']."'";
-                              echo ">".$fila['especie']."</option>";
-                            }
-                            Database::disconnect();?>
-                          </select>
+                          <input type="color" id="basic-color" name="basic-color" list="basic-colors">
+                          <datalist id="basic-colors"><?php
+                            foreach ($aColores as $codigo => $nombre) {?>
+                              <option value="<?=$codigo?>"><?=$nombre?></option><?php
+                            }?>
+                          </datalist>
                         </div>
                       </div>
                     </div>
@@ -132,7 +128,7 @@
           <!-- Container-fluid Ends-->
         </div>
         <!-- footer start-->
-		    <?php include("footer.php"); ?>
+		<?php include("footer.php"); ?>
       </div>
     </div>
     <!-- latest jquery-->

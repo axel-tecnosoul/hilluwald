@@ -15,13 +15,13 @@
 		$pdo = Database::connect();
 		$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 		
-		$sql = "INSERT INTO cultivos(nombre, nombre_corto, precio, icono, color, id_usuario, fecha_hora_alta) VALUES (?,?,?,?,?,?,now())";
+		$sql = "INSERT INTO procedencias_especies(procedencia, id_usuario, fecha_hora_alta) VALUES (?,?,now())";
 		$q = $pdo->prepare($sql);
-		$q->execute(array($_POST['nombre'],$_POST['nombre_corto'], $_POST['precio'],$_POST['icon'],$_POST['basic-color'],$_SESSION['user']['id']));
+		$q->execute(array($_POST['procedencia'],$_SESSION['user']['id']));
 		
 		Database::disconnect();
 		
-		header("Location: listarCultivos.php");
+		header("Location: listarProcedenciasEspecies.php");
 	}
 	
 ?>
@@ -51,7 +51,7 @@
                     <h3><?php include("title.php"); ?></h3>
                     <ol class="breadcrumb">
                       <li class="breadcrumb-item"><a href="#"><i data-feather="home"></i></a></li>
-                      <li class="breadcrumb-item">Nuevo Cultivo</li>
+                      <li class="breadcrumb-item">Nueva Procedencia de Especies</li>
                     </ol>
                   </div>
                 </div>
@@ -73,55 +73,19 @@
               <div class="col-sm-12">
                 <div class="card">
                   <div class="card-header">
-                    <h5>Nuevo Cultivo</h5>
+                    <h5>Nueva Procedencia de Especies</h5>
                   </div>
-				          <form class="form theme-form" role="form" method="post" action="nuevoCultivo.php">
+				          <form class="form theme-form" role="form" method="post" action="nuevoProcedenciasEspecies.php">
                     <div class="card-body">
                       <div class="form-group row">
-                        <label class="col-sm-3 col-form-label">Material</label>
-                        <div class="col-sm-9"><input name="nombre" type="text" maxlength="99" class="form-control" value="" required="required"></div>
-                      </div>
-                      <div class="form-group row">
                         <label class="col-sm-3 col-form-label">Procedencia</label>
-                        <div class="col-sm-9">
-                          <select name="id_procedencia" id="id_procedencia" class="js-example-basic-single col-sm-12 form-control" required="required">
-                            <option value="">Seleccione...</option><?php
-                            $pdo = Database::connect();
-                            $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-                            $sqlZon = "SELECT id, procedencia FROM procedencias_especies WHERE activo=1";
-                            $q = $pdo->prepare($sqlZon);
-                            $q->execute();
-                            while ($fila = $q->fetch(PDO::FETCH_ASSOC)) {
-                              echo "<option value='".$fila['id']."'";
-                              echo ">".$fila['procedencia']."</option>";
-                            }
-                            Database::disconnect();?>
-                          </select>
-                        </div>
-                      </div>
-                      <div class="form-group row">
-                        <label class="col-sm-3 col-form-label">Especie</label>
-                        <div class="col-sm-9">
-                          <select name="id_especie" id="id_especie" class="js-example-basic-single col-sm-12 form-control" required="required">
-                            <option value="">Seleccione...</option><?php
-                            $pdo = Database::connect();
-                            $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-                            $sqlZon = "SELECT id, especie FROM especies WHERE activo=1";
-                            $q = $pdo->prepare($sqlZon);
-                            $q->execute();
-                            while ($fila = $q->fetch(PDO::FETCH_ASSOC)) {
-                              echo "<option value='".$fila['id']."'";
-                              echo ">".$fila['especie']."</option>";
-                            }
-                            Database::disconnect();?>
-                          </select>
-                        </div>
+                        <div class="col-sm-9"><input name="procedencia" type="text" maxlength="99" class="form-control" value="" required="required"></div>
                       </div>
                     </div>
                     <div class="card-footer">
                       <div class="col-sm-9 offset-sm-3">
                         <button class="btn btn-primary" type="submit">Crear</button>
-						            <a href="listarCultivos.php" class="btn btn-light">Volver</a>
+						            <a href="listarProcedenciasEspecies.php" class="btn btn-light">Volver</a>
                       </div>
                     </div>
                   </form>
@@ -132,7 +96,7 @@
           <!-- Container-fluid Ends-->
         </div>
         <!-- footer start-->
-		    <?php include("footer.php"); ?>
+		<?php include("footer.php"); ?>
       </div>
     </div>
     <!-- latest jquery-->
