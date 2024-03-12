@@ -14,10 +14,12 @@ if ( null==$id ) {
   header("Location: listarClientes.php");
 }
 
+$pdo = Database::connect();
+$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
 try {
-  
-  $pdo = Database::connect();
-  $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+  $pdo->beginTransaction();
   
   $sql = "DELETE from plantadores WHERE id_cliente = ?";
   $q = $pdo->prepare($sql);
@@ -34,12 +36,20 @@ try {
   $sql = "DELETE from clientes WHERE id = ?";
   $q = $pdo->prepare($sql);
   $q->execute(array($id));
+
+  // Confirmar la transacción
+  $pdo->commit();
   
   Database::disconnect();
   
   header("Location: listarClientes.php");
 
 } catch (PDOException $e) {
+  
+  // Si algo falla, hacer rollback
+  $pdo->rollBack();
+  Database::disconnect();
+
   if($e->getCode()==23000){?>
     El cliente no se puede eliminar porque está siendo utilizando en otras tablas de la base de datos
     <br><br>
