@@ -8,16 +8,16 @@
 	require 'database.php';
 
 	if ( !empty($_POST)) {
-    var_dump($_POST);
-     die;
+    // var_dump($_POST);
+    // die;
 
 		// insert data
 		$pdo = Database::connect();
 		$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 		
-		$sql = "INSERT INTO clientes(razon_social, direccion, telefono, email, cuit, cond_fiscal, fecha_hora, id_usuario, fecha_hora_alta) VALUES (?,?,?,?,?,now())";
+		$sql = "INSERT INTO clientes(razon_social, direccion, telefono, email, cuit, cond_fiscal, fecha_alta, id_usuario, fecha_hora_alta) VALUES (?,?,?,?,?,?,?,?,now())";
 		$q = $pdo->prepare($sql);
-		$q->execute(array($_POST['razon_social'], $_POST['direccion'],$_POST['telefono'],$_POST['email'],$_POST['cuit'],$_POST['cond_fiscal'],$_POST['fecha_hora'],$_SESSION['user']['id']));
+		$q->execute(array($_POST['razon_social'], $_POST['direccion_cliente'],$_POST['telefono_cliente'],$_POST['email'],$_POST['cuit'],$_POST['cond_fiscal'],$_POST['fecha_alta'],$_SESSION['user']['id']));
     $idCliente = $pdo->lastInsertId();
 
     foreach($_POST["nombre_lotes"] as $key => $nombre_lotes){
@@ -27,7 +27,7 @@
       
       $sql = "INSERT INTO lotes (id_cliente, nombre, direccion, id_localidad, id_usuario, fecha_hora_alta) VALUES (?,?,?,?,?,now()) ";
       $q = $pdo->prepare($sql);
-      $q->execute(array($idCliente,$nombre_lotes,$_POST["direccion"][$key],$_SESSION['user']['id']));
+      $q->execute(array($idCliente,$nombre_lotes,$_POST["direccion"][$key],$_POST["id_localidad"][$key],$_SESSION['user']['id']));
     }
     
     foreach($_POST["nombre_plantadores"] as $key => $nombre_plantadores){
@@ -120,6 +120,20 @@
                               </div>
 
                               <div class="form-group col-4">
+                                <label class="cond_fiscal">Condicion Fiscal</label>
+                                  <select name="cond_fiscal" class="form-control">
+                                    <option value="">- Seleccione -</option><?php
+                                    foreach ($aCondicionesFiscales as $value) {
+                                      $selected="";
+                                      if($value==$data["cond_fiscal"]){
+                                        $selected="selected";
+                                      }?>
+                                      <option <?=$selected?>><?=$value?></option><?php
+                                    }?>
+                                  </select>
+                              </div>
+
+                              <div class="form-group col-4">
                                 <label for="email">E-mail</label>
                                 <input type="email" class="form-control" id="email" name="email" aria-describedby="email" placeholder="Introduzca el email">
                                 <!-- <small id="direccion" class="form-text text-muted">We'll never share your text with anyone else.</small> -->
@@ -131,11 +145,6 @@
                                 <!-- <small id="cuit" class="form-text text-muted">We'll never share your text with anyone else.</small> -->
                               </div>
                               
-                              <div class="form-group col-4">
-                                <label for="cond_fiscal">Condicion Fiscal</label>
-                                <input type="text" class="form-control" id="cond_fiscal" name="cond_fiscal" aria-describedby="cond_fiscal" placeholder="Introduzca la Condicion Fiscal">
-                                <!-- <small id="cuit" class="form-text text-muted">We'll never share your text with anyone else.</small> -->
-                              </div>
                               <div class="form-group col-4">
                                 <label for="fecha_alta">Fecha Alta</label>
                                 <input type="date" class="form-control" id="fecha_alta" name="fecha_alta" aria-describedby="fecha_alta" placeholder="Introduzca la Fecha Alta">
@@ -158,7 +167,7 @@
                                       <th>Nombre</th>
                                       <th>Direccion</th>
                                       <th>Localidades</th>
-                                      <th>Activo</th>
+                                      <th>Eliminar</th>
                                     </tr>
                                   </thead>
                                   <tbody>
@@ -170,7 +179,7 @@
                                         <input type="text" class="form-control" placeholder="Direccion" name="direccion[]" id="direccion-0"/>
                                       </td>
                                       <td data-name="localidad">
-                                          <select name="id_localidad[]" id="id_localidad-0" class="js-example-basic-single col-sm-12 form-control" required="required">
+                                          <select name="id_localidad[]" id="id_localidad-0" class="js-example-basic-single col-sm-12 ">
                                             <option value="">Seleccione...</option><?php
                                             $pdo = Database::connect();
                                             $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);

@@ -106,7 +106,7 @@ if(empty($_SESSION['user'])){
                             echo '&nbsp;&nbsp;';
                             echo '<a href="#" title="Eliminar" onclick="openModalEliminar('.$row["id"].')"><img src="img/icon_baja.png" width="24" height="25" border="0" alt="Eliminar"></a>';
                             echo '&nbsp;&nbsp;';
-                            echo '<a href="verCliente.php?id='.$row["id"].'"><img src="img/eye.png" width="30" border="0" alt="Ver Operaciones" title="Ver Operaciones"></a>';
+                            echo '<a href="verCliente.php?id='.$row["id"].'"><img src="img/eye.png" width="30" border="0" alt="Ver Operaciones" title="Ver Cliente"></a>';
                             //echo '&nbsp;&nbsp;';
                             echo '</td>';
                             echo '<td>'. $row["direccion"] . '</td>';

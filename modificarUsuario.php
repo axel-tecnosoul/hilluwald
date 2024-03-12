@@ -41,6 +41,23 @@
 		$data = $q->fetch(PDO::FETCH_ASSOC);
 		
 		Database::disconnect();
+
+		$aOptionsActivo = [
+			[
+			  "value"=>0,
+			  "id"=>"activo_no",
+			  "label"=>"No",
+			  "checked"=>$data['activo'] ==0? true : false,
+			  "disabled" => false,
+			],
+			[
+			  "value" => 1,
+			  "id" => "activo_si",
+			  "label" => "Si",
+			  "checked" => $data['activo'] ==1 ? true : false,
+			  "disabled" => false,
+			],
+		];
 	}
 	
 ?>
@@ -158,11 +175,16 @@
                           </div>
                           <div class="form-group row">
                             <label class="col-sm-3 col-form-label">Activo</label>
-                            <div class="col-sm-9">
-                              <select name="activo" id="activo" class="js-example-basic-single col-sm-12" required="required">
-                                <option value="1" <?php if ($data['activo']==1) echo " selected ";?>>Si</option>
-                                <option value="0" <?php if ($data['activo']==0) echo " selected ";?>>No</option>
-                              </select>
+                            <div class="col-sm-9"><?php
+                              foreach ($aOptionsActivo as $option) {?>
+                                <label class="d-block" for="<?=$option["id"]?>">
+                                <input type="radio" name="activo" class="radio_animated" id="<?=$option["id"]?>" value="<?=$option["value"]?>" required<?php
+                                  if($option["checked"]) echo " checked";
+                                  if($option["disabled"]) echo " disabled";?>
+                                >
+                                <label for="<?=$option["id"]?>"><?=$option["label"]?></label>
+                                </label><?php
+                              }?>
                             </div>
                           </div>
                         </div>
