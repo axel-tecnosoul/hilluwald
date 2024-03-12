@@ -26,7 +26,17 @@
 		
 		$sql = "UPDATE clientes set razon_social = ?, direccion = ?, telefono = ?, email = ?, cuit = ?, cond_fiscal = ?, id_usuario = ? where id = ?";
 		$q = $pdo->prepare($sql);
-		$q->execute(array($_POST['razon_social'],$_POST['direccion'],$_POST['telefono'],$_POST['email'],$_POST['cuit'],$_POST['cond_fiscal'],$_SESSION['user']['id'],$_GET['id']));
+		$q->execute(array($_POST['razon_social'],$_POST['direccion'],$_POST['telefono'],$_POST['email'],$_POST['cuit'],$_POST['cond_fiscal'],$_SESSION['user']['id'],$id_cliente));
+
+    $sql = "DELETE FROM cliente_sucursal WHERE id_cliente = ?";
+    $q = $pdo->prepare($sql);
+    $q->execute(array($id_cliente));
+
+    foreach ($_POST["sucursales"] as $key => $id_sucursal) {
+      $sql = "INSERT INTO cliente_sucursal (id_cliente, id_sucursal) VALUES (?,?)";
+      $q = $pdo->prepare($sql);
+      $q->execute(array($id_cliente,$id_sucursal));
+    }
 
     foreach($_POST["nombre_lotes"] as $key => $nombre_lotes){
       if($key==0 || $_POST["direccion_lotes"] == 0){
@@ -68,10 +78,17 @@
 		
 		$pdo = Database::connect();
 		$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-		$sql = "SELECT c.id, c.razon_social, c.direccion, c.telefono, c.email, c.cuit, c.cond_fiscal, c.activo, c.id_usuario FROM clientes c WHERE c.id = ? ";
+		
+    $sql = "SELECT c.id, c.razon_social, c.direccion, c.telefono, c.email, c.cuit, c.cond_fiscal, c.activo, c.id_usuario FROM clientes c WHERE c.id = ? ";
 		$q = $pdo->prepare($sql);
 		$q->execute(array($id_cliente));
 		$data = $q->fetch(PDO::FETCH_ASSOC);
+
+    $sql2 = "SELECT GROUP_CONCAT(id_sucursal SEPARATOR ',') AS sucursales FROM cliente_sucursal WHERE id_cliente = ? ";
+		$q2 = $pdo->prepare($sql2);
+		$q2->execute(array($id_cliente));
+		$data2 = $q2->fetch(PDO::FETCH_ASSOC);
+    $aSucursales=explode(",",$data2["sucursales"]);
     
     $lotes[]=[
       "id_lotes"  =>0,
@@ -230,6 +247,21 @@
                                     }?>
                                 </select>
                             </div>
+                            <div class="form-group col-4">
+                                <label for="sucursales">Sucursales</label>
+                                <select name="sucursales[]" class="js-example-basic-single col-12" multiple>
+                                  <option value="">- Seleccione -</option><?php
+                                  $pdo = Database::connect();
+                                  $sql = " SELECT id, nombre FROM sucursales";
+                                  foreach ($pdo->query($sql) as $row) {
+                                    $selected="";
+                                    if(in_array($row["id"],$aSucursales)){
+                                      $selected="selected";
+                                    }?>
+                                    <option value="<?=$row["id"]?>" <?=$selected?>><?=$row["nombre"]?></option><?php
+                                  }?>
+                                </select>
+                              </div>
                           </div>
                         </div><!-- .col -->
                       </div><!-- .row -->
