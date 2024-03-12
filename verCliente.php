@@ -68,7 +68,7 @@ Database::disconnect();
       background-color: #007bff!important;
       color: #fff!important;
     }
-    .bandejas {
+    .contenedores {
       background-color: #ffc107!important;
       color: #000!important;
     }
@@ -190,7 +190,7 @@ Database::disconnect();
                         
                         <button class="btn pagos" style="text-transform: none;" title="Nuevo Pago" data-toggle="modal" data-target="#nuevoPago"><i class="fa fa-plus"></i> Pago</button>
 
-                        <button class="btn bandejas" style="text-transform: none;" title="Nueva devolucion de bandejas" data-toggle="modal" data-target="#nuevaDevolucionBandejas"><i class="fa fa-plus"></i> Bandejas</button> -->
+                        <button class="btn contenedores" style="text-transform: none;" title="Nueva devolucion de contenedores" data-toggle="modal" data-target="#nuevaDevolucionContenedores"><i class="fa fa-plus"></i> Contenedores</button> -->
                       </div>
                       <div class="col-md-8">
                         <div class="row">
@@ -305,7 +305,7 @@ Database::disconnect();
                               <th style="text-align: center;vertical-align: middle;" rowspan="2">Cantidad pedida</th>
                               <th style="text-align: center;vertical-align: middle;"class="borderRetiroLeft borderRetiroRight" colspan="2">Retiros</th>
                               <th style="text-align: center;vertical-align: middle;" class="borderPagoLeft borderPagoRight" colspan="2">Pagos</th>
-                              <th style="text-align: center;vertical-align: middle;" class="borderPagoLeft borderPagoRight" colspan="2">Bandejas</th>
+                              <th style="text-align: center;vertical-align: middle;" class="borderPagoLeft borderPagoRight" colspan="2">Contenedores</th>
                             </tr>
                             <tr>
                               <th style="text-align: center;vertical-align: middle;">Cantidad</th>
@@ -781,8 +781,8 @@ Database::disconnect();
           modal.modal("show")
           modal.find("span.idPedido").html(this.dataset.idPedido)
         })
-        $(document).on("click",".btnNuevaDevolucionBandejas",function(){
-          let modal=$("#nuevaDevolucionBandejas")
+        $(document).on("click",".btnNuevaDevolucionContenedores",function(){
+          let modal=$("#nuevaDevolucionContenedores")
           modal.modal("show")
           modal.find("span.idPedido").html(this.dataset.idPedido)
         })
@@ -872,8 +872,8 @@ Database::disconnect();
                         <a href="#" class="dropdown-item pagos btnNuevoPago" data-id-pedido="${row.id_pedido}">
                           <i class="fa fa-plus"></i> Pago
                         </a>
-                        <a href="#" class="dropdown-item bandejas btnNuevaDevolucionBandejas" data-id-pedido="${row.id_pedido}">
-                          <i class="fa fa-plus"></i> Devolucion de bandejas
+                        <a href="#" class="dropdown-item contenedores btnNuevaDevolucionContenedores" data-id-pedido="${row.id_pedido}">
+                          <i class="fa fa-plus"></i> Devolucion de contenedores
                         </a>
                         <a href="#" class="dropdown-item plantines btnNuevaDevolucionPlantines" data-id-pedido="${row.id_pedido}">
                           <i class="fa fa-plus"></i> Devolucion de plantines

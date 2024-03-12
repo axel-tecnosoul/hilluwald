@@ -1,19 +1,16 @@
 <?php 
 session_start(); 
-if(empty($_SESSION['user'])){
+if(empty($_SESSION['user']))
+{
 	header("Location: index.php");
 	die("Redirecting to index.php"); 
-}?>
+}
+?>
 <!DOCTYPE html>
 <html lang="en">
-  <head><?php 
-    include('head_tables.php');?>
+  <head>
+	<?php include('head_tables.php');?>
   </head>
-  <style>
-    td.child {
-      background-color: beige;
-    }
-  </style>
   <body class="light-only">
     <!-- page-wrapper Start-->
     <div class="page-wrapper">
@@ -37,7 +34,7 @@ if(empty($_SESSION['user'])){
                     <h3><?php include("title.php"); ?></h3>
                     <ol class="breadcrumb">
                       <li class="breadcrumb-item"><a href="#"><i data-feather="home"></i></a></li>
-                      <li class="breadcrumb-item">Bandejas</li>
+                      <li class="breadcrumb-item">Tipos de Contenedores</li>
                     </ol>
                   </div>
                 </div>
@@ -60,10 +57,7 @@ if(empty($_SESSION['user'])){
               <div class="col-sm-12">
                 <div class="card">
                   <div class="card-header">
-                    <h5>bandejas&nbsp;
-                      <a href="nuevaBandeja.php"><img src="img/icon_alta.png" width="24" height="25" border="0" alt="Nuevo" title="Nuevo"></a>
-                      <!-- &nbsp;<a href="exportbandejas.php"><img src="img/xls.png" width="24" height="25" border="0" alt="Exportar" title="Exportar"></a> -->
-                    </h5>
+                    <h5>Tipos de Contenedores&nbsp;<a href="nuevoTipoContenedor.php"><img src="img/icon_alta.png" width="24" height="25" border="0" alt="Nuevo" title="Nuevo"></a></h5><span>
                   </div>
                   <div class="card-body">
                     <div class="dt-ext table-responsive">
@@ -71,38 +65,26 @@ if(empty($_SESSION['user'])){
                         <thead>
                           <tr>
                             <th>ID</th>
-                            <th>Cantidad de Orificios</th>
-                            <th>Ancho</th>
-                            <th>Alto</th>
-                            <th>Activo</th>
+                            <th>Tipo</th>
                             <th>Opciones</th>
                           </tr>
                         </thead>
                         <tbody><?php
-                        
                           include 'database.php';
                           $pdo = Database::connect();
-                          $sql = " SELECT id, cantidad_orificios, ancho, alto, activo, id_usuario FROM bandejas WHERE 1 ";
+                          $sql = " SELECT id, tipo, id_usuario, fecha_hora_alta FROM tipos_contenedores  WHERE 1 ";
                           
-                          foreach ($pdo->query($sql) as $row) {
-                            echo '<tr>';
-                            echo '<td>'. $row["id"] . '</td>';
-                            echo '<td>'. $row["cantidad_orificios"] . '</td>';
-                            echo '<td>'. $row["ancho"] . '</td>';
-                            echo '<td>'. $row["alto"] . '</td>';
-                            if ($row["activo"] == 1) {
-                              echo '<td>Si</td>';
-                            } else {
-                              echo '<td>No</td>';
-                            }
-                            echo '<td>';
-                            echo '<a href="modificarBandeja.php?id='.$row["id"].'"><img src="img/icon_modificar.png" width="24" height="25" border="0" alt="Modificar" title="Modificar"></a>';
-                            echo '&nbsp;&nbsp;';
-                            echo '<a href="#" title="Eliminar" onclick="openModalEliminar('.$row["id"].')"><img src="img/icon_baja.png" width="24" height="25" border="0" alt="Eliminar"></a>';
-                            echo '&nbsp;&nbsp;';
-                            //echo '&nbsp;&nbsp;';
-                            echo '</td>';
-                            echo '</tr>';
+                          foreach ($pdo->query($sql) as $row) {?>
+                            <tr>
+                              <td><?=$row['id']?></td>
+                              <td><?=$row['tipo']?></td>
+                              <td>
+                                <a href="modificarTipoContenedor.php?id=<?=$row["id"]?>"><img src="img/icon_modificar.png" width="24" height="25" border="0" alt="Modificar" title="Modificar"></a>
+                                &nbsp;&nbsp;
+                                <a href="#" data-toggle="modal" data-target="#eliminarModal_<?=$row["id"]?>"><img src="img/icon_baja.png" width="24" height="25" border="0" alt="Eliminar" title="Eliminar"></a>
+                                &nbsp;&nbsp;
+                              </td>
+                            </tr><?php
                           }
                           Database::disconnect();?>
                         </tbody>
@@ -121,23 +103,30 @@ if(empty($_SESSION['user'])){
         <?php include("footer.php"); ?>
       </div>
     </div>
-
-    <div class="modal fade" id="eliminarModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-      <div class="modal-dialog" role="document">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="exampleModalLabel">Confirmación</h5>
-            <button class="close" type="button" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
-          </div>
-          <div class="modal-body">¿Está seguro que desea eliminar la Bandeja?</div>
-          <div class="modal-footer">
-            <a id="btnEliminar" class="btn btn-primary">Eliminar</a>
-            <button class="btn btn-light" type="button" data-dismiss="modal" aria-label="Close">Volver</button>
-          </div>
-        </div>
-      </div>
-    </div>
-	
+	<?php 
+	$pdo = Database::connect();
+	$sql = " SELECT id, procedencia, activo, id_usuario, fecha_hora_alta FROM `procedencias_especies` WHERE 1 ";
+	foreach ($pdo->query($sql) as $row) {
+	?>
+	<div class="modal fade" id="eliminarModal_<?php echo $row[0];?>" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+	  <div class="modal-dialog" role="document">
+		<div class="modal-content">
+		  <div class="modal-header">
+			<h5 class="modal-title" id="exampleModalLabel">Confirmación</h5>
+			<button class="close" type="button" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+		  </div>
+		  <div class="modal-body">¿Está seguro que desea eliminar el Tipo de Contenedor?</div>
+      <div class="modal-footer">
+        <a href="eliminarTipoContenedor.php?id=<?php echo $row[0];?>" class="btn btn-primary">Eliminar</a>
+        <button class="btn btn-light" type="button" data-dismiss="modal" aria-label="Close">Volver</button>
+		  </div>
+		</div>
+	  </div>
+	</div>
+	<?php 
+	}
+	Database::disconnect();
+	?>
     <!-- latest jquery-->
     <script src="assets/js/jquery-3.2.1.min.js"></script>
     <!-- Bootstrap js-->
@@ -202,11 +191,6 @@ if(empty($_SESSION['user'])){
 				}}
 			});
 		});
-
-    function openModalEliminar(idCliente){
-      $('#eliminarModal').modal("show");
-      document.getElementById("btnEliminar").href="eliminarCliente.php?id="+idCliente;
-    }
 		
 		</script>
 		<script src="https://cdn.datatables.net/plug-ins/1.10.15/i18n/Spanish.json"></script>

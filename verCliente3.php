@@ -87,7 +87,7 @@ Database::disconnect();
 
                       <li class="nav-item"><a class="nav-link" id="pills-pagos-tab" data-toggle="pill" href="#pills-pagos" role="tab" aria-controls="pills-pagos" aria-selected="false"><i class="fa fa-usd"></i>Pagos</a></li>
 
-                      <li class="nav-item"><a class="nav-link" id="pills-bandejas-tab" data-toggle="pill" href="#pills-bandejas" role="tab" aria-controls="pills-bandejas" aria-selected="false"><i class="fa fa-th"></i>Bandejas</a></li>
+                      <li class="nav-item"><a class="nav-link" id="pills-contenedores-tab" data-toggle="pill" href="#pills-contenedores" role="tab" aria-controls="pills-contenedores" aria-selected="false"><i class="fa fa-th"></i>Contenedores</a></li>
                     </ul>
 
                     <div class="tab-content" id="pills-tabContent">
@@ -196,8 +196,8 @@ Database::disconnect();
                               <th>ID Remito</th>
                               <th>Transporte</th>
                               <th>Chofer</th>
-                              <th>Cantidad de Bandejas</th>
-                              <th>Bandejas Devueltas</th>
+                              <th>Cantidad de Contenedores</th>
+                              <th>Contenedores Devueltas</th>
                               <th>Fecha</th>
                             </tr>
                           </thead>
@@ -259,10 +259,10 @@ Database::disconnect();
                         </table>
                         
                       </div>
-                      <div class="tab-pane fade" id="pills-bandejas" role="tabpanel" aria-labelledby="pills-bandejas-tab"><?php
+                      <div class="tab-pane fade" id="pills-contenedores" role="tabpanel" aria-labelledby="pills-contenedores-tab"><?php
 
-                        //include_once("tablaBandejas.php");?>
-                        <table id="bandejasTable" class="table table-striped table-bordered tablas_cliente" style="width:100%">
+                        //include_once("tablaContenedores.php");?>
+                        <table id="contenedoresTable" class="table table-striped table-bordered tablas_cliente" style="width:100%">
                           <thead>
                             <tr>
                               <th>ID Devolución</th>

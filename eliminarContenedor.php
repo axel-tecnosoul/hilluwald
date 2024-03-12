@@ -11,19 +11,19 @@ if ( !empty($_GET['id'])) {
 }
 
 if ( null==$id ) {
-  header("Location: listarBandejas.php");
+  header("Location: listarContenedores.php");
 }
 
 try {
   
   $pdo = Database::connect();
   $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-  $sql = "DELETE from bandejas WHERE id = ?";
+  $sql = "DELETE from contenedores WHERE id = ?";
   $q = $pdo->prepare($sql);
   $q->execute(array($id));
   Database::disconnect();
   
-  header("Location: listarBandejas.php");
+  header("Location: listarContenedores.php");
 
 } catch (PDOException $e) {
   if($e->getCode()==23000){?>

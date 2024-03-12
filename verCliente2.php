@@ -419,10 +419,10 @@ Database::disconnect();
                         </table>
                         
                       </div>
-                      <div class="tab-pane fade" id="pills-bandejas" role="tabpanel" aria-labelledby="pills-bandejas-tab"><?php
+                      <div class="tab-pane fade" id="pills-contenedores" role="tabpanel" aria-labelledby="pills-contenedores-tab"><?php
 
-                        //include_once("tablaBandejas.php");?>
-                        <table id="bandejasTable" class="table table-striped table-bordered tablas_cliente" style="width:100%">
+                        //include_once("tablaContenedores.php");?>
+                        <table id="contenedoresTable" class="table table-striped table-bordered tablas_cliente" style="width:100%">
                           <thead>
                             <tr>
                               <th>ID Devolución</th>

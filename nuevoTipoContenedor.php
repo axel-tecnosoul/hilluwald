@@ -7,17 +7,19 @@ if(empty($_SESSION['user'])){
 require 'database.php';
 
 if ( !empty($_POST)) {
+  // var_dump($_POST);
+  // die;
   // insert data
   $pdo = Database::connect();
   $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-
-  $sql = "INSERT INTO bandejas (cantidad_orificios, ancho, alto, activo, id_usuario, fecha_hora_alta) VALUES (?,?,?,1,?,NOW())";
+  
+  $sql = "INSERT INTO tipos_contenedores (tipo, id_usuario) VALUES (?,?)";
   $q = $pdo->prepare($sql);
-  $q->execute(array($_POST['cantidad_orificios'], $_POST['ancho'] ,$_POST['alto'],$_SESSION["user"]["id"]));
-
+  $q->execute(array($_POST['tipo'],$_SESSION['user']['id']));
+  
   Database::disconnect();
-
-  header("Location: listarBandejas.php");
+  
+  header("Location: listarTiposContenedores.php");
 }?>
 <!DOCTYPE html>
 <html lang="en">
@@ -29,7 +31,7 @@ if ( !empty($_POST)) {
     <!-- Loader ends-->
     <!-- page-wrapper Start-->
     <div class="page-wrapper">
-	  <?php include('header.php');?>
+	    <?php include('header.php');?>
 	  
       <!-- Page Header Start-->
       <div class="page-body-wrapper">
@@ -45,7 +47,7 @@ if ( !empty($_POST)) {
                     <h3><?php include("title.php"); ?></h3>
                     <ol class="breadcrumb">
                       <li class="breadcrumb-item"><a href="#"><i data-feather="home"></i></a></li>
-                      <li class="breadcrumb-item">Nuevo Bandeja</li>
+                      <li class="breadcrumb-item">Nuevo Tipo de Contenedor</li>
                     </ol>
                   </div>
                 </div>
@@ -67,31 +69,19 @@ if ( !empty($_POST)) {
               <div class="col-sm-12">
                 <div class="card">
                   <div class="card-header">
-                    <h5>Nuevo Bandeja</h5>
+                    <h5>Nuevo Tipo de Contenedor</h5>
                   </div>
-				          <form class="form theme-form" role="form" method="post" action="nuevaBandeja.php">
+				          <form class="form theme-form" role="form" method="post" action="nuevoTipoContenedor.php">
                     <div class="card-body">
-                      <div class="row">
-                        <div class="col">
-                          <div class="form-group row">
-                            <label class="col-sm-3 col-form-label">Cantidad de Orificios</label>
-                            <div class="col-sm-9"><input name="cantidad_orificios" type="text" maxlength="99" class="form-control" required></div>
-                          </div>
-                          <div class="form-group row">
-                            <label class="col-sm-3 col-form-label">Ancho</label>
-                            <div class="col-sm-9"><input name="ancho" type="text" maxlength="25" class="form-control" value="" required></div>
-                          </div>
-                          <div class="form-group row">
-                            <label class="col-sm-3 col-form-label">Alto</label>
-                            <div class="col-sm-9"><input name="alto" type="text" maxlength="199" class="form-control" required></div>
-                          </div>
-                        </div>
+                      <div class="form-group row">
+                        <label class="col-sm-3 col-form-label">Tipo</label>
+                        <div class="col-sm-9"><input name="tipo" type="text" maxlength="99" class="form-control" value="" required="required"></div>
                       </div>
                     </div>
                     <div class="card-footer">
                       <div class="col-sm-9 offset-sm-3">
                         <button class="btn btn-primary" type="submit">Crear</button>
-						            <a href="listarbandejas.php" class="btn btn-light">Volver</a>
+						            <a href="listarTiposContenedores.php" class="btn btn-light">Volver</a>
                       </div>
                     </div>
                   </form>
