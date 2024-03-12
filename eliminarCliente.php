@@ -18,9 +18,23 @@ try {
   
   $pdo = Database::connect();
   $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+  
+  $sql = "DELETE from plantadores WHERE id_cliente = ?";
+  $q = $pdo->prepare($sql);
+  $q->execute(array($id));
+
+  $sql = "DELETE from lotes WHERE id_cliente = ?";
+  $q = $pdo->prepare($sql);
+  $q->execute(array($id));
+
+  $sql = "DELETE from cliente_sucursal WHERE id_cliente = ?";
+  $q = $pdo->prepare($sql);
+  $q->execute(array($id));
+  
   $sql = "DELETE from clientes WHERE id = ?";
   $q = $pdo->prepare($sql);
   $q->execute(array($id));
+  
   Database::disconnect();
   
   header("Location: listarClientes.php");
