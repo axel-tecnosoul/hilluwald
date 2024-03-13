@@ -310,15 +310,15 @@
     <script type="text/javascript">
 
       $(document).ready(function(){
-          $("#addRowLotes").on('click', function(event) {
-            event.preventDefault();
-            addRowLotes();
-          }).click();
+        $("#addRowLotes").on('click', function(event) {
+          event.preventDefault();
+          addRowLotes();
+        }).click();
 
-          $("#addRowPlantadores").on('click', function(event) {
-            event.preventDefault();
-            addRowPlantadores();
-          }).click();
+        $("#addRowPlantadores").on('click', function(event) {
+          event.preventDefault();
+          addRowPlantadores();
+        }).click();
       });
 
       function eliminarFila(t){

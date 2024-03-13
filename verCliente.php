@@ -343,7 +343,7 @@ Database::disconnect();
           </div>
 
           <!-- MODAL PARA NUEVO PEDIDO -->
-          <div class="modal fade" id="nuevoPedido" role="dialog" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+          <div class="modal fade" id="nuevoPedido" role="dialog" data-backdrop="static" data-keyboard="false" tabindex="-1000000000000" aria-labelledby="myLargeModalLabel" aria-hidden="true">
             <div class="modal-dialog modal-lg">
               <div class="modal-content">
                 <div class="modal-header">
@@ -355,11 +355,11 @@ Database::disconnect();
                 <form class="form theme-form formulario" role="form" method="post" action="nuevoPedido.php?id_cliente=<?=$id?>">
                   <div class="modal-body">
                     <div class="row">
-                      <div class="form-group col-6">
+                      <div class="form-group col-4">
                         <label for="fecha_pedido">Fecha</label>
                         <input name="fecha_pedido" id="fecha_pedido" type="date" class="form-control multiselect" value="<?=$hoy?>" required>
                       </div>
-                      <div class="form-group col-6">
+                      <div class="form-group col-4">
                         <label for="campana_pedido">Campaña</label>
                         <select name="campana_pedido" id="campana_pedido" style="width: 100%;" required class="js-example-basic-single"><?php
                           // Generar las opciones del select
@@ -370,17 +370,37 @@ Database::disconnect();
                           }?>
                         </select>
                       </div>
+                      <div class="form-group col-4">
+                        <label for="sucursal_pedido">Sucursal</label>
+                        <select name="sucursal_pedido" id="sucursal_pedido" style="width: 100%;" required class="js-example-basic-single"><?php
+                          $pdo = Database::connect();
+                          $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+                          $sqlZon = "SELECT id_sucursal,s.nombre FROM cliente_sucursal cs INNER JOIN sucursales s ON cs.id_sucursal=s.id WHERE id_cliente = ".$id;
+                          $q = $pdo->prepare($sqlZon);
+                          $q->execute();
+                          $afe=$q->rowCount();
+                          if($afe>1){
+                            echo "<option value=''>Seleccione...</option>";
+                          }
+                          while ($fila = $q->fetch(PDO::FETCH_ASSOC)) {
+                            echo "<option value='".$fila['id']."'";
+                            echo ">".$fila['nombre']."</option>";
+                          }
+                          Database::disconnect();?>
+                        </select>
+                      </div>
                     </div>
                     <div class="row">
                       <div class="col-sm-12">
-                        <table class="table table-striped table-bordered">
+                        <!-- <table class="table table-striped table-bordered">
                           <tr>
                             <th>Especie</th>
                             <th>Procedencia</th>
                             <th>Material</th>
                             <th>Cantidad</th>
                           </tr><?php
-                          $pdo = Database::connect();
+                          /*$pdo = Database::connect();
                           $sql = " SELECT id, nombre FROM cultivos";
                           foreach ($pdo->query($sql) as $row) {?>
                             <tr>
@@ -391,7 +411,107 @@ Database::disconnect();
                               </td>
                             </tr><?php
                           }
+                          Database::disconnect();*/?>
+                        </table> --><?php
+                          $pdo = Database::connect();
+                          $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+                          $sqlZon = "SELECT id, especie FROM especies WHERE activo = 1";
+                          $q = $pdo->prepare($sqlZon);
+                          $q->execute();
+
+                          $aEspecies=[];
+                          while ($fila = $q->fetch(PDO::FETCH_ASSOC)) {
+                            $aEspecies[]=[
+                              "id"=>$fila['id'],
+                              "especie"=>$fila['especie'],
+                            ];
+                          }
+
+                          $sqlZon = "SELECT id, procedencia FROM procedencias_especies WHERE activo = 1";
+                          $q = $pdo->prepare($sqlZon);
+                          $q->execute();
+
+                          $aProcedencias=[];
+                          while ($fila = $q->fetch(PDO::FETCH_ASSOC)) {
+                            $aProcedencias[]=[
+                              "id"=>$fila['id'],
+                              "procedencia"=>$fila['procedencia'],
+                            ];
+                          }
+
+                          $sqlZon = "SELECT id, material, id_procedencia, id_especie FROM cultivos WHERE activo = 1";
+                          $q = $pdo->prepare($sqlZon);
+                          $q->execute();
+
+                          $aMateriales=[];
+                          while ($fila = $q->fetch(PDO::FETCH_ASSOC)) {
+                            $aMateriales[]=[
+                              "id"=>$fila['id'],
+                              "material"=>$fila['material'],
+                              "id_procedencia"=>$fila['id_procedencia'],
+                              "id_especie"=>$fila['id_especie'],
+                            ];
+                          }
+
                           Database::disconnect();?>
+                        <table class="table-detalle table table-bordered table-hover text-center" id="tableLotes">
+                          <thead>
+                            <tr>
+                              <th>Especie</th>
+                              <th>Procedencia</th>
+                              <th>Material</th>
+                              <th>Cantidad</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr id='addr0' data-id="0" style="display: none;">
+                              <td data-name="id_especie" class="text-left">
+                                <select name="id_especie[]" id="id_especie-0" class="js-example-basic-single id_especie" style="width: 100%;" data-required="1">
+                                  <option value="">Seleccione...</option><?php
+                                  foreach ($aEspecies as $especie) {
+                                    echo "<option value='".$especie['id']."'";
+                                    echo ">".$especie['especie']."</option>";
+                                  }
+                                  Database::disconnect();?>
+                                </select>
+                              </td>
+                              <td data-name="id_procedencia" class="text-left">
+                                <select name="id_procedencia[]" id="id_procedencia-0" class="js-example-basic-single id_procedencia" style="width: 100%;" data-required="0" disabled>
+                                  <option value="null">Seleccione...</option><?php
+                                  foreach ($aProcedencias as $procedencia) {
+                                    echo "<option value='".$procedencia['id']."'";
+                                    echo ">".$procedencia['procedencia']."</option>";
+                                  }
+                                  Database::disconnect();?>
+                                </select>
+                              </td>
+                              <td data-name="id_material" class="text-left">
+                                <select name="id_material[]" id="id_material-0" class="js-example-basic-single id_material" style="width: 100%;" data-required="0" disabled>
+                                  <option value="null">Seleccione...</option><?php
+                                  foreach ($aMateriales as $material) {
+                                    echo "<option value='".$material['id']."'";
+                                    echo "data-id-especie='".$material['id_especie']."'";
+                                    echo "data-id-procedencia='".$material['id_procedencia']."'";
+                                    echo ">".$material['material']."</option>";
+                                  }
+                                  Database::disconnect();?>
+                                </select>
+                              </td>
+                              <td data-name="eliminar">
+                                <span name="eliminar[]" title="Eliminar" class="btn btn-sm row-remove text-center" onClick="eliminarFila(this);">
+                                  <img src="img/icon_baja.png" width="24" height="25" border="0" alt="Eliminar" title="Eliminar">
+                                </span>
+                              </td>
+                            </tr>
+                          </tbody>
+                          <tfoot>
+                            <tr>
+                              <td colspan="4" align='right'>
+                                <input type="button" class="btn btn-dark" id="addRowCultivos" value="Agregar Cultivo">
+                              </td>
+                            </tr>
+                          </tfoot>
                         </table>
                         <div class="mensajeError" style="color: red; display: none;">Por favor, ingrese al menos una cantidad.</div>
                       </div>
@@ -410,7 +530,7 @@ Database::disconnect();
           <!-- FIN MODAL PARA NUEVO PEDIDO -->
 
           <!-- MODAL PARA NUEVO RETIRO -->
-          <div class="modal fade" id="nuevoRetiro" role="dialog" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+          <div class="modal fade" id="nuevoRetiro" role="dialog" data-backdrop="static" data-keyboard="false" tabindex="-1000000000000" aria-labelledby="myLargeModalLabel" aria-hidden="true">
             <div class="modal-dialog modal-lg">
               <div class="modal-content">
                 <div class="modal-header">
@@ -569,7 +689,7 @@ Database::disconnect();
           <!-- FIN MODAL PARA NUEVO RETIRO -->
 
           <!-- MODAL PARA NUEVO PAGO -->
-          <div class="modal fade" id="nuevoPago" role="dialog" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+          <div class="modal fade" id="nuevoPago" role="dialog" data-backdrop="static" data-keyboard="false" tabindex="-1000000000000" aria-labelledby="myLargeModalLabel" aria-hidden="true">
             <div class="modal-dialog modal-lg">
               <div class="modal-content">
                 <div class="modal-header">
@@ -720,6 +840,150 @@ Database::disconnect();
               event.preventDefault(); // Evitar el envío del formulario
           }
         });
+
+        $(document).on("change",".id_especie",function(){
+          let fila=$(this).parents("tr");
+          let id_procedencia=fila.find(".id_procedencia")
+          let id_material=fila.find(".id_material")
+          console.log(fila);
+          let disabled=true;
+          if(this.value>0){
+            disabled=false;
+          }
+
+          id_procedencia.attr("disabled",disabled)
+          //id_procedencia.val(3)
+          id_material.attr("disabled",disabled)
+          //id_material.val(3)
+          getMateriales(this);
+        })
+
+        $(document).on("change",".id_procedencia",function(){
+          getMateriales(this);
+        })
+
+        function getMateriales(el){
+          
+          let fila=$(el).parents("tr");
+          console.log(fila);
+          let selectMaterial=fila.find(".id_material")
+          let selectProcedencia=fila.find(".id_procedencia")
+          let id_procedencia=selectProcedencia.val();
+          let selectEspecie=fila.find(".id_especie")
+          let id_especie=selectEspecie.val();
+          if(id_especie>0){
+            selectMaterial.attr("disabled",false)
+            selectMaterial.find("option").each(function(){
+              let disabled=true;
+              if(this.value=="" || this.dataset.idEspecie==id_especie){
+                if(id_procedencia>0){
+                  disabled=true;
+                  if(this.value=="" || this.dataset.idProcedencia==id_procedencia){
+                    disabled=false;
+                  }
+                }else{
+                  disabled=false;
+                }
+              }
+              $(this).attr("disabled",disabled);
+            })
+            
+            // Destruir y volver a aplicar Select2
+            selectMaterial.select2('destroy');
+            selectMaterial.select2();
+          }else{
+            selectMaterial.attr("disabled",true)
+          }
+        }
+
+        $("#addRowCultivos").on('click', function(event) {
+          event.preventDefault();
+          addRowCultivos();
+        }).click();
+
+        function addRowCultivos(){
+          //alert("hola");
+          var newid = 0;
+          var primero="";
+          var ultimoRegistro=0;
+          $.each($("#tableLotes tr"), function() {
+            if (parseInt($(this).data("id")) > newid) {
+              newid = parseInt($(this).data("id"));
+            }
+          });
+          //debugger;
+          newid++;
+          //console.log(newid);
+          var tr = $("<tr></tr>", {
+            "id": "addr"+newid,
+            "data-id": newid
+          });
+          //console.log(newid);
+          var p=0;
+          $.each($("#tableLotes tbody tr:nth(0) td"),function(){//loop through each td and create new elements with name of newid
+            var cur_td = $(this); 
+            var children = cur_td.children();
+            if($(this).data("name")!=undefined){// add new td and element if it has a name
+              var td = $("<td></td>", {
+                "data-name": $(cur_td).data("name"),
+                "class": this.className
+              });
+              var c = $(cur_td).find($(children[0]).prop('tagName')).clone();//.val("")
+              
+              var id=$(c).attr("id");
+              if($(c).data("required")==1){
+                $(c).attr("required",true);
+              }
+              ultimoRegistro=id;
+              if(id!=undefined){
+                //console.log("id1: ");
+                //console.log(id);
+                id=id.split("-");
+                c.attr("id", id[0]+"-"+newid);//modificamos el id de cada input
+                if(p==0){
+                  primero=c;
+                  p++;
+                }
+              }
+              c.appendTo($(td));
+              td.appendTo($(tr));
+              
+            }else {
+              //console.log("<td></td>",{'text':$('#tab_logic tr').length})
+              var td = $("<td></td>", {
+                'text': $('#tableLotes tr').length
+              }).appendTo($(tr));
+            }
+          });
+          //console.log($(tr).find($("input[name='detalledireccion[]']")));
+          //console.log(tr);//.find($("input"))
+          $(tr).appendTo($('#tableLotes'));// add the new row
+          if(newid>0){
+            //primero.focus();
+            let sel2=$("#id_especie-"+newid)
+            sel2.select2();//llamamos para inicializar select2
+            //lo destruimos para que elimine las clases que arrastra de la clonacion y volvemos a inicializar
+            sel2.select2('destroy');
+            sel2.select2();
+            sel2.css('width', '100%');
+
+            let sel3=$("#id_procedencia-"+newid)
+            sel3.select2();//llamamos para inicializar select2
+            //lo destruimos para que elimine las clases que arrastra de la clonacion y volvemos a inicializar
+            sel3.select2('destroy');
+            sel3.select2();
+            sel3.css('width', '100%');
+
+            let sel4=$("#id_material-"+newid)
+            sel4.select2();//llamamos para inicializar select2
+            //lo destruimos para que elimine las clases que arrastra de la clonacion y volvemos a inicializar
+            sel4.select2('destroy');
+            sel4.select2();
+            sel4.css('width', '100%');
+            
+          }
+          return tr.attr("id");
+        }
 
         $("#id_transporte").on("change",function(){
           let id_transporte=$(this).val();
