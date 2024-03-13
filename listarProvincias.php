@@ -34,7 +34,7 @@ if(empty($_SESSION['user']))
                     <h3><?php include("title.php"); ?></h3>
                     <ol class="breadcrumb">
                       <li class="breadcrumb-item"><a href="#"><i data-feather="home"></i></a></li>
-                      <li class="breadcrumb-item">Cultivos</li>
+                      <li class="breadcrumb-item">Provincias</li>
                     </ol>
                   </div>
                 </div>
@@ -57,7 +57,7 @@ if(empty($_SESSION['user']))
               <div class="col-sm-12">
                 <div class="card">
                   <div class="card-header">
-                    <h5>Cultivos&nbsp;<a href="nuevoCultivo.php"><img src="img/icon_alta.png" width="24" height="25" border="0" alt="Nuevo" title="Nuevo"></a></h5><span>
+                    <h5>provincias&nbsp;<a href="nuevoprovincia.php"><img src="img/icon_alta.png" width="24" height="25" border="0" alt="Nuevo" title="Nuevo"></a></h5><span>
                   </div>
                   <div class="card-body">
                     <div class="dt-ext table-responsive">
@@ -65,34 +65,31 @@ if(empty($_SESSION['user']))
                         <thead>
                           <tr>
                             <th>ID</th>
-                            <th>Material</th>
-                            <th>Procedencia</th>
-                            <th>Especie</th>
-                            <th>Nombre corto</th>
+                            <th>Provincia</th>
                             <th>Opciones</th>
                           </tr>
                         </thead>
-                        <tbody><?php
-                          include 'database.php';
-                          $pdo = Database::connect();
-                          $sql = "SELECT c.id,c.material,p.procedencia,e.especie,c.nombre_corto FROM cultivos c INNER JOIN procedencias_especies p ON c.id_procedencia=p.id INNER JOIN especies e ON c.id_especie=e.id WHERE 1 ";
-                          
-                          foreach ($pdo->query($sql) as $row) {?>
-                            <tr>
-                              <td><?=$row['id']?></td>
-                              <td><?=$row['material']?></td>
-                              <td><?=$row['procedencia']?></td>
-                              <td><?=$row['especie']?></td>
-                              <td><?=$row['nombre_corto']?></td>
-                              <td>
-                                <a href="modificarCultivo.php?id=<?=$row["id"]?>"><img src="img/icon_modificar.png" width="24" height="25" border="0" alt="Modificar" title="Modificar"></a>
-                                &nbsp;&nbsp;
-                                <a href="#" data-toggle="modal" data-target="#eliminarModal_<?=$row["id"]?>"><img src="img/icon_baja.png" width="24" height="25" border="0" alt="Eliminar" title="Eliminar"></a>
-                                &nbsp;&nbsp;
-                              </td>
-                            </tr><?php
-                          }
-                          Database::disconnect();?>
+                        <tbody>
+                          <?php 
+                            include 'database.php';
+                            $pdo = Database::connect();
+                            $sql = " SELECT id, provincia FROM provincias WHERE 1 ";
+                            
+                            foreach ($pdo->query($sql) as $row) {
+                              echo '<tr>';
+                              echo '<td>'. $row["id"] . '</td>';
+                              echo '<td>'. $row["provincia"] . '</td>';
+                              echo '<td>';
+                              echo '<a href="modificarProvincia.php?id='.$row["id"].'"><img src="img/icon_modificar.png" width="24" height="25" border="0" alt="Modificar" title="Modificar"></a>';
+                              echo '&nbsp;&nbsp;';
+                              echo '<a href="#" title="Eliminar" onclick="openModalEliminar('.$row["id"].')"><img src="img/icon_baja.png" width="24" height="25" border="0" alt="Eliminar"></a>';
+                              echo '&nbsp;&nbsp;';
+                              //echo '&nbsp;&nbsp;';
+                              echo '</td>';
+                              echo '</tr>';
+                            }
+                            Database::disconnect();
+                            ?>
                         </tbody>
                       </table>
                     </div>
@@ -109,19 +106,19 @@ if(empty($_SESSION['user']))
         <?php include("footer.php"); ?>
       </div>
     </div>
-    <div class="modal fade" id="eliminarModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-      <div class="modal-dialog" role="document">
-      <div class="modal-content">
-        <div class="modal-header">
-        <h5 class="modal-title" id="exampleModalLabel">Confirmación</h5>
-        <button class="close" type="button" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+	  <div class="modal fade" id="eliminarModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+	    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">Confirmación</h5>
+            <button class="close" type="button" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+          </div>
+          <div class="modal-body">¿Está seguro que desea eliminar la Provincia?</div>
+          <div class="modal-footer">
+            <a id="btnEliminar" class="btn btn-primary">Eliminar</a>
+            <button class="btn btn-light" type="button" data-dismiss="modal" aria-label="Close">Volver</button>
+          </div>
         </div>
-        <div class="modal-body">¿Está seguro que desea eliminar la Cultivo?</div>
-        <div class="modal-footer">
-        <a href="btnEliminar" class="btn btn-primary">Eliminar</a>
-        <button class="btn btn-light" type="button" data-dismiss="modal" aria-label="Close">Volver</button>
-        </div>
-      </div>
       </div>
     </div>
     <!-- latest jquery-->
@@ -189,9 +186,9 @@ if(empty($_SESSION['user']))
 			});
 		});
 
-    function openModalEliminar(idCultivo){
+    function openModalEliminar(idProvincia){
       $('#eliminarModal').modal("show");
-      document.getElementById("btnEliminar").href="eliminarCultivo.php?id="+idCultivo;
+      document.getElementById("btnEliminar").href="eliminarProvincia.php?id="+idProvincia;
     }
 		
 		</script>

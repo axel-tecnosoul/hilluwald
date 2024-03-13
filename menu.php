@@ -23,6 +23,9 @@
           <li><a href="listarTransportes.php"><i class="fa fa-circle"></i>Transportes</a></li>
           <li><a href="listarProcedenciasEspecies.php"><i class="fa fa-circle"></i>Procedencias de Especies</a></li>
           <li><a href="listarEspecies.php"><i class="fa fa-circle"></i>Especies</a></li>
+          <li><a href="listarLocalidades.php"><i class="fa fa-circle"></i>Localidades</a></li>
+          <li><a href="listarProvincias.php"><i class="fa fa-circle"></i>Provincias</a></li>
+          <li><a href="listarPaises.php"><i class="fa fa-circle"></i>Paises</a></li>
           <li><a href="listarUsuarios.php"><i class="fa fa-circle"></i>Usuarios</a></li>
         </ul>
       </li>
