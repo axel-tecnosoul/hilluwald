@@ -206,18 +206,6 @@
                             </div>
 
                             <div class="form-group col-4">
-                              <label for="email">E-mail</label>
-                              <input type="email" class="form-control" id="email" name="email" aria-describedby="email" placeholder="Introduzca el email" value="<?= $data['email']; ?>">
-                              <!-- <small id="direccion" class="form-text text-muted">We'll never share your text with anyone else.</small> -->
-                            </div>
-
-                            <div class="form-group col-4">
-                              <label for="cuit">CUIT</label>
-                              <input type="text" class="form-control" id="cuit" name="cuit" aria-describedby="cuit" placeholder="Introduzca el CUIT" value="<?= $data['cuit']; ?>">
-                              <!-- <small id="cuit" class="form-text text-muted">We'll never share your text with anyone else.</small> -->
-                            </div>
-
-                            <div class="form-group col-4">
                               <label class="cond_fiscal">Condicion Fiscal</label>
                                 <select name="cond_fiscal" class="form-control">
                                   <option value="">- Seleccione -</option><?php
@@ -229,6 +217,18 @@
                                     <option <?=$selected?>><?=$value?></option><?php
                                     }?>
                                 </select>
+                            </div>
+
+                            <div class="form-group col-4">
+                              <label for="email">E-mail</label>
+                              <input type="email" class="form-control" id="email" name="email" aria-describedby="email" placeholder="Introduzca el email" value="<?= $data['email']; ?>">
+                              <!-- <small id="direccion" class="form-text text-muted">We'll never share your text with anyone else.</small> -->
+                            </div>
+
+                            <div class="form-group col-4">
+                              <label for="cuit">CUIT</label>
+                              <input type="text" class="form-control" id="cuit" name="cuit" aria-describedby="cuit" placeholder="Introduzca el CUIT" value="<?= $data['cuit']; ?>">
+                              <!-- <small id="cuit" class="form-text text-muted">We'll never share your text with anyone else.</small> -->
                             </div>
                           </div>
                         </div><!-- .col -->
@@ -286,10 +286,17 @@
                                       </select>
                                     </td>
                                     <td data-name="activo">
-                                      <select class="form-control" name="lotes_activo[]" id="lotes_activo-<?=$clave?>" class="js-example-basic-hide-search">
-                                        <option value="1" <?php if ($valor['lotes_activo']==1) echo " selected ";?>>Si</option>
-                                        <option value="0" <?php if ($valor['lotes_activo']==0) echo " selected ";?>>No</option>
-                                      </select>
+                                      <div class="row"><?php
+                                        foreach ($aOptionsActivo as $option) {?>
+                                          <label class="d-block" for="<?=$option["id"]?>">
+                                            <input type="radio" name="activo" class="radio_animated " id="<?=$option["id"]?>" value="<?=$option["value"]?>" required style="margin-left: 1rem;"<?php
+                                              if($option["checked"]) echo " checked";
+                                              if($option["disabled"]) echo " disabled";?>
+                                            >
+                                            <label for="<?=$option["id"]?>"><?=$option["label"]?></label>
+                                          </label><?php
+                                          }?>
+                                      </div>
                                     </td>
                                   </tr><?php
                                 }?>
