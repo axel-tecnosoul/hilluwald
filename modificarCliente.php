@@ -223,18 +223,6 @@
                             </div>
 
                             <div class="form-group col-4">
-                              <label for="email">E-mail</label>
-                              <input type="email" class="form-control" id="email" name="email" aria-describedby="email" placeholder="Introduzca el email" value="<?= $data['email']; ?>">
-                              <!-- <small id="direccion" class="form-text text-muted">We'll never share your text with anyone else.</small> -->
-                            </div>
-
-                            <div class="form-group col-4">
-                              <label for="cuit">CUIT</label>
-                              <input type="text" class="form-control" id="cuit" name="cuit" aria-describedby="cuit" placeholder="Introduzca el CUIT" value="<?= $data['cuit']; ?>">
-                              <!-- <small id="cuit" class="form-text text-muted">We'll never share your text with anyone else.</small> -->
-                            </div>
-
-                            <div class="form-group col-4">
                               <label class="cond_fiscal">Condicion Fiscal</label>
                                 <select name="cond_fiscal" class="form-control">
                                   <option value="">- Seleccione -</option><?php
@@ -246,6 +234,18 @@
                                     <option <?=$selected?>><?=$value?></option><?php
                                     }?>
                                 </select>
+                            </div>
+
+                            <div class="form-group col-4">
+                              <label for="email">E-mail</label>
+                              <input type="email" class="form-control" id="email" name="email" aria-describedby="email" placeholder="Introduzca el email" value="<?= $data['email']; ?>">
+                              <!-- <small id="direccion" class="form-text text-muted">We'll never share your text with anyone else.</small> -->
+                            </div>
+
+                            <div class="form-group col-4">
+                              <label for="cuit">CUIT</label>
+                              <input type="text" class="form-control" id="cuit" name="cuit" aria-describedby="cuit" placeholder="Introduzca el CUIT" value="<?= $data['cuit']; ?>">
+                              <!-- <small id="cuit" class="form-text text-muted">We'll never share your text with anyone else.</small> -->
                             </div>
                             <div class="form-group col-4">
                                 <label for="sucursales">Sucursales</label>
@@ -262,6 +262,7 @@
                                   }?>
                                 </select>
                               </div>
+                            </div>
                           </div>
                         </div><!-- .col -->
                       </div><!-- .row -->
@@ -318,9 +319,9 @@
                                       </select>
                                     </td>
                                     <td data-name="activo">
-                                      <select class="form-control" name="lotes_activo[]" id="lotes_activo-<?=$clave?>" class="js-example-basic-hide-search">
-                                        <option value="1" <?php if ($valor['lotes_activo']==1) echo " selected ";?>>Si</option>
-                                        <option value="0" <?php if ($valor['lotes_activo']==0) echo " selected ";?>>No</option>
+                                      <select name="lotes_activo[]" class="form-control" id="lotes_activo-<?=$clave?>" class="js-example-basic-hide-search">
+                                      <option value="1" <?php if ($valor['lotes_activo']==1) echo " selected ";?>>Si</option>
+                                      <option value="0" <?php if ($valor['lotes_activo']==0) echo " selected ";?>>No</option>
                                       </select>
                                     </td>
                                   </tr><?php
