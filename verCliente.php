@@ -669,7 +669,7 @@ Database::disconnect();
                                 <th align="center">Cultivo</th>
                                 <th align="center">Cantidad</th>
                               </tr><?php
-                              $pdo = Database::connect();
+                              /*$pdo = Database::connect();
                               $sql = " SELECT id, nombre FROM cultivos";
                               foreach ($pdo->query($sql) as $row) {?>
                                 <tr>
@@ -680,7 +680,7 @@ Database::disconnect();
                                   </td>
                                 </tr><?php
                               }
-                              Database::disconnect();?>
+                              Database::disconnect();*/?>
                             </table>
                             <div class="mensajeError" style="color: red; display: none;">Por favor, ingrese al menos una cantidad.</div>
                           </div>
@@ -739,7 +739,7 @@ Database::disconnect();
                                 <th>Cantidad</th>
                               </tr><?php
                               //include 'database.php';
-                              $pdo = Database::connect();
+                              /*$pdo = Database::connect();
                               $sql = " SELECT id, nombre FROM cultivos";
                               foreach ($pdo->query($sql) as $row) {?>
                                 <tr>
@@ -750,7 +750,7 @@ Database::disconnect();
                                   </td>
                                 </tr><?php
                               }
-                              Database::disconnect();?>
+                              Database::disconnect();*/?>
                             </table>
                           </div>
                         </div>
@@ -1150,7 +1150,7 @@ Database::disconnect();
                 if(tipo_comprobante=="Pedido"){
                   return `
                     <div class="dropdown">
-                      <button class="btn btn-sm ${clase} dropdown-toggle" type="button" data-toggle="dropdown" aria-expanded="false">
+                      <button class="btn btn-sm ${clase} dropdown-toggle" type="button" data-toggle="dropdown" aria-expanded="false" style="white-space: nowrap;">
                         ${tipo_comprobante+' N° '+row.id_pedido}
                       </button>
                       <div class="dropdown-menu">

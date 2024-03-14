@@ -70,28 +70,26 @@ if(empty($_SESSION['user']))
                             <th>Opciones</th>
                           </tr>
                         </thead>
-                        <tbody>
-                          <?php 
-							include 'database.php';
-							$pdo = Database::connect();
-							$sql = " SELECT id, nombre, direccion FROM sucursales WHERE 1 ";
-							
-							foreach ($pdo->query($sql) as $row) {
-                echo '<tr>';
-                echo '<td>'. $row["id"] . '</td>';
-                echo '<td>'. $row["nombre"] . '</td>';
-                echo '<td>'. $row["direccion"] . '</td>';
-                echo '<td>';
-                echo '<a href="modificarSucursal.php?id='.$row["id"].'"><img src="img/icon_modificar.png" width="24" height="25" border="0" alt="Modificar" title="Modificar"></a>';
-                echo '&nbsp;&nbsp;';
-                echo '<a href="#" title="Eliminar" onclick="openModalEliminar('.$row["id"].')"><img src="img/icon_baja.png" width="24" height="25" border="0" alt="Eliminar"></a>';
-                echo '&nbsp;&nbsp;';
-                //echo '&nbsp;&nbsp;';
-                echo '</td>';
-                echo '</tr>';
-              }
-						  Database::disconnect();
-						  ?>
+                        <tbody><?php
+                          include 'database.php';
+                          $pdo = Database::connect();
+                          $sql = " SELECT id, nombre, direccion FROM sucursales WHERE 1 ";
+                          
+                          foreach ($pdo->query($sql) as $row) {
+                            echo '<tr>';
+                            echo '<td>'. $row["id"] . '</td>';
+                            echo '<td>'. $row["nombre"] . '</td>';
+                            echo '<td>'. $row["direccion"] . '</td>';
+                            echo '<td>';
+                            echo '<a href="modificarSucursal.php?id='.$row["id"].'"><img src="img/icon_modificar.png" width="24" height="25" border="0" alt="Modificar" title="Modificar"></a>';
+                            echo '&nbsp;&nbsp;';
+                            echo '<a href="#" title="Eliminar" onclick="openModalEliminar('.$row["id"].')"><img src="img/icon_baja.png" width="24" height="25" border="0" alt="Eliminar"></a>';
+                            echo '&nbsp;&nbsp;';
+                            //echo '&nbsp;&nbsp;';
+                            echo '</td>';
+                            echo '</tr>';
+                          }
+                          Database::disconnect();?>
                         </tbody>
                       </table>
                     </div>

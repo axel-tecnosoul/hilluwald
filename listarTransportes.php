@@ -72,34 +72,32 @@ if(empty($_SESSION['user']))
                             <th>Opciones</th>
                           </tr>
                         </thead>
-                        <tbody>
-                          <?php 
-							include 'database.php';
-							$pdo = Database::connect();
-							$sql = " SELECT t.id, t.razon_social, t.cuit, t.domicilio, t.id_usuario, t.fecha_hora_alta, t.activo, u.usuario FROM transportes t left join usuarios u on u.id = t.id_usuario WHERE 1 ";
-							
-							foreach ($pdo->query($sql) as $row) {
-                echo '<tr>';
-                echo '<td>'. $row["id"] . '</td>';
-                echo '<td>'. $row["razon_social"] . '</td>';
-                echo '<td>'. $row["cuit"] . '</td>';
-                echo '<td>'. $row["domicilio"] . '</td>';
-                if ($row["activo"] == 1) {
-                  echo '<td>Si</td>';
-                } else {
-                  echo '<td>No</td>';
-                }
-                echo '<td>';
-                echo '<a href="modificarTransporte.php?id='.$row["id"].'"><img src="img/icon_modificar.png" width="24" height="25" border="0" alt="Modificar" title="Modificar"></a>';
-                echo '&nbsp;&nbsp;';
-                echo '<a href="#" title="Eliminar" onclick="openModalEliminar('.$row["id"].')"><img src="img/icon_baja.png" width="24" height="25" border="0" alt="Eliminar"></a>';
-                echo '&nbsp;&nbsp;';
-                //echo '&nbsp;&nbsp;';
-                echo '</td>';
-                echo '</tr>';
-              }
-						   Database::disconnect();
-						  ?>
+                        <tbody><?php
+                          include 'database.php';
+                          $pdo = Database::connect();
+                          $sql = " SELECT t.id, t.razon_social, t.cuit, t.domicilio, t.id_usuario, t.fecha_hora_alta, t.activo, u.usuario FROM transportes t left join usuarios u on u.id = t.id_usuario WHERE 1 ";
+                          
+                          foreach ($pdo->query($sql) as $row) {
+                            echo '<tr>';
+                            echo '<td>'. $row["id"] . '</td>';
+                            echo '<td>'. $row["razon_social"] . '</td>';
+                            echo '<td>'. $row["cuit"] . '</td>';
+                            echo '<td>'. $row["domicilio"] . '</td>';
+                            if ($row["activo"] == 1) {
+                              echo '<td>Si</td>';
+                            } else {
+                              echo '<td>No</td>';
+                            }
+                            echo '<td>';
+                            echo '<a href="modificarTransporte.php?id='.$row["id"].'"><img src="img/icon_modificar.png" width="24" height="25" border="0" alt="Modificar" title="Modificar"></a>';
+                            echo '&nbsp;&nbsp;';
+                            echo '<a href="#" title="Eliminar" onclick="openModalEliminar('.$row["id"].')"><img src="img/icon_baja.png" width="24" height="25" border="0" alt="Eliminar"></a>';
+                            echo '&nbsp;&nbsp;';
+                            //echo '&nbsp;&nbsp;';
+                            echo '</td>';
+                            echo '</tr>';
+                          }
+                          Database::disconnect();?>
                         </tbody>
                       </table>
                     </div>

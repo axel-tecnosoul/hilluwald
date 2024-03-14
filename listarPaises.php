@@ -1,15 +1,13 @@
 <?php 
 session_start(); 
-if(empty($_SESSION['user']))
-{
+if(empty($_SESSION['user'])){
 	header("Location: index.php");
 	die("Redirecting to index.php"); 
-}
-?>
+}?>
 <!DOCTYPE html>
 <html lang="en">
   <head>
-	<?php include('head_tables.php');?>
+	  <?php include('head_tables.php');?>
   </head>
   <body class="light-only">
     <!-- page-wrapper Start-->
