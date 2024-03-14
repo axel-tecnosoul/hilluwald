@@ -27,7 +27,8 @@ if($id_cliente!=0 and $id_cliente!=""){
 $id_cultivo=$_GET["id_cultivo"];
 $filtroCultivo="";
 if($id_cultivo!=0 and $id_cultivo!=""){
-  $filtroCultivo=" AND pd.id_cultivo IN ($id_cultivo)";
+  //$filtroCultivo=" AND pd.id_cultivo IN ($id_cultivo)";
+  $filtroCultivo=" AND pd.id_especie IN ($id_cultivo)";
 }
 
 function encerrar_entre_comillas($valor) {
@@ -79,6 +80,7 @@ if($desde<=$hasta){
   //INICIO OBTENCION DE REGISTROS A MOSTRAR EN LA TABLA
 
   //obtenemos los pedidos
+  //$sql = " SELECT p.id,date_format(p.fecha,'%d/%m/%Y') AS fecha,p.campana,pd.cantidad_plantines,p.fecha_hora_alta FROM pedidos p INNER JOIN pedidos_detalle pd ON pd.id_pedido=p.id WHERE p.anulado=0 $filtroDesde $filtroHasta $filtroCliente $filtroCultivo";
   $sql = " SELECT p.id,date_format(p.fecha,'%d/%m/%Y') AS fecha,p.campana,pd.cantidad_plantines,p.fecha_hora_alta FROM pedidos p INNER JOIN pedidos_detalle pd ON pd.id_pedido=p.id WHERE p.anulado=0 $filtroDesde $filtroHasta $filtroCliente $filtroCultivo";
   //echo $sql;
   foreach ($pdo->query($sql) as $row) {
@@ -115,41 +117,44 @@ if($desde<=$hasta){
     ];
   }
 
-  //obtenemos los retiros
-  $sql = " SELECT p.id,date_format(p.fecha,'%d/%m/%Y') AS fecha,p.campana,pd.cantidad_plantines,p.fecha_hora_alta FROM remitos p INNER JOIN remitos_detalle pd ON pd.id_remito=p.id WHERE 1 $filtroDesde $filtroHasta $filtroCliente $filtroCultivo";//p.anulado=0 
-  //echo $sql;
-  foreach ($pdo->query($sql) as $row) {
-    
-    //$iconVer="<a href='verMovimientoCajaChica.php?id=".$row["id_movimiento"]."' target='_blank' class='badge badge-primary'><i class='fa fa-eye' aria-hidden='true'></i></a>";
-    //$iconVer="<span data-id='".$row["id_movimiento"]."' data-tipo='movimiento' class='ver badge badge-primary'><i class='fa fa-eye' aria-hidden='true'></i></span>";
+  $b=1;
+  if($b==0){
+    //obtenemos los retiros
+    $sql = " SELECT p.id,date_format(p.fecha,'%d/%m/%Y') AS fecha,p.campana,pd.cantidad_plantines,p.fecha_hora_alta FROM remitos p INNER JOIN remitos_detalle pd ON pd.id_remito=p.id WHERE 1 $filtroDesde $filtroHasta $filtroCliente $filtroCultivo";//p.anulado=0 
+    //echo $sql;
+    foreach ($pdo->query($sql) as $row) {
+      
+      //$iconVer="<a href='verMovimientoCajaChica.php?id=".$row["id_movimiento"]."' target='_blank' class='badge badge-primary'><i class='fa fa-eye' aria-hidden='true'></i></a>";
+      //$iconVer="<span data-id='".$row["id_movimiento"]."' data-tipo='movimiento' class='ver badge badge-primary'><i class='fa fa-eye' aria-hidden='true'></i></span>";
 
-    /*$iconEdit="";
-    $cerrado="<i class='fa fa-lock' aria-hidden='true'></i> ";
-    if($row["id_cierre_caja"]==0){
-      $iconEdit="<a href='modificarMovimientoCajaChica.php?id=".$row["id_movimiento"]."' target='_blank' class='badge badge-secondary'><i class='fa fa-pencil-square-o' aria-hidden='true'></i></a>";
-      $cerrado="<i class='fa fa-unlock' aria-hidden='true'></i> ";
+      /*$iconEdit="";
+      $cerrado="<i class='fa fa-lock' aria-hidden='true'></i> ";
+      if($row["id_cierre_caja"]==0){
+        $iconEdit="<a href='modificarMovimientoCajaChica.php?id=".$row["id_movimiento"]."' target='_blank' class='badge badge-secondary'><i class='fa fa-pencil-square-o' aria-hidden='true'></i></a>";
+        $cerrado="<i class='fa fa-unlock' aria-hidden='true'></i> ";
+      }
+
+      if($row["tipo_movimiento"]=="Ingreso"){
+        $credito=$row["total"];
+        $debito=0;
+        $saldo=0;
+      }else{
+        $credito=0;
+        $debito=$row["total"];
+        $saldo=0;
+      }*/
+      $aCtaCte[]=[
+        "tipo_comprobante"=>"Retiro",
+        "id_pedido"=>$row['id'],
+        "fecha"=>$row['fecha'],// AS fecha_hora
+        "campana"=>$row["campana"],
+        "cantidad"=>$row['cantidad_plantines'],
+        /*"cantidad_pedido"=>"",
+        "cantidad_retiro"=>$row['cantidad_plantines'],
+        "cantidad_pago"=>"",*/
+        "fecha_hora_alta"=>$row['fecha_hora_alta'],
+      ];
     }
-
-    if($row["tipo_movimiento"]=="Ingreso"){
-      $credito=$row["total"];
-      $debito=0;
-      $saldo=0;
-    }else{
-      $credito=0;
-      $debito=$row["total"];
-      $saldo=0;
-    }*/
-    $aCtaCte[]=[
-      "tipo_comprobante"=>"Retiro",
-      "id_pedido"=>$row['id'],
-      "fecha"=>$row['fecha'],// AS fecha_hora
-      "campana"=>$row["campana"],
-      "cantidad"=>$row['cantidad_plantines'],
-      /*"cantidad_pedido"=>"",
-      "cantidad_retiro"=>$row['cantidad_plantines'],
-      "cantidad_pago"=>"",*/
-      "fecha_hora_alta"=>$row['fecha_hora_alta'],
-    ];
   }
   Database::disconnect();
 

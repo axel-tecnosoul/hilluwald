@@ -29,7 +29,7 @@ $anio_actual = date("Y");
 $anio_inicial = $anio_actual - 2;
 $anio_final = $anio_actual + 2;
 
-$sql = " SELECT c.id AS id_cultivo, e.id AS id_especie, pe.id AS id_procedencia, e.especie, pe.procedencia, c.material, c.nombre_corto, e.icono, e.color FROM cultivos c LEFT JOIN procedencias_especies pe ON c.id_procedencia=pe.id LEFT JOIN especies e ON c.id_especie=e.id INNER JOIN pedidos_detalle pd ON pd.id_cultivo=c.id INNER JOIN pedidos p ON pd.id_pedido=p.id WHERE p.anulado=0 AND p.id_cliente=".$id." GROUP BY c.id";
+$sql = " SELECT c.id AS id_cultivo, e.id AS id_especie, pe.id AS id_procedencia, e.especie, pe.procedencia, c.material, c.nombre_corto, e.icono, e.color FROM pedidos_detalle pd INNER JOIN pedidos p ON pd.id_pedido=p.id INNER JOIN especies e ON pd.id_especie=e.id LEFT JOIN procedencias_especies pe ON pd.id_procedencia=pe.id LEFT JOIN cultivos c ON pd.id_material=c.id WHERE p.anulado=0 AND p.id_cliente=".$id." GROUP BY c.id";
 //$sql = " SELECT c.id, c.nombre FROM cultivos c";
 $aCultivosPedidos=[];
 foreach ($pdo->query($sql) as $row) {
@@ -352,7 +352,7 @@ Database::disconnect();
                     <span aria-hidden="true">&times;</span>
                   </button>
                 </div>
-                <form class="form theme-form formulario" role="form" method="post" action="nuevoPedido.php?id_cliente=<?=$id?>">
+                <form class="form theme-form" id="formPedido" role="form" method="post" action="nuevoPedido.php?id_cliente=<?=$id?>">
                   <div class="modal-body">
                     <div class="row">
                       <div class="form-group col-4">
@@ -384,11 +384,19 @@ Database::disconnect();
                             echo "<option value=''>Seleccione...</option>";
                           }
                           while ($fila = $q->fetch(PDO::FETCH_ASSOC)) {
-                            echo "<option value='".$fila['id']."'";
+                            echo "<option value='".$fila['id_sucursal']."'";
                             echo ">".$fila['nombre']."</option>";
                           }
                           Database::disconnect();?>
                         </select>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="form-group col-2">
+                        <label for="observaciones_pedido" class="col-form-label">Observaciones:</label>
+                      </div>
+                      <div class="form-group col-10">
+                        <textarea name="observaciones_pedido" id="observaciones_pedido" class="form-control"></textarea>
                       </div>
                     </div>
                     <div class="row">
@@ -455,13 +463,14 @@ Database::disconnect();
                           }
 
                           Database::disconnect();?>
-                        <table class="table-detalle table table-bordered table-hover text-center" id="tableLotes">
+                        <table class="table-detalle table table-bordered table-hover text-center" id="tableCultivos">
                           <thead>
                             <tr>
                               <th>Especie</th>
                               <th>Procedencia</th>
                               <th>Material</th>
                               <th>Cantidad</th>
+                              <th>Eliminar</th>
                             </tr>
                           </thead>
                           <tbody>
@@ -478,7 +487,7 @@ Database::disconnect();
                               </td>
                               <td data-name="id_procedencia" class="text-left">
                                 <select name="id_procedencia[]" id="id_procedencia-0" class="js-example-basic-single id_procedencia" style="width: 100%;" data-required="0" disabled>
-                                  <option value="null">Seleccione...</option><?php
+                                  <option value="">Seleccione...</option><?php
                                   foreach ($aProcedencias as $procedencia) {
                                     echo "<option value='".$procedencia['id']."'";
                                     echo ">".$procedencia['procedencia']."</option>";
@@ -488,7 +497,7 @@ Database::disconnect();
                               </td>
                               <td data-name="id_material" class="text-left">
                                 <select name="id_material[]" id="id_material-0" class="js-example-basic-single id_material" style="width: 100%;" data-required="0" disabled>
-                                  <option value="null">Seleccione...</option><?php
+                                  <option value="">Seleccione...</option><?php
                                   foreach ($aMateriales as $material) {
                                     echo "<option value='".$material['id']."'";
                                     echo "data-id-especie='".$material['id_especie']."'";
@@ -497,6 +506,9 @@ Database::disconnect();
                                   }
                                   Database::disconnect();?>
                                 </select>
+                              </td>
+                              <td data-name="cantidad">
+                                <input type="number" name="cantidad[]" id="cantidad-0" class="form-control cantidad" placeholder="Cantidad" min="1" disabled>
                               </td>
                               <td data-name="eliminar">
                                 <span name="eliminar[]" title="Eliminar" class="btn btn-sm row-remove text-center" onClick="eliminarFila(this);">
@@ -507,7 +519,7 @@ Database::disconnect();
                           </tbody>
                           <tfoot>
                             <tr>
-                              <td colspan="4" align='right'>
+                              <td colspan="5" align='right'>
                                 <input type="button" class="btn btn-dark" id="addRowCultivos" value="Agregar Cultivo">
                               </td>
                             </tr>
@@ -816,7 +828,7 @@ Database::disconnect();
 
     <script>
       $(document).ready(function() {
-        $("#nuevoPedido").modal("show")
+        //$("#nuevoPedido").modal("show")
 
         $('.formulario').submit(function(event) {
           let inputs_cantidad=$(this).find('input.cantidad')
@@ -841,10 +853,25 @@ Database::disconnect();
           }
         });
 
+        $('#formPedido').submit(function(event) {
+          //event.preventDefault(); // Evitar el envío del formulario
+          $(".id_especie").attr("disabled",false)
+          //console.log($(".id_especie"));
+          $(".id_procedencia").attr("disabled",false)
+          //console.log($(".id_procedencia"));
+          $(".id_material").attr("disabled",false)
+          //console.log($(".id_material"));
+          $(".cantidad").attr("disabled",false)
+          //console.log($(".id_material"));
+        })
+
         $(document).on("change",".id_especie",function(){
           let fila=$(this).parents("tr");
+          
           let id_procedencia=fila.find(".id_procedencia")
           let id_material=fila.find(".id_material")
+          let cantidad=fila.find(".cantidad")
+          
           console.log(fila);
           let disabled=true;
           if(this.value>0){
@@ -854,6 +881,7 @@ Database::disconnect();
           id_procedencia.attr("disabled",disabled)
           //id_procedencia.val(3)
           id_material.attr("disabled",disabled)
+          cantidad.attr("disabled",disabled)
           //id_material.val(3)
           getMateriales(this);
         })
@@ -906,7 +934,7 @@ Database::disconnect();
           var newid = 0;
           var primero="";
           var ultimoRegistro=0;
-          $.each($("#tableLotes tr"), function() {
+          $.each($("#tableCultivos tr"), function() {
             if (parseInt($(this).data("id")) > newid) {
               newid = parseInt($(this).data("id"));
             }
@@ -920,7 +948,7 @@ Database::disconnect();
           });
           //console.log(newid);
           var p=0;
-          $.each($("#tableLotes tbody tr:nth(0) td"),function(){//loop through each td and create new elements with name of newid
+          $.each($("#tableCultivos tbody tr:nth(0) td"),function(){//loop through each td and create new elements with name of newid
             var cur_td = $(this); 
             var children = cur_td.children();
             if($(this).data("name")!=undefined){// add new td and element if it has a name
@@ -951,13 +979,13 @@ Database::disconnect();
             }else {
               //console.log("<td></td>",{'text':$('#tab_logic tr').length})
               var td = $("<td></td>", {
-                'text': $('#tableLotes tr').length
+                'text': $('#tableCultivos tr').length
               }).appendTo($(tr));
             }
           });
           //console.log($(tr).find($("input[name='detalledireccion[]']")));
           //console.log(tr);//.find($("input"))
-          $(tr).appendTo($('#tableLotes'));// add the new row
+          $(tr).appendTo($('#tableCultivos'));// add the new row
           if(newid>0){
             //primero.focus();
             let sel2=$("#id_especie-"+newid)
@@ -1178,13 +1206,15 @@ Database::disconnect();
               },
               {
                 render: function(data, type, row, meta) {
-                  return Intl.NumberFormat("de-DE").format(row.cantidad_pago)
+                  //return Intl.NumberFormat("de-DE").format(row.cantidad_pago)
+                  return 0;
                 },
                 className: "dt-body-right borderPagoLeft",
               },
               {
                 render: function(data, type, row, meta) {
-                  return Intl.NumberFormat("de-DE").format(row.saldo_pago)
+                  //return Intl.NumberFormat("de-DE").format(row.saldo_pago)
+                  return 0;
                 },
                 className: "dt-body-right borderPagoRight",
               },

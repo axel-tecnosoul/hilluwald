@@ -26,9 +26,9 @@ if ( !empty($_POST)) {
 
   //$id_cliente=($_POST['id_cliente']) ?: NULL;
   
-  $sql = "INSERT INTO pedidos (id_cliente, fecha, campana, id_usuario) VALUES (?,?,?,?)";
+  $sql = "INSERT INTO pedidos (id_cliente, fecha, campana, id_sucursal, observaciones, id_usuario) VALUES (?,?,?,?,?,?)";
   $q = $pdo->prepare($sql);
-  $params=array($_GET['id_cliente'],$_POST['fecha_pedido'],$_POST['campana_pedido'],$_SESSION['user']['id']);
+  $params=array($_GET['id_cliente'],$_POST['fecha_pedido'],$_POST['campana_pedido'],$_POST['sucursal_pedido'],$_POST['observaciones_pedido'],$_SESSION['user']['id']);
   $q->execute($params);
   $id_pedido = $pdo->lastInsertId();
 
@@ -49,22 +49,40 @@ if ( !empty($_POST)) {
   $aProductos=[];
 
   $cantProdOK=0;
-  foreach ($_POST['id_cultivo'] as $key => $id_cultivo) {
+  foreach ($_POST['id_especie'] as $key => $id_especie) {
+
+    $id_cultivo=NULL;
+
     $cantidad = $_POST['cantidad'][$key];
+    $id_especie = $_POST['id_especie'][$key];
+    $id_procedencia = $_POST['id_procedencia'][$key];
+    $id_material = $_POST['id_material'][$key];
 
     if($cantidad>0){
 
       $aProductos[]=[
-        "id_cultivo"=>$id_cultivo,
+        "id_especie"=>$id_especie,
         "cantidad"=>$cantidad,
       ];
 
-      $sql = "INSERT INTO pedidos_detalle (id_pedido, id_cultivo, cantidad_plantines) VALUES (?,?,?)";
+      $sql = "INSERT INTO pedidos_detalle (id_pedido, id_cultivo, id_especie, id_procedencia, id_material, cantidad_plantines) VALUES (?,?,?,?,?,?)";
       $q = $pdo->prepare($sql);
       //$q->execute(array($idVenta,$id_cultivo,$cantidad,$precio,$subtotal,$modalidad,$pagado));
-      $params=array($id_pedido,$id_cultivo,$cantidad);
-      $q->execute($params);
-      $afe=$q->rowCount();
+      $params=array($id_pedido,$id_cultivo,$id_especie,$id_procedencia,$id_material,$cantidad);
+      $result = $q->execute($params);
+      //var_dump($result);
+      
+      if ($result === false) {
+        // Si ocurrió un error, obtener información sobre el error
+        $errorInfo = $q->errorInfo();
+        // El mensaje de error se encuentra en el índice 2 del array
+        $errorMessage = $errorInfo[2];
+        // Mostrar el mensaje de error o realizar alguna otra acción
+        echo "Error al ejecutar la consulta: $errorMessage";
+      } else {
+        // La consulta se ejecutó correctamente
+        $afe = $q->rowCount();
+      }
 
       if($afe==1){
         $cantProdOK++;
