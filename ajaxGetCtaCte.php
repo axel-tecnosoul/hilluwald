@@ -111,7 +111,7 @@ if($desde<=$hasta){
       "campana"=>$row["campana"],
       "cantidad"=>$row['cantidad_plantines'],
       /*"cantidad_pedido"=>$row['cantidad_plantines'],
-      "cantidad_retiro"=>"",
+      "cantidad_despacho"=>"",
       "cantidad_pago"=>"",*/
       "fecha_hora_alta"=>$row['fecha_hora_alta'],
     ];
@@ -119,7 +119,7 @@ if($desde<=$hasta){
 
   $b=1;
   if($b==0){
-    //obtenemos los retiros
+    //obtenemos los despachos
     $sql = " SELECT p.id,date_format(p.fecha,'%d/%m/%Y') AS fecha,p.campana,pd.cantidad_plantines,p.fecha_hora_alta FROM remitos p INNER JOIN remitos_detalle pd ON pd.id_remito=p.id WHERE 1 $filtroDesde $filtroHasta $filtroCliente $filtroCultivo";//p.anulado=0 
     //echo $sql;
     foreach ($pdo->query($sql) as $row) {
@@ -144,13 +144,13 @@ if($desde<=$hasta){
         $saldo=0;
       }*/
       $aCtaCte[]=[
-        "tipo_comprobante"=>"Retiro",
+        "tipo_comprobante"=>"Despacho",
         "id_pedido"=>$row['id'],
         "fecha"=>$row['fecha'],// AS fecha_hora
         "campana"=>$row["campana"],
         "cantidad"=>$row['cantidad_plantines'],
         /*"cantidad_pedido"=>"",
-        "cantidad_retiro"=>$row['cantidad_plantines'],
+        "cantidad_despacho"=>$row['cantidad_plantines'],
         "cantidad_pago"=>"",*/
         "fecha_hora_alta"=>$row['fecha_hora_alta'],
       ];
@@ -179,30 +179,30 @@ if($desde<=$hasta){
     $cantidad=$aCtaCte[$key]['cantidad'];
     switch ($value["tipo_comprobante"]) {
       case 'Pedido':
-        $saldo_retiro=$cantidad;
+        $saldo_despacho=$cantidad;
         $saldo_pago=$cantidad;
         if($key>0){
-          $saldo_retiro=$aCtaCte[$key-1]["saldo_retiro"]+$cantidad;
+          $saldo_despacho=$aCtaCte[$key-1]["saldo_despacho"]+$cantidad;
           $saldo_pago=$aCtaCte[$key-1]["saldo_pago"]+$cantidad;
         }
 
         $aCtaCte[$key]["cantidad_pedido"]=$cantidad;
-        $aCtaCte[$key]["cantidad_retiro"]="";
-        $aCtaCte[$key]["saldo_retiro"]=$saldo_retiro;
+        $aCtaCte[$key]["cantidad_despacho"]="";
+        $aCtaCte[$key]["saldo_despacho"]=$saldo_despacho;
         $aCtaCte[$key]["cantidad_pago"]="";
         $aCtaCte[$key]["saldo_pago"]=$saldo_pago;
         break;
-      case 'Retiro':
-        $saldo_retiro=$cantidad;
+      case 'Despacho':
+        $saldo_despacho=$cantidad;
         $saldo_pago=0;
         if($key>0){
-          $saldo_retiro=$aCtaCte[$key-1]["saldo_retiro"]-$cantidad;
+          $saldo_despacho=$aCtaCte[$key-1]["saldo_despacho"]-$cantidad;
           $saldo_pago=$aCtaCte[$key-1]["saldo_pago"];
         }
 
         $aCtaCte[$key]["cantidad_pedido"]="";
-        $aCtaCte[$key]["cantidad_retiro"]=$cantidad;
-        $aCtaCte[$key]["saldo_retiro"]=$saldo_retiro;
+        $aCtaCte[$key]["cantidad_despacho"]=$cantidad;
+        $aCtaCte[$key]["saldo_despacho"]=$saldo_despacho;
         $aCtaCte[$key]["cantidad_pago"]="";
         $aCtaCte[$key]["saldo_pago"]=$saldo_pago;
         break;

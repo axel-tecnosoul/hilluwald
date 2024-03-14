@@ -60,7 +60,7 @@ Database::disconnect();
       background-color: #28a745!important;
       color: #fff!important;
     }
-    .retiros{
+    .despachos{
       background-color: #6c757d!important;
       color: #fff!important;
     }
@@ -79,12 +79,12 @@ Database::disconnect();
     .tablas_cta_cte th, .tablas_cta_cte td {
       border: 1px solid #dee2e6;
     }
-    .borderRetiroLeft{
+    .borderDespachoLeft{
       /*border-left: solid 1px #6c757d !important;*/
       /*background-color: #6c757d !important;*/
       /*background-color: rgb(108 117 125)!important;*/
     }
-    .borderRetiroRight{
+    .borderDespachoRight{
       /*border-right: solid 1px #6c757d !important;*/
       /*background-color: #6c757d !important;*/
       /*background-color: rgb(108 117 125)!important;*/
@@ -186,7 +186,7 @@ Database::disconnect();
                           <i class="fa fa-plus"></i> Pedido
                         </button>
 
-                        <!-- <button class="btn retiros" style="text-transform: none;" title="Nuevo Retiro" data-toggle="modal" data-target="#nuevoRetiro"><i class="fa fa-plus"></i> Retiro</button>
+                        <!-- <button class="btn despachos" style="text-transform: none;" title="Nuevo Despacho" data-toggle="modal" data-target="#nuevoDespacho"><i class="fa fa-plus"></i> Despacho</button>
                         
                         <button class="btn pagos" style="text-transform: none;" title="Nuevo Pago" data-toggle="modal" data-target="#nuevoPago"><i class="fa fa-plus"></i> Pago</button>
 
@@ -281,7 +281,7 @@ Database::disconnect();
                             <td rowspan="2" style="vertical-align: middle;" class="border-0 p-1">
                               <select id="tipo_comprobante" class="form-control form-control-sm filtraTabla selectpicker" data-style="multiselect" data-selected-text-format="count > 1" multiple>
                                 <option value="Pedido">Pedido</option>
-                                <option value="Retiro">Retiro</option>
+                                <option value="Despacho">Despacho</option>
                                 <option value="Pago">Pago</option>
                               </select>
                             </td>
@@ -299,7 +299,7 @@ Database::disconnect();
                               <th style="text-align: center;vertical-align: middle;" rowspan="2">Comprobante</th>
                               <th style="text-align: center;vertical-align: middle;" rowspan="2">Campaña</th>
                               <th style="text-align: center;vertical-align: middle;" rowspan="2">Cantidad pedida</th>
-                              <th style="text-align: center;vertical-align: middle;"class="borderRetiroLeft borderRetiroRight" colspan="2">Retiros</th>
+                              <th style="text-align: center;vertical-align: middle;"class="borderDespachoLeft borderDespachoRight" colspan="2">Despachos</th>
                               <th style="text-align: center;vertical-align: middle;" class="borderPagoLeft borderPagoRight" colspan="2">Pagos</th>
                               <th style="text-align: center;vertical-align: middle;" class="borderPagoLeft borderPagoRight" colspan="2">Contenedores</th>
                             </tr>
@@ -542,26 +542,26 @@ Database::disconnect();
           <!-- FIN MODAL PARA NUEVO PEDIDO -->
 
           <!-- MODAL PARA NUEVO RETIRO -->
-          <div class="modal fade" id="nuevoRetiro" role="dialog" data-backdrop="static" data-keyboard="false" tabindex="-1000000000000" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+          <div class="modal fade" id="nuevoDespacho" role="dialog" data-backdrop="static" data-keyboard="false" tabindex="-1000000000000" aria-labelledby="myLargeModalLabel" aria-hidden="true">
             <div class="modal-dialog modal-lg">
               <div class="modal-content">
                 <div class="modal-header">
-                  <h5>Nuevo Retiro de <?=$data['razon_social'];?> Pedido N° <span class="idPedido"></span></h5>
+                  <h5>Nuevo Despacho de <?=$data['razon_social'];?> Pedido N° <span class="idPedido"></span></h5>
                   <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                   </button>
                 </div>
-                <form class="form theme-form formulario" role="form" method="post" action="nuevoRetiro.php?id_cliente=<?=$id?>">
-                  <input name="id_pedido_retiro" id="id_pedido_retiro" type="hidden">
+                <form class="form theme-form formulario" role="form" method="post" action="nuevoDespacho.php?id_cliente=<?=$id?>">
+                  <input name="id_pedido_despacho" id="id_pedido_despacho" type="hidden">
                   <div class="modal-body">
                     <div class="row">
                       <div class="form-group col-4">
-                        <label for="fecha_retiro">Fecha</label>
-                        <input name="fecha_retiro" id="fecha_retiro" type="date" class="form-control multiselect" value="<?=$hoy?>" required>
+                        <label for="fecha_despacho">Fecha</label>
+                        <input name="fecha_despacho" id="fecha_despacho" type="date" class="form-control multiselect" value="<?=$hoy?>" required>
                       </div>
                       <div class="form-group col-4">
-                        <label for="campana_retiro">Campaña</label><br>
-                        <select name="campana_retiro" id="campana_retiro" style="width: 100%;" required class="js-example-basic-single"><?php
+                        <label for="campana_despacho">Campaña</label><br>
+                        <select name="campana_despacho" id="campana_despacho" style="width: 100%;" required class="js-example-basic-single"><?php
                         // data-style="multiselect" data-live-search="true"
                           // Generar las opciones del select
                           for ($i = $anio_inicial; $i <= $anio_final; $i++) {
@@ -1059,8 +1059,8 @@ Database::disconnect();
           }
         }
 
-        $(document).on("click",".btnNuevoRetiro",function(){
-          let modal=$("#nuevoRetiro")
+        $(document).on("click",".btnNuevoDespacho",function(){
+          let modal=$("#nuevoDespacho")
           modal.modal("show")
           modal.find("span.idPedido").html(this.dataset.idPedido)
         })
@@ -1137,8 +1137,8 @@ Database::disconnect();
                 if(tipo_comprobante=="Pedido"){
                   clase="pedidos";
                 }
-                if(tipo_comprobante=="Retiro"){
-                  clase="retiros";
+                if(tipo_comprobante=="Despacho"){
+                  clase="despachos";
                 }
                 if(tipo_comprobante=="Pago"){
                   clase="pagos";
@@ -1154,8 +1154,8 @@ Database::disconnect();
                         ${tipo_comprobante+' N° '+row.id_pedido}
                       </button>
                       <div class="dropdown-menu">
-                        <a href="#" class="dropdown-item retiros btnNuevoRetiro" data-id-pedido="${row.id_pedido}">
-                          <i class="fa fa-plus"></i> Retiro
+                        <a href="#" class="dropdown-item despachos btnNuevoDespacho" data-id-pedido="${row.id_pedido}">
+                          <i class="fa fa-plus"></i> Despacho
                         </a>
                         <a href="#" class="dropdown-item pagos btnNuevoPago" data-id-pedido="${row.id_pedido}">
                           <i class="fa fa-plus"></i> Pago
@@ -1182,15 +1182,15 @@ Database::disconnect();
               },
               {
                 render: function(data, type, row, meta) {
-                  return Intl.NumberFormat("de-DE").format(row.cantidad_retiro)
+                  return Intl.NumberFormat("de-DE").format(row.cantidad_despacho)
                 },
-                className: "dt-body-right borderRetiroLeft",
+                className: "dt-body-right borderDespachoLeft",
               },
               {
                 render: function(data, type, row, meta) {
-                  return Intl.NumberFormat("de-DE").format(row.saldo_retiro)
+                  return Intl.NumberFormat("de-DE").format(row.saldo_despacho)
                 },
-                className: "dt-body-right borderRetiroRight",
+                className: "dt-body-right borderDespachoRight",
               },
               {
                 render: function(data, type, row, meta) {
@@ -1235,8 +1235,8 @@ Database::disconnect();
               // Update footer
               //$(api.column(3).footer()).html(new Intl.NumberFormat('es-AR', {currency: 'ARS', style: 'currency'}).format(total_cantidad));
               $(api.column(3).footer()).html(Intl.NumberFormat("de-DE").format(totales.totalPedido));
-              $(api.column(4).footer()).html(Intl.NumberFormat("de-DE").format(totales.totalRetiro));
-              $(api.column(5).footer()).html(Intl.NumberFormat("de-DE").format(ultimosSaldos.saldoRetiro));
+              $(api.column(4).footer()).html(Intl.NumberFormat("de-DE").format(totales.totalDespacho));
+              $(api.column(5).footer()).html(Intl.NumberFormat("de-DE").format(ultimosSaldos.saldoDespacho));
               $(api.column(6).footer()).html(Intl.NumberFormat("de-DE").format(totales.totalPago));
               $(api.column(7).footer()).html(Intl.NumberFormat("de-DE").format(ultimosSaldos.saldoPago));
               $(api.column(8).footer()).html(Intl.NumberFormat("de-DE").format(totales.totalPago));
@@ -1247,18 +1247,18 @@ Database::disconnect();
           })
         }
 
-        // Función para sumar las cantidades de pedidos, retiros y pagos
+        // Función para sumar las cantidades de pedidos, despachos y pagos
         function sumarCantidades(datos) {
             let totalPedido = 0;
-            let totalRetiro = 0;
+            let totalDespacho = 0;
             let totalPago = 0;
 
             datos.forEach(item => {
                 if (item.cantidad_pedido !== "") {
                     totalPedido += parseInt(item.cantidad_pedido);
                 }
-                if (item.cantidad_retiro !== "") {
-                    totalRetiro += parseInt(item.cantidad_retiro);
+                if (item.cantidad_despacho !== "") {
+                    totalDespacho += parseInt(item.cantidad_despacho);
                 }
                 if (item.cantidad_pago !== "") {
                     totalPago += parseInt(item.cantidad_pago);
@@ -1267,18 +1267,18 @@ Database::disconnect();
 
             return {
                 totalPedido,
-                totalRetiro,
+                totalDespacho,
                 totalPago
             };
         }
 
-        // Función para obtener el último saldo de retiro y pago
+        // Función para obtener el último saldo de despacho y pago
         function obtenerUltimosSaldos(datos) {
-            const ultimoRetiro = datos.filter(item => item.saldo_retiro !== "").pop();
+            const ultimoDespacho = datos.filter(item => item.saldo_despacho !== "").pop();
             const ultimoPago = datos.filter(item => item.saldo_pago !== "").pop();
 
             return {
-                saldoRetiro: ultimoRetiro ? ultimoRetiro.saldo_retiro : 0,
+                saldoDespacho: ultimoDespacho ? ultimoDespacho.saldo_despacho : 0,
                 saldoPago: ultimoPago ? ultimoPago.saldo_pago : 0
             };
         }

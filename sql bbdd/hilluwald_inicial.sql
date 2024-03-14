@@ -123,7 +123,7 @@ CREATE TABLE `pedidos` (
   `id_usuario` int(11) DEFAULT NULL,
   `campana` varchar(50) DEFAULT NULL,
   `pago_completo` tinyint(1) DEFAULT 0,
-  `retiro_completo` tinyint(1) DEFAULT 0,
+  `despacho_completo` tinyint(1) DEFAULT 0,
   `motivo_saldado` varchar(255) DEFAULT NULL,
   `fecha_hora_alta` datetime DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;

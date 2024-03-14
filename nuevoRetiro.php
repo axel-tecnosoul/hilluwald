@@ -28,7 +28,7 @@ if ( !empty($_POST)) {
 
   $sql = "INSERT INTO remitos (fecha, id_cliente, id_cliente_retira, campana, id_transporte, id_chofer, id_vehiculo, id_usuario) VALUES (?,?,?,?,?,?,?,?)";
   $q = $pdo->prepare($sql);
-  $params=array($_POST['fecha_retiro'],$_GET['id_cliente'],$_POST['id_cliente_retira'],$_POST['campana_retiro'],$_POST['id_transporte'],$_POST['id_chofer'],$_POST['id_vehiculo'],$_SESSION['user']['id']);
+  $params=array($_POST['fecha_despacho'],$_GET['id_cliente'],$_POST['id_cliente_retira'],$_POST['campana_despacho'],$_POST['id_transporte'],$_POST['id_chofer'],$_POST['id_vehiculo'],$_SESSION['user']['id']);
   $q->execute($params);
   $id_remito = $pdo->lastInsertId();
 

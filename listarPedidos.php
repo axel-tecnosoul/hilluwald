@@ -117,7 +117,7 @@ $desde=date("Y-m-d",strtotime($hoy." -1 year"))?>
                             <th>Cliente</th>
                             <th>Campaña</th>
                             <!-- <th>Pago Completo</th>
-                            <th>Retiro Completo</th> -->
+                            <th>Despacho Completo</th> -->
                             <th>Opciones</th>
                             <th class="none"></th>
                           </tr>
@@ -261,7 +261,7 @@ $desde=date("Y-m-d",strtotime($hoy." -1 year"))?>
           {"data": "razon_social"},
           {"data": "campana"},
           /*{"data": "pago_completo"},
-          {"data": "retiro_completo"},*/
+          {"data": "despacho_completo"},*/
           {render: function(data, type, row, meta) {
             let btnVer='<a href="verPedido.php?id='+row.id_pedido+'"><img src="img/eye.png" width="24" height="15" border="0" alt="Ver Pedido" title="Ver Pedido"></a>&nbsp;&nbsp;'
             let btnImprimir='<a href="remito.php?id='+row.id_pedido+'" target="_blank"><img src="img/print.png" width="30" height="20" border="0" alt="Imprimir Remito" title="Imprimir Remito"></a>&nbsp;&nbsp;'

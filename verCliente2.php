@@ -88,7 +88,7 @@ Database::disconnect();
                     <div class="row">
                       <div class="col-12">
                         <a href="nuevoPedido.php" class="btn btn-light" style="text-transform: none;" title="Nuevo Pedido"><i class="fa fa-plus"></i> Pedido</a>
-                        <a href="nuevoRetiro.php" class="btn btn-light" style="text-transform: none;" title="Nuevo Retiro"><i class="fa fa-plus"></i> Retiro</a>
+                        <a href="nuevoDespacho.php" class="btn btn-light" style="text-transform: none;" title="Nuevo Despacho"><i class="fa fa-plus"></i> Despacho</a>
                         <a href="nuevoPago.php" class="btn btn-light" style="text-transform: none;" title="Nuevo Pago"><i class="fa fa-plus"></i> Pago</a>
                       </div>
                     </div>
@@ -172,7 +172,7 @@ Database::disconnect();
                           <td rowspan="2" style="vertical-align: middle;" class="border-0 p-1">
                             <select id="tipo_comprobante" class="form-control form-control-sm filtraTabla selectpicker" data-style="multiselect" data-selected-text-format="count > 1" multiple>
                               <option value="Pedido">Pedido</option>
-                              <option value="Retiro">Retiro</option>
+                              <option value="Despacho">Despacho</option>
                               <option value="Pago">Pago</option>
                             </select>
                           </td>
@@ -202,7 +202,7 @@ Database::disconnect();
                               <th style="text-align: center;vertical-align: middle;" rowspan="2">Comprobante</th>
                               <th style="text-align: center;vertical-align: middle;" rowspan="2">Campaña</th>
                               <th style="text-align: center;vertical-align: middle;" rowspan="2">Cantidad</th>
-                              <th style="text-align: center;vertical-align: middle;" colspan="2">Cta Cte Retiros</th>
+                              <th style="text-align: center;vertical-align: middle;" colspan="2">Cta Cte Despachos</th>
                               <th style="text-align: center;vertical-align: middle;" colspan="2">Cta Cte Pagos</th>
                             </tr>
                             <tr>
@@ -225,7 +225,7 @@ Database::disconnect();
                             </tr>
                             <tr>
                               <td>1 02 2024</td>
-                              <td>Retiro N° 1</td>
+                              <td>Despacho N° 1</td>
                               <td>2024</td>
                               <td align="right"></td>
                               <td align="right">200</td>
@@ -255,7 +255,7 @@ Database::disconnect();
                             </tr>
                             <tr>
                               <td>6 02 2024</td>
-                              <td>Retiro N° 2</td>
+                              <td>Despacho N° 2</td>
                               <td>2024</td>
                               <td align="right"></td>
                               <td align="right">200</td>
@@ -265,7 +265,7 @@ Database::disconnect();
                             </tr>
                             <tr>
                               <td>7 02 2024</td>
-                              <td>Retiro N° 3</td>
+                              <td>Despacho N° 3</td>
                               <td>2024</td>
                               <td align="right"></td>
                               <td align="right">200</td>
@@ -298,7 +298,7 @@ Database::disconnect();
                               <th style="text-align: center;vertical-align: middle;" rowspan="2">Comprobante</th>
                               <th style="text-align: center;vertical-align: middle;" rowspan="2">Campaña</th>
                               <th style="text-align: center;vertical-align: middle;" rowspan="2">Cantidad</th>
-                              <th style="text-align: center;vertical-align: middle;" colspan="2">Cta Cte Retiros</th>
+                              <th style="text-align: center;vertical-align: middle;" colspan="2">Cta Cte Despachos</th>
                               <th style="text-align: center;vertical-align: middle;" colspan="2">Cta Cte Pagos</th>
                             </tr>
                             <tr>
@@ -351,7 +351,7 @@ Database::disconnect();
                             </tr>
                             <tr>
                               <td>6 02 2024</td>
-                              <td>Retiro N° 2</td>
+                              <td>Despacho N° 2</td>
                               <td>2024</td>
                               <td align="right"></td>
                               <td align="right">200</td>
@@ -361,7 +361,7 @@ Database::disconnect();
                             </tr>
                             <tr>
                               <td>7 02 2024</td>
-                              <td>Retiro N° 3</td>
+                              <td>Despacho N° 3</td>
                               <td>2024</td>
                               <td align="right"></td>
                               <td align="right">200</td>

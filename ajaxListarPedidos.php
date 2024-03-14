@@ -12,7 +12,7 @@ $columns = $_GET['columns'];
 
 //$data_columns = ["","p.cb","p.codigo","c.categoria","p.descripcion","CONCAT(pr.nombre,' ',pr.apellido)","p.precio","p.activo"];//PARA EL ORDENAMIENTO
 
-$data_columns = $fields = ['p.id','date_format(p.fecha,"%d/%m/%Y")','c.razon_social','p.campana','p.pago_completo','p.retiro_completo',"GROUP_CONCAT('+',FORMAT(pd.cantidad_plantines,0,'de_DE'),' ',e.especie SEPARATOR '<br>') AS detalle_cultivos"];//,'p.estado'
+$data_columns = $fields = ['p.id','date_format(p.fecha,"%d/%m/%Y")','c.razon_social','p.campana','p.pago_completo','p.despacho_completo',"GROUP_CONCAT('+',FORMAT(pd.cantidad_plantines,0,'de_DE'),' ',e.especie SEPARATOR '<br>') AS detalle_cultivos"];//,'p.estado'
 
 //$from="FROM pedidos p INNER JOIN pedidos_detalle pd ON pd.id_pedido=p.id LEFT JOIN clientes c ON c.id = p.id_cliente INNER JOIN cultivos cu ON pd.id_cultivo=cu.id";
 $from="FROM pedidos p INNER JOIN pedidos_detalle pd ON pd.id_pedido=p.id LEFT JOIN clientes c ON c.id = p.id_cliente INNER JOIN especies e ON pd.id_cultivo=e.id";
@@ -128,9 +128,9 @@ if ($st) {
       if($row['pago_completo']==1){
         $pago_completo="Si";
       }
-      $retiro_completo="No";
-      if($row['retiro_completo']==1){
-        $retiro_completo="Si";
+      $despacho_completo="No";
+      if($row['despacho_completo']==1){
+        $despacho_completo="Si";
       }
 
       $aPedidos[]=[
@@ -140,7 +140,7 @@ if ($st) {
         "razon_social"=>$row["razon_social"],
         "campana"=>$row["campana"],
         "pago_completo"=>$pago_completo,
-        "retiro_completo"=>$retiro_completo,
+        "despacho_completo"=>$despacho_completo,
         "detalle_cultivos"=>$row["detalle_cultivos"]
         //"estado"=>$row['estado']
       ];

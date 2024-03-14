@@ -83,7 +83,7 @@ Database::disconnect();
 
                       <li class="nav-item"><a class="nav-link" id="pills-pedidos-tab" data-toggle="pill" href="#pills-pedidos" role="tab" aria-controls="pills-pedidos" aria-selected="false"><i class="fa fa-shopping-cart"></i>Pedidos</a></li>
 
-                      <li class="nav-item"><a class="nav-link" id="pills-retiros-tab" data-toggle="pill" href="#pills-retiros" role="tab" aria-controls="pills-retiros" aria-selected="false"><i class="fa fa-truck"></i></i>Retiros</a></li>
+                      <li class="nav-item"><a class="nav-link" id="pills-despachos-tab" data-toggle="pill" href="#pills-despachos" role="tab" aria-controls="pills-despachos" aria-selected="false"><i class="fa fa-truck"></i></i>Despachos</a></li>
 
                       <li class="nav-item"><a class="nav-link" id="pills-pagos-tab" data-toggle="pill" href="#pills-pagos" role="tab" aria-controls="pills-pagos" aria-selected="false"><i class="fa fa-usd"></i>Pagos</a></li>
 
@@ -149,7 +149,7 @@ Database::disconnect();
                               <th>Retirado</th>
                               <th>Pagado</th>
                               <!-- <th>Pago Completo</th>
-                              <th>Retiro Completo</th>
+                              <th>Despacho Completo</th>
                               <th>Motivo Saldado</th> -->
                             </tr>
                           </thead>
@@ -186,9 +186,9 @@ Database::disconnect();
                         </table>
 
                       </div>
-                      <div class="tab-pane fade" id="pills-retiros" role="tabpanel" aria-labelledby="pills-retiros-tab"><?php
+                      <div class="tab-pane fade" id="pills-despachos" role="tabpanel" aria-labelledby="pills-despachos-tab"><?php
 
-                        //include_once("formRetiros.php");?>
+                        //include_once("formDespachos.php");?>
 
                         <table id="remitosTable" class="table table-striped table-bordered tablas_cliente" style="width:100%">
                           <thead>
