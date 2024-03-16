@@ -12,10 +12,10 @@ $columns = $_GET['columns'];
 
 //$data_columns = ["","p.cb","p.codigo","c.categoria","p.descripcion","CONCAT(pr.nombre,' ',pr.apellido)","p.precio","p.activo"];//PARA EL ORDENAMIENTO
 
-$data_columns = $fields = ['p.id','date_format(p.fecha,"%d/%m/%Y")','c.razon_social','p.campana','p.pago_completo','p.despacho_completo',"GROUP_CONCAT('+',FORMAT(pd.cantidad_plantines,0,'de_DE'),' ',e.especie SEPARATOR '<br>') AS detalle_cultivos"];//,'p.estado'
+$data_columns = $fields = ['p.id','date_format(p.fecha,"%d/%m/%Y")','c.razon_social','p.campana','p.pago_completo','p.despacho_completo',"GROUP_CONCAT('+',FORMAT(pd.cantidad_plantines,0,'de_DE'),' ',s.servicio,' ',e.especie SEPARATOR '<br>') AS detalle_cultivos"];//,'p.estado'
 
 //$from="FROM pedidos p INNER JOIN pedidos_detalle pd ON pd.id_pedido=p.id LEFT JOIN clientes c ON c.id = p.id_cliente INNER JOIN cultivos cu ON pd.id_cultivo=cu.id";
-$from="FROM pedidos p INNER JOIN pedidos_detalle pd ON pd.id_pedido=p.id LEFT JOIN clientes c ON c.id = p.id_cliente INNER JOIN especies e ON pd.id_cultivo=e.id";
+$from="FROM pedidos p INNER JOIN pedidos_detalle pd ON pd.id_pedido=p.id LEFT JOIN clientes c ON c.id = p.id_cliente INNER JOIN especies e ON pd.id_especie=e.id INNER JOIN servicios s ON pd.id_servicio=s.id";
 
 $orderBy = " ORDER BY ";
 foreach ($_GET['order'] as $order) {

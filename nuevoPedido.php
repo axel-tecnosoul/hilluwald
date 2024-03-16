@@ -54,9 +54,13 @@ if ( !empty($_POST)) {
     $id_cultivo=NULL;
 
     $cantidad = $_POST['cantidad'][$key];
+    $id_servicio = $_POST['id_servicio'][$key];
     $id_especie = $_POST['id_especie'][$key];
     $id_procedencia = $_POST['id_procedencia'][$key];
     $id_material = $_POST['id_material'][$key];
+
+    if($id_procedencia<1) $id_procedencia=NULL;
+    if($id_material<1) $id_material=NULL;
 
     if($cantidad>0){
 
@@ -65,10 +69,10 @@ if ( !empty($_POST)) {
         "cantidad"=>$cantidad,
       ];
 
-      $sql = "INSERT INTO pedidos_detalle (id_pedido, id_cultivo, id_especie, id_procedencia, id_material, cantidad_plantines) VALUES (?,?,?,?,?,?)";
+      $sql = "INSERT INTO pedidos_detalle (id_pedido, id_servicio, id_cultivo, id_especie, id_procedencia, id_material, cantidad_plantines) VALUES (?,?,?,?,?,?,?)";
       $q = $pdo->prepare($sql);
       //$q->execute(array($idVenta,$id_cultivo,$cantidad,$precio,$subtotal,$modalidad,$pagado));
-      $params=array($id_pedido,$id_cultivo,$id_especie,$id_procedencia,$id_material,$cantidad);
+      $params=array($id_pedido,$id_servicio,$id_cultivo,$id_especie,$id_procedencia,$id_material,$cantidad);
       $result = $q->execute($params);
       //var_dump($result);
       

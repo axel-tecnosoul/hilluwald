@@ -344,7 +344,7 @@ Database::disconnect();
 
           <!-- MODAL PARA NUEVO PEDIDO -->
           <div class="modal fade" id="nuevoPedido" role="dialog" data-backdrop="static" data-keyboard="false" tabindex="-1000000000000" aria-labelledby="myLargeModalLabel" aria-hidden="true">
-            <div class="modal-dialog modal-lg">
+            <div class="modal-dialog modal-lg" style="max-width: 1200px;">
               <div class="modal-content">
                 <div class="modal-header">
                   <h5 class="modal-title">Nuevo Pedido de <?=$data['razon_social'];?></h5>
@@ -398,83 +398,82 @@ Database::disconnect();
                       <div class="form-group col-10">
                         <textarea name="observaciones_pedido" id="observaciones_pedido" class="form-control"></textarea>
                       </div>
-                    </div>
+                    </div><?php
+                      $pdo = Database::connect();
+                      $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+                      $sqlZon = "SELECT id, servicio FROM servicios WHERE activo = 1";
+                      $q = $pdo->prepare($sqlZon);
+                      $q->execute();
+                      $aServicio=[];
+                      while ($fila = $q->fetch(PDO::FETCH_ASSOC)) {
+                        $aServicio[]=[
+                          "id"=>$fila['id'],
+                          "servicio"=>$fila['servicio'],
+                        ];
+                      }
+                      
+                      $sqlZon = "SELECT id, especie FROM especies WHERE activo = 1";
+                      $q = $pdo->prepare($sqlZon);
+                      $q->execute();
+                      $aEspecies=[];
+                      while ($fila = $q->fetch(PDO::FETCH_ASSOC)) {
+                        $aEspecies[]=[
+                          "id"=>$fila['id'],
+                          "especie"=>$fila['especie'],
+                        ];
+                      }
+
+                      $sqlZon = "SELECT id, procedencia FROM procedencias_especies WHERE activo = 1";
+                      $q = $pdo->prepare($sqlZon);
+                      $q->execute();
+                      $aProcedencias=[];
+                      while ($fila = $q->fetch(PDO::FETCH_ASSOC)) {
+                        $aProcedencias[]=[
+                          "id"=>$fila['id'],
+                          "procedencia"=>$fila['procedencia'],
+                        ];
+                      }
+
+                      $sqlZon = "SELECT id, material, id_procedencia, id_especie FROM cultivos WHERE activo = 1";
+                      $q = $pdo->prepare($sqlZon);
+                      $q->execute();
+                      $aMateriales=[];
+                      while ($fila = $q->fetch(PDO::FETCH_ASSOC)) {
+                        $aMateriales[]=[
+                          "id"=>$fila['id'],
+                          "material"=>$fila['material'],
+                          "id_procedencia"=>$fila['id_procedencia'],
+                          "id_especie"=>$fila['id_especie'],
+                        ];
+                      }
+
+                      Database::disconnect();?>
                     <div class="row">
                       <div class="col-sm-12">
-                        <!-- <table class="table table-striped table-bordered">
-                          <tr>
-                            <th>Especie</th>
-                            <th>Procedencia</th>
-                            <th>Material</th>
-                            <th>Cantidad</th>
-                          </tr><?php
-                          /*$pdo = Database::connect();
-                          $sql = " SELECT id, nombre FROM cultivos";
-                          foreach ($pdo->query($sql) as $row) {?>
-                            <tr>
-                              <td><?=$row["nombre"]?></td>
-                              <td>
-                                <input type="hidden" name="id_cultivo[]" value="<?=$row["id"]?>">
-                                <input type="number" name="cantidad[]" class="form-control cantidad" placeholder="Cantidad">
-                              </td>
-                            </tr><?php
-                          }
-                          Database::disconnect();*/?>
-                        </table> --><?php
-                          $pdo = Database::connect();
-                          $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-
-                          $sqlZon = "SELECT id, especie FROM especies WHERE activo = 1";
-                          $q = $pdo->prepare($sqlZon);
-                          $q->execute();
-
-                          $aEspecies=[];
-                          while ($fila = $q->fetch(PDO::FETCH_ASSOC)) {
-                            $aEspecies[]=[
-                              "id"=>$fila['id'],
-                              "especie"=>$fila['especie'],
-                            ];
-                          }
-
-                          $sqlZon = "SELECT id, procedencia FROM procedencias_especies WHERE activo = 1";
-                          $q = $pdo->prepare($sqlZon);
-                          $q->execute();
-
-                          $aProcedencias=[];
-                          while ($fila = $q->fetch(PDO::FETCH_ASSOC)) {
-                            $aProcedencias[]=[
-                              "id"=>$fila['id'],
-                              "procedencia"=>$fila['procedencia'],
-                            ];
-                          }
-
-                          $sqlZon = "SELECT id, material, id_procedencia, id_especie FROM cultivos WHERE activo = 1";
-                          $q = $pdo->prepare($sqlZon);
-                          $q->execute();
-
-                          $aMateriales=[];
-                          while ($fila = $q->fetch(PDO::FETCH_ASSOC)) {
-                            $aMateriales[]=[
-                              "id"=>$fila['id'],
-                              "material"=>$fila['material'],
-                              "id_procedencia"=>$fila['id_procedencia'],
-                              "id_especie"=>$fila['id_especie'],
-                            ];
-                          }
-
-                          Database::disconnect();?>
-                        <table class="table-detalle table table-bordered table-hover text-center" id="tableCultivos">
+                        <table class="table-detalle table table-bordered table-hover text-center" id="tableCultivos" style="table-layout: fixed;">
                           <thead>
                             <tr>
-                              <th>Especie</th>
-                              <th>Procedencia</th>
-                              <th>Material</th>
-                              <th>Cantidad</th>
-                              <th>Eliminar</th>
+                              <th style="width: 17%;">Servicio</th>
+                              <th style="width: 20%;">Especie</th>
+                              <th style="width: 20%;">Procedencia</th>
+                              <th style="width: 20%;">Material</th>
+                              <th style="width: 13%;">Cantidad</th>
+                              <th style="width: 10%;">Eliminar</th>
                             </tr>
                           </thead>
                           <tbody>
                             <tr id='addr0' data-id="0" style="display: none;">
+                              <td data-name="id_servicio" class="text-left">
+                                <select name="id_servicio[]" id="id_servicio-0" class="js-example-basic-single id_servicio" style="width: 100%;" data-required="1">
+                                  <option value="">Seleccione...</option><?php
+                                  foreach ($aServicio as $servicio) {
+                                    echo "<option value='".$servicio['id']."'";
+                                    echo ">".$servicio['servicio']."</option>";
+                                  }
+                                  Database::disconnect();?>
+                                </select>
+                              </td>
                               <td data-name="id_especie" class="text-left">
                                 <select name="id_especie[]" id="id_especie-0" class="js-example-basic-single id_especie" style="width: 100%;" data-required="1">
                                   <option value="">Seleccione...</option><?php
@@ -487,28 +486,16 @@ Database::disconnect();
                               </td>
                               <td data-name="id_procedencia" class="text-left">
                                 <select name="id_procedencia[]" id="id_procedencia-0" class="js-example-basic-single id_procedencia" style="width: 100%;" data-required="0" disabled>
-                                  <option value="">Seleccione...</option><?php
-                                  foreach ($aProcedencias as $procedencia) {
-                                    echo "<option value='".$procedencia['id']."'";
-                                    echo ">".$procedencia['procedencia']."</option>";
-                                  }
-                                  Database::disconnect();?>
+                                  <option value="">Seleccione una especie...</option>
                                 </select>
                               </td>
                               <td data-name="id_material" class="text-left">
                                 <select name="id_material[]" id="id_material-0" class="js-example-basic-single id_material" style="width: 100%;" data-required="0" disabled>
-                                  <option value="">Seleccione...</option><?php
-                                  foreach ($aMateriales as $material) {
-                                    echo "<option value='".$material['id']."'";
-                                    echo "data-id-especie='".$material['id_especie']."'";
-                                    echo "data-id-procedencia='".$material['id_procedencia']."'";
-                                    echo ">".$material['material']."</option>";
-                                  }
-                                  Database::disconnect();?>
+                                  <option value="">Seleccione una procedencia...</option>
                                 </select>
                               </td>
                               <td data-name="cantidad">
-                                <input type="number" name="cantidad[]" id="cantidad-0" class="form-control cantidad" placeholder="Cantidad" min="1" disabled>
+                                <input type="number" name="cantidad[]" id="cantidad-0" class="form-control cantidad" placeholder="Cantidad" min="1" data-required="1" disabled>
                               </td>
                               <td data-name="eliminar">
                                 <span name="eliminar[]" title="Eliminar" class="btn btn-sm row-remove text-center" onClick="eliminarFila(this);">
@@ -530,7 +517,7 @@ Database::disconnect();
                     </div>
                   </div>
                   <div class="modal-footer">
-                    <div class="col-sm-9 offset-sm-3">
+                    <div class="col-12 text-center">
                       <button class="btn btn-primary" type="submit">Crear</button>
                       <button type="button" class="btn btn-light" data-dismiss="modal">Cerrar</button>
                     </div>
@@ -541,9 +528,9 @@ Database::disconnect();
           </div>
           <!-- FIN MODAL PARA NUEVO PEDIDO -->
 
-          <!-- MODAL PARA NUEVO RETIRO -->
+          <!-- MODAL PARA NUEVO DESPACHO -->
           <div class="modal fade" id="nuevoDespacho" role="dialog" data-backdrop="static" data-keyboard="false" tabindex="-1000000000000" aria-labelledby="myLargeModalLabel" aria-hidden="true">
-            <div class="modal-dialog modal-lg">
+            <div class="modal-dialog modal-lg" style="max-width: 1200px;">
               <div class="modal-content">
                 <div class="modal-header">
                   <h5>Nuevo Despacho de <?=$data['razon_social'];?> Pedido N° <span class="idPedido"></span></h5>
@@ -629,7 +616,7 @@ Database::disconnect();
                     <div class="row">
                       <div class="form-group col-4">
                         <label>Lote</label>
-                        <select name="id_lote" id="id_lote" class="js-example-basic-single" required style="width: 100%;">
+                        <select name="id_lote" id="id_lote" class="js-example-basic-single" style="width: 100%;">
                           <option value="">- Seleccione -</option><?php
                           $pdo = Database::connect();
                           $sql = " SELECT l.id, nombre, direccion, localidad, provincia FROM lotes l INNER JOIN localidades l2 ON l.id_localidad=l2.id INNER JOIN provincias p ON l2.id_provincia=p.id WHERE l.id_cliente=".$id;
@@ -642,21 +629,57 @@ Database::disconnect();
                       </div>
                       <div class="form-group col-4">
                         <label for="id_plantador">Plantador</label>
-                        <select name="id_plantador" id="id_plantador" class="js-example-basic-single" required style="width: 100%;">
+                        <select name="id_plantador" id="id_plantador" class="js-example-basic-single" style="width: 100%;">
                           <option value="">- Seleccione -</option><?php
-                          /*$pdo = Database::connect();
-                          $sql = " SELECT id, nombre_apellido, id_transporte FROM plantadores";
+                          $pdo = Database::connect();
+                          $sql = " SELECT id, nombre FROM plantadores WHERE l.id_cliente=".$id;
                           foreach ($pdo->query($sql) as $row) {?>
-                            <option value="<?=$row["id"]?>" data-id-transporte="<?=$row["id_transporte"]?>"><?=$row["nombre_apellido"]?></option><?php
+                            <option value="<?=$row["id"]?>"><?=$row["nombre"]?></option><?php
                           }
-                          Database::disconnect();*/?>
+                          Database::disconnect();?>
                         </select>
                       </div>
                       <div class="form-group col-4">
                         <label for="id_vehiculo">Patente 2</label>
                         <input type="text" name="patente2" id="patente2" class="form-control" style="width: 100%;">
-                          
-                        </input>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="form-group col-4">
+                        <label for="id_provincia">Provincia</label>
+                        <select name="id_provincia" id="id_provincia" class="js-example-basic-single" style="width: 100%;">
+                          <option value="">- Seleccione -</option><?php
+                          $pdo = Database::connect();
+                          $sql = " SELECT id, provincia FROM provincias";
+                          foreach ($pdo->query($sql) as $row) {?>
+                            <option value="<?=$row["id"]?>"><?=$row["provincia"]?></option><?php
+                          }
+                          Database::disconnect();?>
+                        </select>
+                      </div>
+                      <div class="form-group col-4">
+                        <label for="id_localidad">Localidad</label>
+                        <select name="id_localidad" id="id_localidad" class="js-example-basic-single" style="width: 100%;">
+                          <option value="">- Seleccione -</option><?php
+                          $pdo = Database::connect();
+                          $sql = " SELECT id, localidad, id_provincia FROM localidades";
+                          foreach ($pdo->query($sql) as $row) {?>
+                            <option value="<?=$row["id"]?>" data-id-provincia="<?=$row["id_provincia"]?>"><?=$row["localidad"]?></option><?php
+                          }
+                          Database::disconnect();?>
+                        </select>
+                      </div>
+                      <div class="form-group col-4">
+                        <label for="id_vehiculo">Lugar de entrega</label>
+                        <input type="text" name="lugar_entrega" id="lugar_entrega" class="form-control" style="width: 100%;">
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="form-group col-2">
+                        <label for="observaciones_pedido" class="col-form-label">Observaciones:</label>
+                      </div>
+                      <div class="form-group col-10">
+                        <textarea name="observaciones_pedido" id="observaciones_pedido" class="form-control"></textarea>
                       </div>
                     </div>
                     <div class="row">
@@ -664,23 +687,14 @@ Database::disconnect();
                         <div class="form-group row">
                           <!-- <label class="col-sm-12 col-form-label">Cultivos</label> -->
                           <div class="col-sm-12">
-                            <table class="table table-striped table-bordered">
-                              <tr>
-                                <th align="center">Cultivo</th>
-                                <th align="center">Cantidad</th>
-                              </tr><?php
-                              /*$pdo = Database::connect();
-                              $sql = " SELECT id, nombre FROM cultivos";
-                              foreach ($pdo->query($sql) as $row) {?>
+                            <table class="table table-striped table-bordered" id="detallePedido">
+                              <thead>
                                 <tr>
-                                  <td><?=$row["nombre"]?></td>
-                                  <td>
-                                    <input type="hidden" name="id_cultivo[]" value="<?=$row["id"]?>">
-                                    <input type="number" name="cantidad[]" class="form-control cantidad" placeholder="Cantidad">
-                                  </td>
-                                </tr><?php
-                              }
-                              Database::disconnect();*/?>
+                                  <th align="center">Cultivo</th>
+                                  <th align="center">Cantidad</th>
+                                </tr>
+                              </thead>
+                              <tbody></tbody>
                             </table>
                             <div class="mensajeError" style="color: red; display: none;">Por favor, ingrese al menos una cantidad.</div>
                           </div>
@@ -689,7 +703,7 @@ Database::disconnect();
                     </div>
                   </div>
                   <div class="modal-footer">
-                    <div class="col-sm-9 offset-sm-3">
+                    <div class="col-12 text-center">
                       <button class="btn btn-primary" type="submit">Crear</button>
                       <button type="button" class="btn btn-light" data-dismiss="modal">Cerrar</button>
                     </div>
@@ -698,7 +712,7 @@ Database::disconnect();
               </div>
             </div>
           </div>
-          <!-- FIN MODAL PARA NUEVO RETIRO -->
+          <!-- FIN MODAL PARA NUEVO DESPACHO -->
 
           <!-- MODAL PARA NUEVO PAGO -->
           <div class="modal fade" id="nuevoPago" role="dialog" data-backdrop="static" data-keyboard="false" tabindex="-1000000000000" aria-labelledby="myLargeModalLabel" aria-hidden="true">
@@ -866,61 +880,168 @@ Database::disconnect();
         })
 
         $(document).on("change",".id_especie",function(){
+          let id_especie=this.value;
           let fila=$(this).parents("tr");
           
-          let id_procedencia=fila.find(".id_procedencia")
-          let id_material=fila.find(".id_material")
-          let cantidad=fila.find(".cantidad")
-          
-          console.log(fila);
           let disabled=true;
-          if(this.value>0){
+          if(id_especie>0){
             disabled=false;
           }
 
-          id_procedencia.attr("disabled",disabled)
-          //id_procedencia.val(3)
-          id_material.attr("disabled",disabled)
-          cantidad.attr("disabled",disabled)
-          //id_material.val(3)
-          getMateriales(this);
+          /*let select_material=fila.find(".id_material").attr("disabled",true);
+          select_material=select_material[0]
+          select_material.innerHTML="";
+          $option = document.createElement("option");
+          let optionText = document.createTextNode("Seleccione...");
+          $option.appendChild(optionText);
+          $option.setAttribute("value","");
+          select_material.appendChild($option);*/
+
+          fila.find(".cantidad").attr("disabled",disabled)
+
+          getProcedenciasDeEspecie(fila);
+          getMaterialesDeProcedencia(fila);
         })
 
         $(document).on("change",".id_procedencia",function(){
-          getMateriales(this);
+          let id_procedencia=this.value;
+          let fila=$(this).parents("tr");
+          
+          let disabled=true;
+          if(id_procedencia>0){
+            disabled=false;
+          }
+          
+          fila.find(".id_material").attr("disabled",disabled)
+          getMaterialesDeProcedencia(fila);
         })
 
-        function getMateriales(el){
-          
-          let fila=$(el).parents("tr");
-          console.log(fila);
-          let selectMaterial=fila.find(".id_material")
-          let selectProcedencia=fila.find(".id_procedencia")
-          let id_procedencia=selectProcedencia.val();
-          let selectEspecie=fila.find(".id_especie")
-          let id_especie=selectEspecie.val();
+        function getProcedenciasDeEspecie(fila){
+          let id_especie=fila.find(".id_especie").val()
+          let select_procedencia=fila.find(".id_procedencia")
+          select_procedencia=select_procedencia[0]
+          select_procedencia.innerHTML="";
+
           if(id_especie>0){
-            selectMaterial.attr("disabled",false)
-            selectMaterial.find("option").each(function(){
-              let disabled=true;
-              if(this.value=="" || this.dataset.idEspecie==id_especie){
-                if(id_procedencia>0){
-                  disabled=true;
-                  if(this.value=="" || this.dataset.idProcedencia==id_procedencia){
-                    disabled=false;
-                  }
-                }else{
-                  disabled=false;
-                }
+            select_procedencia.disabled=true;
+            $option = document.createElement("option");
+            let optionText = document.createTextNode("Buscando...");
+            $option.appendChild(optionText);
+            $option.setAttribute("value","");
+            //$option.setAttribute("data-horas", procedencias.horas_caducidad);
+            select_procedencia.appendChild($option);
+
+            let datosIniciales = new FormData();
+            datosIniciales.append('id_especie', id_especie);
+            $.ajax({
+              data: datosIniciales,
+              url: "getProcedenciasDeEspecie.php",
+              method: "post",
+              cache: false,
+              contentType: false,
+              processData: false,
+              success: function(respuesta){
+                //console.log(respuesta);
+                /*Convierto en json la respuesta del servidor*/
+                respuestaJson = JSON.parse(respuesta);
+                console.log(respuestaJson);
+
+                select_procedencia.disabled=false;
+
+                select_procedencia.innerHTML="";
+
+                $option = document.createElement("option");
+                let optionText = document.createTextNode("Seleccione...");
+                $option.appendChild(optionText);
+                $option.setAttribute("value","");
+                //$option.setAttribute("data-horas", procedencias.horas_caducidad);
+                select_procedencia.appendChild($option);
+
+                //Genero los options del select de prioridades
+                respuestaJson.forEach((procedencias)=>{
+                  $option = document.createElement("option");
+                  let optionText = document.createTextNode(procedencias.procedencia);
+                  $option.appendChild(optionText);
+                  $option.setAttribute("value", procedencias.id);
+                  //$option.setAttribute("data-horas", procedencias.horas_caducidad);
+                  select_procedencia.appendChild($option);
+                });
+
               }
-              $(this).attr("disabled",disabled);
-            })
-            
-            // Destruir y volver a aplicar Select2
-            selectMaterial.select2('destroy');
-            selectMaterial.select2();
+            });
           }else{
-            selectMaterial.attr("disabled",true)
+            select_procedencia.disabled=true;
+            $option = document.createElement("option");
+            let optionText = document.createTextNode("Seleccione una procedencia...");
+            $option.appendChild(optionText);
+            $option.setAttribute("value","");
+            //$option.setAttribute("data-horas", procedencias.horas_caducidad);
+            select_procedencia.appendChild($option);
+          }
+        }
+
+        function getMaterialesDeProcedencia(fila){
+          let id_especie=fila.find(".id_especie").val()
+          let id_procedencia=fila.find(".id_procedencia").val()
+          let select_material=fila.find(".id_material")
+          select_material=select_material[0]
+          select_material.innerHTML="";
+
+          if(id_procedencia>0){
+
+            select_material.disabled=false;
+            $option = document.createElement("option");
+            let optionText = document.createTextNode("Buscando...");
+            $option.appendChild(optionText);
+            $option.setAttribute("value","");
+            //$option.setAttribute("data-horas", procedencias.horas_caducidad);
+            select_material.appendChild($option);
+
+            let datosIniciales = new FormData();
+            datosIniciales.append('id_especie', id_especie);
+            datosIniciales.append('id_procedencia', id_procedencia);
+            $.ajax({
+              data: datosIniciales,
+              url: "getMaterialesDeProcedencia.php",
+              method: "post",
+              cache: false,
+              contentType: false,
+              processData: false,
+              success: function(respuesta){
+                //console.log(respuesta);
+                /*Convierto en json la respuesta del servidor*/
+                respuestaJson = JSON.parse(respuesta);
+                console.log(respuestaJson);
+
+                select_material.innerHTML="";
+
+                $option = document.createElement("option");
+                let optionText = document.createTextNode("Seleccione...");
+                $option.appendChild(optionText);
+                $option.setAttribute("value","");
+                //$option.setAttribute("data-horas", procedencias.horas_caducidad);
+                select_material.appendChild($option);
+
+                //Genero los options del select de prioridades
+                respuestaJson.forEach((materiales)=>{
+                  $option = document.createElement("option");
+                  let optionText = document.createTextNode(materiales.material);
+                  $option.appendChild(optionText);
+                  $option.setAttribute("value", materiales.id);
+                  //$option.setAttribute("data-horas", materiales.horas_caducidad);
+                  select_material.appendChild($option);
+                });
+
+              }
+            });
+          }else{
+            select_material.disabled=true;
+            $option = document.createElement("option");
+            let optionText = document.createTextNode("Seleccione una procedencia...");
+            $option.appendChild(optionText);
+            $option.setAttribute("value","");
+            //$option.setAttribute("data-horas", procedencias.horas_caducidad);
+            select_material.appendChild($option);
           }
         }
 
@@ -988,6 +1109,13 @@ Database::disconnect();
           $(tr).appendTo($('#tableCultivos'));// add the new row
           if(newid>0){
             //primero.focus();
+            let sel5=$("#id_servicio-"+newid)
+            sel5.select2();//llamamos para inicializar select2
+            //lo destruimos para que elimine las clases que arrastra de la clonacion y volvemos a inicializar
+            sel5.select2('destroy');
+            sel5.select2();
+            sel5.css('width', '100%');
+
             let sel2=$("#id_especie-"+newid)
             sel2.select2();//llamamos para inicializar select2
             //lo destruimos para que elimine las clases que arrastra de la clonacion y volvemos a inicializar
@@ -1060,10 +1188,14 @@ Database::disconnect();
         }
 
         $(document).on("click",".btnNuevoDespacho",function(){
+          let id_pedido=this.dataset.idPedido;
           let modal=$("#nuevoDespacho")
           modal.modal("show")
-          modal.find("span.idPedido").html(this.dataset.idPedido)
+          modal.find("span.idPedido").html(id_pedido)
+
+          getDetallePedido(id_pedido)
         })
+
         $(document).on("click",".btnNuevoPago",function(){
           let modal=$("#nuevoPago")
           modal.modal("show")
@@ -1079,6 +1211,50 @@ Database::disconnect();
           modal.modal("show")
           modal.find("span.idPedido").html(this.dataset.idPedido)
         })
+
+        function getDetallePedido(id_pedido){
+          let table=$('#detallePedido')
+          table.DataTable().destroy();
+          table.DataTable({
+            //dom: 'rtip',
+            //serverSide: true,
+            processing: true,
+            ajax:{url:'ajaxGetDetallePedidoNuevoDespacho.php?id_pedido='+id_pedido,dataSrc:""},
+            stateSave: true,
+            responsive: true,
+
+            dom: 'rtip',
+            ordering: false,
+            paginate: false,
+            //scrollY: '100vh',
+            scrollCollapse: true,
+
+            language: {
+              "decimal": "",
+              "emptyTable": "No hay información",
+              "info": "Mostrando _START_ a _END_ de _TOTAL_ Registros",
+              "infoEmpty": "Mostrando 0 to 0 of 0 Registros",
+              "infoFiltered": "(Filtrado de _MAX_ total registros)",
+              "infoPostFix": "",
+              "thousands": ",",
+              "lengthMenu": "Mostrar _MENU_ Registros",
+              "loadingRecords": "Cargando...",
+              "processing": "Procesando...",
+              "search": "Buscar:",
+              "zeroRecords": "No hay resultados",
+              "paginate": {
+                  "first": "Primero",
+                  "last": "Ultimo",
+                  "next": "Siguiente",
+                  "previous": "Anterior"
+              }
+            },
+            "columns":[
+              {"data": "fecha"},
+              {"data": "campana"},
+            ],
+          })
+        }
 
         $(".nav_id_cultivo").on("click",function(){
           let id_cultivo=this.dataset.id_cultivo
