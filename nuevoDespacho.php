@@ -24,13 +24,16 @@ if ( !empty($_POST)) {
     var_dump($_GET);
   }
 
+  if($_POST['id_lote']=="") $_POST['id_lote']=NULL;
+  if($_POST['id_plantador']=="") $_POST['id_plantador']=NULL;
+
   //$id_cliente=($_POST['id_cliente']) ?: NULL;
 
-  $sql = "INSERT INTO remitos (fecha, id_cliente, id_cliente_retira, campana, id_transporte, id_chofer, id_vehiculo, id_usuario) VALUES (?,?,?,?,?,?,?,?)";
+  $sql = "INSERT INTO despachos (fecha, id_cliente, id_pedido, id_cliente_retira, campana, id_transporte, id_chofer, id_vehiculo, patente2, id_lote, id_plantador, id_localidad, lugar_entrega, observaciones, id_usuario) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
   $q = $pdo->prepare($sql);
-  $params=array($_POST['fecha_despacho'],$_GET['id_cliente'],$_POST['id_cliente_retira'],$_POST['campana_despacho'],$_POST['id_transporte'],$_POST['id_chofer'],$_POST['id_vehiculo'],$_SESSION['user']['id']);
+  $params=array($_POST['fecha_despacho'],$_GET['id_cliente'],$_POST['id_pedido_despacho'],$_POST['id_cliente_retira'],$_POST['campana_despacho'],$_POST['id_transporte'],$_POST['id_chofer'],$_POST['id_vehiculo'],$_POST['patente2'],$_POST['id_lote'],$_POST['id_plantador'],$_POST['id_localidad'],$_POST['lugar_entrega'],$_POST['observaciones_despacho'],$_SESSION['user']['id']);
   $q->execute($params);
-  $id_remito = $pdo->lastInsertId();
+  $id_despacho = $pdo->lastInsertId();
 
   $aDebug[]=[
     "consulta"=>$sql,
@@ -49,20 +52,28 @@ if ( !empty($_POST)) {
   $aProductos=[];
 
   $cantProdOK=0;
-  foreach ($_POST['id_cultivo'] as $key => $id_cultivo) {
-    $cantidad = $_POST['cantidad'][$key];
+  foreach ($_POST['id_servicio'] as $key => $id_servicio) {
+    $cantidad_despachar = $_POST['cantidad_despachar'][$key];
 
-    if($cantidad>0){
+    if($cantidad_despachar>0){
+
+      $id_servicio = $_POST['id_servicio'][$key];
+      $id_especie = $_POST['id_especie'][$key];
+      $id_procedencia = $_POST['id_procedencia'][$key];
+      $id_material = $_POST['id_material'][$key];
 
       $aProductos[]=[
-        "id_cultivo"=>$id_cultivo,
-        "cantidad"=>$cantidad,
+        "id_servicio"=>$id_servicio,
+        "id_especie"=>$id_especie,
+        "id_procedencia"=>$id_procedencia,
+        "id_material"=>$id_material,
+        "cantidad_despachar"=>$cantidad_despachar,
       ];
 
-      $sql = "INSERT INTO remitos_detalle (id_remito, id_cultivo, cantidad_plantines) VALUES (?,?,?)";
+      $sql = "INSERT INTO despachos_detalle (id_despacho, id_servicio, id_especie, id_procedencia, id_material, cantidad_plantines) VALUES (?,?,?,?,?,?)";
       $q = $pdo->prepare($sql);
-      //$q->execute(array($idVenta,$id_cultivo,$cantidad,$precio,$subtotal,$modalidad,$pagado));
-      $params=array($id_remito,$id_cultivo,$cantidad);
+      //$q->execute(array($idVenta,$id_servicio,$cantidad_despachar,$precio,$subtotal,$modalidad,$pagado));
+      $params=array($id_despacho,$id_servicio,$id_especie,$id_procedencia,$id_material,$cantidad_despachar);
       $q->execute($params);
       $afe=$q->rowCount();
 
