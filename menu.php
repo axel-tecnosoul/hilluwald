@@ -9,6 +9,7 @@
     $id_perfil=$_SESSION['user']['id_perfil'];?>
 		
     <li><a class="sidebar-header" href="listarPedidos.php"><i data-feather="file"></i><span>Pedidos</span><i class="fa fa-angle-right pull-right"></i></a></li>
+    <li><a class="sidebar-header" href="listarDespachos.php"><i data-feather="file"></i><span>Despachos</span><i class="fa fa-angle-right pull-right"></i></a></li>
 
     <li><a class="sidebar-header" href="listarClientes.php"><i data-feather="user"></i><span>Clientes</span><i class="fa fa-angle-right pull-right"></i></a></li>
 
@@ -19,6 +20,7 @@
           <li><a href="listarSucursales.php"><i class="fa fa-circle"></i>Sucursales</a></li>
           <li><a href="listarContenedores.php"><i class="fa fa-circle"></i>Contenedores</a></li>
           <li><a href="listarTiposContenedores.php"><i class="fa fa-circle"></i>Tipo de Contenedores</a></li>
+          <li><a href="listarServicios.php"><i class="fa fa-circle"></i>Servicios</a></li>
           <li><a href="listarCultivos.php"><i class="fa fa-circle"></i>Cultivos</a></li>
           <li><a href="listarTransportes.php"><i class="fa fa-circle"></i>Transportes</a></li>
           <li><a href="listarProcedenciasEspecies.php"><i class="fa fa-circle"></i>Procedencias de Especies</a></li>
