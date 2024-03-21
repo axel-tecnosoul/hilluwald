@@ -20,7 +20,7 @@ if ( null==$id ) {
 
 $pdo = Database::connect();
 $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-$sql = '"SELECT d.id,date_format(d.fecha,"%d/%m/%Y"), c.razon_social, d.id_pedido, d.id_cliente_retira,d.campana,d.id_transporte, ch.nombre_apellido,ve.descripcion, d.patente2, lo.nombre, d.id_plantador, l.localidad, d.id_usuario, d.fecha_hora_alta FROM despachos d INNER JOIN despachos_detalle dd ON dd.id_despacho= d.id LEFT JOIN clientes c ON c.id = d.id_cliente INNER JOIN especies es ON dd.id_cultivo=es.id INNER JOIN transportes t ON d.id_transporte=t.id INNER JOIN choferes ch ON d.id_chofer=ch.id LEFT JOIN lotes lo ON d.id_lote = lo.id INNER JOIN localidades l ON d.id_localidad = l.id  INNER JOIN vehiculos ve ON d.id_vehiculo=ve.id INNER JOIN cultivos cu ON dd.id_cultivo=cu.id INNER JOIN especies e ON dd.id_especie=e.id INNER JOIN procedencias_especies pr ON dd.id_procedencia=pr.id WHERE id = ?"';
+$sql = "SELECT d.id,date_format(d.fecha,'%d/%m/%Y') as fecha, c.razon_social, d.id_pedido, d.id_cliente_retira,d.campana,d.id_transporte, ch.nombre_apellido,ve.descripcion,ve.patente, ve.patente2, lo.nombre, d.id_plantador, t.razon_social as transporte, l.localidad, p.provincia, d.id_usuario, d.fecha_hora_alta FROM despachos d INNER JOIN despachos_detalle dd ON dd.id_despacho= d.id LEFT JOIN clientes c ON c.id = d.id_cliente INNER JOIN especies es ON dd.id_cultivo=es.id INNER JOIN transportes t ON d.id_transporte=t.id INNER JOIN choferes ch ON d.id_chofer=ch.id LEFT JOIN lotes lo ON d.id_lote = lo.id INNER JOIN localidades l ON d.id_localidad = l.id INNER JOIN provincias p on l.id_provincia = p.id INNER JOIN vehiculos ve ON d.id_vehiculo=ve.id INNER JOIN cultivos cu ON dd.id_cultivo=cu.id INNER JOIN especies e ON dd.id_especie=e.id INNER JOIN procedencias_especies pr ON dd.id_procedencia=pr.id WHERE d.id = ?";
 $q = $pdo->prepare($sql);
 $q->execute(array($id));
 $data = $q->fetch(PDO::FETCH_ASSOC);
@@ -75,20 +75,13 @@ Database::disconnect();?>
                   $style="";
                   $texto="";
                   $link_volver="listarDespachos";
-                  if($data['anulada']==1){
-                    $style="background-color: rgb(255 0 0 / 50%);";
-                    $texto="Anulada";
-                    $link_volver="listardespachosAnuladas";
-                  }?>
-                  <div class="card-header" style="<?=$style?>">
-                    <h5>Ver despacho <?=$texto;
-                      if($data['anulada']==0){?>
-                        <a class="btn btn-sm btn-primary" href="remito.php?id=<?= $id;?>" target="_blank"><i class="fa fa-print fa-lg" aria-hidden="true"></i> Remito</a><?php
-                        if($data['facturacion']!="Sin factura"){?>
-                          <a class="btn btn-sm btn-warning" data-toggle="modal" data-target="#modalGenerarNC"><i class="fa fa-minus-circle fa-lg" aria-hidden="true"></i> Nota de Crédito</a><?php
-                        }
-                      }?>
-                    </h5>
+                  // if($data['anulada']==1){
+                  //   $style="background-color: rgb(255 0 0 / 50%);";
+                  //   $texto="Anulada";
+                  //   $link_volver="listardespachosAnuladas";
+                  // }?>
+                  <div class="card-header">
+                    <h5>Ver despacho</h5>
                   </div>
 				          <form class="form theme-form" role="form" method="post" action="#">
                     <div class="card-body">
@@ -96,134 +89,66 @@ Database::disconnect();?>
                         <div class="col">
                           <div class="form-group row">
                             <label class="col-sm-3 col-form-label">Fecha</label>
-                            <div class="col-sm-9"><?=$data['fecha_despacho']; ?></div>
+                            <div class="col-sm-9"><input name="fecha" type="text" axlength="99" class="form-control" value="<?=$data['fecha'];?>" disabled></div>
                           </div>
                           <div class="form-group row">
                             <label class="col-sm-3 col-form-label">Cliente</label>
-                            <div class="col-sm-9"><?=$data['razon_social']; ?></div>
+                            <div class="col-sm-9"><input name="fecha" type="text" axlength="99" class="form-control" value="<?=$data['razon_social'];?>"disabled></div>
                           </div>
                           <div class="form-group row">
-                            <label class="col-sm-3 col-form-label">Facturacion</label>
-                            <div class="col-sm-9"><?=$data['facturacion']; ?></div>
+                            <label class="col-sm-3 col-form-label">Transporte</label>
+                            <div class="col-sm-9"><input name="fecha" type="text" axlength="99" class="form-control" value="<?=$data['transporte'];?>"disabled></div>
+                          </div>
+                          
+                          <div class="form-group row">
+                            <label class="col-sm-3 col-form-label">Chofer</label>
+                            <div class="col-sm-9"><input name="fecha" type="text" axlength="99" class="form-control" value="<?=$data['nombre_apellido'];?>"disabled></div>
                           </div>
                           <div class="form-group row">
-                            <label class="col-sm-3 col-form-label">Productos</label>
-                          <!-- </div>
-                          <div class="form-group row"> -->
-                            <div class="col-sm-9">
+                            <label class="col-sm-3 col-form-label">Vehiculo</label><div class="col-sm-9"><input name="fecha" type="text" axlength="99" class="form-control" value="<?=$data['descripcion'] . " - " . $data['patente'];?>"disabled></div>
+                          </div>
+                          <div class="form-group row">
+                            <label class="col-sm-3 col-form-label">Patente2</label>
+                            <div class="col-sm-9"><input name="fecha" type="text" axlength="99" class="form-control" value="<?=($data['patente2'] == "") ? "Sin Patente" : $data['patente2']; ?>"disabled></div>
+                          </div>
+                          <div class="form-group row">
+                            <label class="col-sm-3 col-form-label">Localidad</label>
+                            <div class="col-sm-9"><input name="fecha" type="text" axlength="99" class="form-control" value="<?=$data['localidad'] . " - ". $data['provincia'];?>"disabled></div>
+                          </div>
+                          <div class="form-group row ">
+                            <div class="col-sm-9 ">
                               <table class="table display">
                                 <thead>
                                   <tr>
-                                    <th>Descripcion</th>
-                                    <th>Precio</th>
+                                    <th>Servicio</th>
+                                    <th>Especie</th>
+                                    <th>Procedencia</th>
+                                    <th>Material</th>
                                     <th>Cantidad</th>
-                                    <th>Subtotal</th>
                                   </tr>
                                 </thead>
                                 <tbody><?php
                                   $pdo = Database::connect();
-                                  $sql = " SELECT p.descripcion, vd.precio, vd.cantidad, vd.subtotal FROM despachos_detalle vd INNER JOIN despachos v ON v.id = vd.id_despacho INNER JOIN productos p ON p.id = vd.id_producto WHERE vd.id_despacho = ".$id;
+                                  $sql = " SELECT cu.material, se.servicio, es.especie, cu.material, pr.procedencia, dd.cantidad_plantines FROM despachos_detalle dd INNER JOIN despachos v ON v.id = dd.id_despacho INNER JOIN cultivos cu ON dd.id_material = cu.id INNER JOIN servicios se ON dd.id_servicio = se.id INNER JOIN especies es ON dd.id_especie = es.id INNER JOIN procedencias_especies pr ON dd.id_procedencia = pr.id WHERE dd.id_despacho = ".$id;
+                                  $cantidad_plantines = 0;
                                   //var_dump($sql);
                                   
                                   foreach ($pdo->query($sql) as $row) {
+                                    $cantidad_plantines += $row['cantidad_plantines'];
                                     echo '<tr>';
-                                    echo '<td>'. $row["descripcion"] . '</td>';
-                                    echo '<td style="text-align:right">$'. number_format($row["precio"],2) . '</td>';
-                                    echo '<td style="text-align:center">'. $row["cantidad"] . '</td>';
-                                    echo '<td style="text-align:right">$'. number_format($row["subtotal"],2) . '</td>';
+                                    echo '<td>'. $row["servicio"] . '</td>';
+                                    echo '<td>'. $row["especie"] . '</td>';
+                                    echo '<td>'. $row["procedencia"] . '</td>';
+                                    echo '<td>'. $row["material"] . '</td>';
+                                    echo '<td>'. $row["cantidad_plantines"] . '</td>';
                                     echo '</tr>';
                                   }
                                   Database::disconnect();?>
                                 </tbody>
                                 <tfoot>
                                   <tr>
-                                    <th style="text-align:right" colspan="3">Total</th>
-                                    <th style="text-align:right">$<?=number_format($data['total'],2); ?></th>
-                                  </tr>
-                                </tfoot>
-                              </table>
-                            </div>
-                          </div>
-                          <div class="form-group row">
-                            <label class="col-sm-3 col-form-label">Modalidad de pago</label>
-                            <div class="col-sm-9"><?=$data['modalidad_pago']?></div>
-                          </div>
-                          <div class="form-group row">
-                            <label class="col-sm-3 col-form-label">Observaciones</label>
-                            <div class="col-sm-9"><?=$data['observaciones']; ?></div>
-                          </div>
-                          <div class="form-group row">
-                            <label class="col-sm-3 col-form-label">Facturas</label>
-                          </div>
-                          <div class="form-group row">
-                            <div class="col-sm-12">
-                              <table class="table display">
-                                <thead>
-                                  <tr style='text-align:center'>
-                                    <th>Tipo Cbte.</th>
-                                    <th>Nro Cbte.</th>
-                                    <!-- <th>Estado</th> -->
-                                    <th>Bruto</th>
-                                    <th>Iva</th>
-                                    <th>Neto</th>
-                                    <!-- <th>CAE</th>
-                                    <th>Fecha vto. CAE</th> -->
-                                    <th>Cbte. Relacionado</th>
-                                    <th>Acciones</th>
-                                  </tr>
-                                </thead>
-                                <tbody><?php
-                                  $pdo = Database::connect();
-                                  $sql = "SELECT f.id AS id_factura,f.tipo_comprobante,f.total_bruto,f.total_neto,f.total_iva,f.estado,f.punto_despacho,f.numero_cbte,f.cae,date_format(f.fecha_vto_cae,'%d/%m/%Y') AS fecha_vencimiento_cae,f.id_cbte_relacionado FROM facturas f WHERE f.id_despacho = $id ";
-                                  //echo $sql;
-                                  $sumaTotal=0;
-                                  foreach ($pdo->query($sql) as $row) {
-                                    $estado=get_estado_comprobante($row['estado']);
-                                    $cbte=format_numero_comprobante($row['punto_despacho'],$row['numero_cbte']);
-                                    $tipo_cbte=get_nombre_comprobante($row["tipo_comprobante"]);
-                                    $class="";
-                                    if($row['estado']=="A"){
-                                      $class="badge badge-success";
-                                    }
-                                    if($row['estado']=="R" or $row['estado']=="E"){
-                                      $class="badge badge-danger";
-                                    }
-                                    if(in_array($row["tipo_comprobante"],["A","B"])){
-                                      $sumaTotal+=$row["total_bruto"];
-                                    }else{
-                                      $sumaTotal-=$row["total_bruto"];
-                                    }
-                                    echo "<tr>";
-                                    echo "<td><span class='$class'>$tipo_cbte</span></td>";
-                                    echo "<td>$cbte</td>";
-                                    //echo "<td>$cbte</td>";
-                                    //echo "<td>$cbte</td>";
-                                    //echo "<td><span class='$class'>$estado</span></td>";
-                                    echo "<td style='text-align:right'>$".number_format($row["total_bruto"],2) ."</td>";
-                                    echo "<td style='text-align:right'>$".number_format($row["total_iva"],2) ."</td>";
-                                    echo "<td style='text-align:right'>$".number_format($row["total_neto"],2) ."</td>";
-                                    /*echo "<td>".$row["cae"]."</td>";
-                                    echo "<td>".$row["fecha_vencimiento_cae"]."</td>";*/
-                                    echo "<td>";
-                                    if(!is_null($row["id_cbte_relacionado"])){?>
-                                      <a href="verdespacho.php?id=<?=$row["id_cbte_relacionado"]?>" target="_blank" title="Ver Comprobante relacionado">
-                                        <img src="img/eye.png" width="24" height="15" border="0" alt="Ver despacho">
-                                        <?=$row['id_cbte_relacionado']?>
-                                      </a><?php
-                                    }
-                                    echo "</td>";
-                                    echo "<td style='text-align:center'>";?>
-                                      <a href="factura.php?id=<?= $row["id_factura"]?>" target="_blank"><img src="img/print.png" width="30" height="25" border="0" alt="Imprimir comprobante" title="Imprimir comprobante"></a><?php
-                                    echo "</td>";
-                                    echo "</tr>";
-                                  }
-                                  Database::disconnect();?>
-                                </tbody>
-                                <tfoot>
-                                  <tr>
-                                    <th colspan="2"></th>
-                                    <th style="text-align:right">$<?=number_format($sumaTotal,2)?></th>
-                                    <th colspan="3"></th>
+                                    <th style="text-align:right" colspan="4">Total</th>
+                                    <th style="text-align:right"><?=$cantidad_plantines; ?></th>
                                   </tr>
                                 </tfoot>
                               </table>
@@ -289,7 +214,7 @@ Database::disconnect();?>
           <!-- Container-fluid Ends-->
         </div>
         <!-- footer start-->
-		<?php include("footer.php"); ?>
+		    <?php include("footer.php"); ?>
       </div>
     </div>
     <!-- latest jquery-->
