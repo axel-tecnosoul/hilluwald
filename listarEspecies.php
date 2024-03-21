@@ -95,7 +95,7 @@ if(empty($_SESSION['user']))
                               <td>
                                 <a href="modificarEspecie.php?id=<?=$row["id"]?>"><img src="img/icon_modificar.png" width="24" height="25" border="0" alt="Modificar" title="Modificar"></a>
                                 &nbsp;&nbsp;
-                                <a href="#" data-toggle="modal" data-target="#eliminarModal_<?=$row["id"]?>"><img src="img/icon_baja.png" width="24" height="25" border="0" alt="Eliminar" title="Eliminar"></a>
+                                <a href="#" data-toggle="modal" onclick="openModalEliminar('<?=$row["id"]; ?>')"><img src="img/icon_baja.png" width="24" height="25" border="0" alt="Eliminar" title="Eliminar"></a>
                                 &nbsp;&nbsp;
                               </td>
                             </tr><?php

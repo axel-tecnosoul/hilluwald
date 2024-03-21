@@ -24,9 +24,9 @@
 		$pdo = Database::connect();
 		$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 		
-		$sql = "UPDATE provincias set provincia = ? where id = ?";
+		$sql = "UPDATE provincias set provincia = ?, id_pais = ? where id = ?";
 		$q = $pdo->prepare($sql);
-		$q->execute(array($_POST['provincia'],$_GET['id']));
+		$q->execute(array($_POST['provincia'], $_POST['id_pais'],$_GET['id']));
 		
 		Database::disconnect();
 		
@@ -36,7 +36,7 @@
 		
 		$pdo = Database::connect();
 		$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-		$sql = "SELECT id, provincia FROM provincias WHERE id = ? ";
+		$sql = "SELECT id, provincia, id_pais FROM provincias WHERE id = ? ";
 		$q = $pdo->prepare($sql);
 		$q->execute(array($id));
 		$data = $q->fetch(PDO::FETCH_ASSOC);
@@ -102,6 +102,27 @@
                           <div class="form-group row">
                             <label class="col-sm-3 col-form-label">Provincia</label>
                             <div class="col-sm-9"><input name="provincia" type="text" maxlength="99" class="form-control" value="<?php echo $data['provincia']; ?>" required="required"></div>
+                          </div>
+                          <div class="form-group row">
+                            <label class="col-sm-3 col-form-label">Paises</label>
+                            <div class="col-sm-9">
+                              <select name="id_pais" id="id_pais" class="js-example-basic-single col-sm-12 form-control" required="required">
+                                <option value="">Seleccione...</option><?php
+                                $pdo = Database::connect();
+                                $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+                                $sqlZon = "SELECT id, pais FROM paises WHERE 1";
+                                $q = $pdo->prepare($sqlZon);
+                                $q->execute();
+                                while ($fila = $q->fetch(PDO::FETCH_ASSOC)) {
+                                  echo "<option value='".$fila['id']."'";
+                                  if($data["id_pais"]==$fila['id']){
+                                    echo " selected";
+                                  }
+                                  echo ">".$fila['pais']."</option>";
+                                }
+                                Database::disconnect();?>
+                              </select>
+                            </div>
                           </div>
                         </div>
                       </div>

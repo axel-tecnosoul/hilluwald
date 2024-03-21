@@ -1,15 +1,13 @@
 <?php 
 session_start(); 
-if(empty($_SESSION['user']))
-{
+if(empty($_SESSION['user'])){
 	header("Location: index.php");
 	die("Redirecting to index.php"); 
-}
-?>
+}?>
 <!DOCTYPE html>
 <html lang="en">
   <head>
-	<?php include('head_tables.php');?>
+	  <?php include('head_tables.php');?>
   </head>
   <body class="light-only">
     <!-- page-wrapper Start-->
@@ -34,7 +32,7 @@ if(empty($_SESSION['user']))
                     <h3><?php include("title.php"); ?></h3>
                     <ol class="breadcrumb">
                       <li class="breadcrumb-item"><a href="#"><i data-feather="home"></i></a></li>
-                      <li class="breadcrumb-item">Provincias</li>
+                      <li class="breadcrumb-item">Servicios</li>
                     </ol>
                   </div>
                 </div>
@@ -57,7 +55,7 @@ if(empty($_SESSION['user']))
               <div class="col-sm-12">
                 <div class="card">
                   <div class="card-header">
-                    <h5>provincias&nbsp;<a href="nuevoprovincia.php"><img src="img/icon_alta.png" width="24" height="25" border="0" alt="Nuevo" title="Nuevo"></a></h5><span>
+                    <h5>Servicios&nbsp;<a href="nuevoServicio.php"><img src="img/icon_alta.png" width="24" height="25" border="0" alt="Nuevo" title="Nuevo"></a></h5><span>
                   </div>
                   <div class="card-body">
                     <div class="dt-ext table-responsive">
@@ -65,8 +63,8 @@ if(empty($_SESSION['user']))
                         <thead>
                           <tr>
                             <th>ID</th>
-                            <th>Provincia</th>
-                            <th>Pais</th>
+                            <th>Servicio</th>
+                            <th>Activo</th>
                             <th>Opciones</th>
                           </tr>
                         </thead>
@@ -74,15 +72,19 @@ if(empty($_SESSION['user']))
                           <?php 
                             include 'database.php';
                             $pdo = Database::connect();
-                            $sql = " SELECT p.id, p.provincia, pi.pais FROM provincias p LEFT JOIN paises pi on p.id_pais = pi.id WHERE 1 ";
+                            $sql = " SELECT id, servicio, activo FROM servicios WHERE 1 ";
                             
                             foreach ($pdo->query($sql) as $row) {
                               echo '<tr>';
                               echo '<td>'. $row["id"] . '</td>';
-                              echo '<td>'. $row["provincia"] . '</td>';
-                              echo '<td>'. $row["pais"] . '</td>';
+                              echo '<td>'. $row["servicio"] . '</td>';
+                              if ($row["activo"] == 1) {
+                                echo '<td>Si</td>';
+                              } else {
+                                echo '<td>No</td>';
+                              }
                               echo '<td>';
-                              echo '<a href="modificarProvincia.php?id='.$row["id"].'"><img src="img/icon_modificar.png" width="24" height="25" border="0" alt="Modificar" title="Modificar"></a>';
+                              echo '<a href="modificarServicio.php?id='.$row["id"].'"><img src="img/icon_modificar.png" width="24" height="25" border="0" alt="Modificar" title="Modificar"></a>';
                               echo '&nbsp;&nbsp;';
                               echo '<a href="#" title="Eliminar" onclick="openModalEliminar('.$row["id"].')"><img src="img/icon_baja.png" width="24" height="25" border="0" alt="Eliminar"></a>';
                               echo '&nbsp;&nbsp;';
@@ -115,7 +117,7 @@ if(empty($_SESSION['user']))
             <h5 class="modal-title" id="exampleModalLabel">Confirmación</h5>
             <button class="close" type="button" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
           </div>
-          <div class="modal-body">¿Está seguro que desea eliminar la Provincia?</div>
+          <div class="modal-body">¿Está seguro que desea eliminar el Servicio?</div>
           <div class="modal-footer">
             <a id="btnEliminar" class="btn btn-primary">Eliminar</a>
             <button class="btn btn-light" type="button" data-dismiss="modal" aria-label="Close">Volver</button>
@@ -188,9 +190,9 @@ if(empty($_SESSION['user']))
 			});
 		});
 
-    function openModalEliminar(idProvincia){
+    function openModalEliminar(idServicio){
       $('#eliminarModal').modal("show");
-      document.getElementById("btnEliminar").href="eliminarProvincia.php?id="+idProvincia;
+      document.getElementById("btnEliminar").href="eliminarServicio.php?id="+idServicio;
     }
 		
 		</script>
