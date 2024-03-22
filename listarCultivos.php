@@ -77,20 +77,20 @@ if(empty($_SESSION['user']))
                           $pdo = Database::connect();
                           $sql = "SELECT c.id,c.material,p.procedencia,e.especie,c.nombre_corto FROM cultivos c INNER JOIN procedencias_especies p ON c.id_procedencia=p.id INNER JOIN especies e ON c.id_especie=e.id WHERE 1 ";
                           
-                          foreach ($pdo->query($sql) as $row) {?>
-                            <tr>
-                              <td><?=$row['id']?></td>
-                              <td><?=$row['material']?></td>
-                              <td><?=$row['procedencia']?></td>
-                              <td><?=$row['especie']?></td>
-                              <td><?=$row['nombre_corto']?></td>
-                              <td>
-                                <a href="modificarCultivo.php?id=<?=$row["id"]?>"><img src="img/icon_modificar.png" width="24" height="25" border="0" alt="Modificar" title="Modificar"></a>
-                                &nbsp;&nbsp;
-                                <a href="#" data-toggle="modal" data-target="#eliminarModal_<?=$row["id"]?>"><img src="img/icon_baja.png" width="24" height="25" border="0" alt="Eliminar" title="Eliminar"></a>
-                                &nbsp;&nbsp;
-                              </td>
-                            </tr><?php
+                          foreach ($pdo->query($sql) as $row) {
+                            echo '<tr>';
+                            echo  '<td>' .$row['id'].'</td>';
+                            echo  '<td>' .$row['material'].'</td>';
+                            echo  '<td>' .$row['procedencia'].'</td>';
+                            echo  '<td>' .$row['especie'].'</td>';
+                            echo  '<td>' .$row['nombre_corto'].'</td>';
+                            echo '<td>';
+                            echo '<a href="modificarCultivo.php?id='.$row["id"].'"><img src="img/icon_modificar.png" width="24" height="25" border="0" alt="Modificar" title="Modificar"></a>';
+                            echo '&nbsp;&nbsp;';
+                            echo '<a href="#" data-toggle="modal" onclick="openModalEliminar('. $row["id"] .')"><img src="img/icon_baja.png" width="24" height="25" border="0" alt="Eliminar" title="Eliminar"></a>';
+                            echo '&nbsp;&nbsp';
+                            echo '</td>';
+                            echo '</tr>';
                           }
                           Database::disconnect();?>
                         </tbody>
@@ -118,8 +118,8 @@ if(empty($_SESSION['user']))
         </div>
         <div class="modal-body">¿Está seguro que desea eliminar la Cultivo?</div>
         <div class="modal-footer">
-        <a href="btnEliminar" class="btn btn-primary">Eliminar</a>
-        <button class="btn btn-light" type="button" data-dismiss="modal" aria-label="Close">Volver</button>
+          <a id="btnEliminar" class="btn btn-primary">Eliminar</a>
+          <button class="btn btn-light" type="button" data-dismiss="modal" aria-label="Close">Volver</button>
         </div>
       </div>
       </div>

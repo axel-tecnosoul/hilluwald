@@ -9,19 +9,19 @@
 	require 'database.php';
 	
 	if ( !empty($_POST)) {
-		// var_dump($_POST);
-    // die;
+		//var_dump($_POST);
+    //die;
 		// insert data
 		$pdo = Database::connect();
 		$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 		
-		$sql = "INSERT INTO provincias(provincia, id_pais) VALUES (?,?)";
+		$sql = "INSERT INTO servicios(servicio, activo, id_usuario) VALUES (?,1,?)";
 		$q = $pdo->prepare($sql);
-		$q->execute(array($_POST['provincia'],$_POST['id_pais']));
+		$q->execute(array($_POST['servicio'],$_SESSION["user"]["id"]));
 		
 		Database::disconnect();
 		
-		header("Location: listarProvincias.php");
+		header("Location: listarServicios.php");
 	}
 	
 ?>
@@ -51,7 +51,7 @@
                     <h3><?php include("title.php"); ?></h3>
                     <ol class="breadcrumb">
                       <li class="breadcrumb-item"><a href="#"><i data-feather="home"></i></a></li>
-                      <li class="breadcrumb-item">Nuevo Provincia</li>
+                      <li class="breadcrumb-item">Nuevo Servicio</li>
                     </ol>
                   </div>
                 </div>
@@ -73,28 +73,15 @@
               <div class="col-sm-12">
                 <div class="card">
                   <div class="card-header">
-                    <h5>Nuevo provincia</h5>
+                    <h5>Nuevo Servicio</h5>
                   </div>
-				          <form class="form theme-form" role="form" method="post" action="nuevoProvincia.php">
+				          <form class="form theme-form" role="form" method="post" action="nuevoServicio.php">
                     <div class="card-body">
                       <div class="row">
                         <div class="col">
                           <div class="form-group row">
-                            <label class="col-sm-3 col-form-label">Provincia</label>
-                            <div class="col-sm-9"><input name="provincia" type="text" maxlength="99" class="form-control" value="" required="required"></div>
-                          </div>
-                          <div class="form-group row">
-                            <label for="paises" class="col-sm-3 col-form-label">Paises</label>
-                            <div class="col-sm-9">
-                              <select name="id_pais" id="id_pais" class="js-example-basic-single col-12">
-                                <option value="">- Seleccione -</option><?php
-                                  $pdo = Database::connect();
-                                  $sql = " SELECT id, pais FROM paises";
-                                    foreach ($pdo->query($sql) as $row) {?>
-                                  <option value="<?=$row["id"]?>"><?=$row["pais"]?></option><?php
-                                }?>
-                              </select>
-                            </div>
+                            <label class="col-sm-3 col-form-label">Servicio</label>
+                            <div class="col-sm-9"><input name="servicio" type="text" maxlength="99" class="form-control" value="" required="required"></div>
                           </div>
                         </div>
                       </div>
@@ -102,7 +89,7 @@
                     <div class="card-footer">
                       <div class="col-sm-9 offset-sm-3">
                         <button class="btn btn-primary" type="submit">Crear</button>
-						            <a href="listarProvincias.php" class="btn btn-light">Volver</a>
+						            <a href="listarServicios.php" class="btn btn-light">Volver</a>
                       </div>
                     </div>
                   </form>
