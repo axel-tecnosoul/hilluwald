@@ -60,7 +60,7 @@ if(empty($_SESSION['user'])){
               <div class="col-sm-12">
                 <div class="card">
                   <div class="card-header">
-                    <h5>contenedores&nbsp;
+                    <h5>Contenedores&nbsp;
                       <a href="nuevoContenedor.php"><img src="img/icon_alta.png" width="24" height="25" border="0" alt="Nuevo" title="Nuevo"></a>
                       <!-- &nbsp;<a href="exportcontenedores.php"><img src="img/xls.png" width="24" height="25" border="0" alt="Exportar" title="Exportar"></a> -->
                     </h5>
@@ -75,6 +75,7 @@ if(empty($_SESSION['user'])){
                             <th>Cantidad de Orificios</th>
                             <th>Ancho</th>
                             <th>Alto</th>
+                            <th>Largo</th>
                             <th>Activo</th>
                             <th>Opciones</th>
                           </tr>
@@ -83,7 +84,7 @@ if(empty($_SESSION['user'])){
                         
                           include 'database.php';
                           $pdo = Database::connect();
-                          $sql = " SELECT c.id, tp.tipo, c.cantidad_orificios, c.ancho, c.alto, c.activo, c.id_usuario FROM contenedores c INNER JOIN tipos_contenedores tp ON c.id_tipo_contenedor=tp.id WHERE 1 ";
+                          $sql = " SELECT c.id, tp.tipo, c.cantidad_orificios, c.ancho, c.alto, c.largo, c.activo, c.id_usuario FROM contenedores c INNER JOIN tipos_contenedores tp ON c.id_tipo_contenedor=tp.id WHERE 1 ";
                           
                           foreach ($pdo->query($sql) as $row) {
                             echo '<tr>';
@@ -92,6 +93,7 @@ if(empty($_SESSION['user'])){
                             echo '<td>'. $row["cantidad_orificios"] . '</td>';
                             echo '<td>'. $row["ancho"] . '</td>';
                             echo '<td>'. $row["alto"] . '</td>';
+                            echo '<td>'. $row["largo"] . '</td>';
                             if ($row["activo"] == 1) {
                               echo '<td>Si</td>';
                             } else {

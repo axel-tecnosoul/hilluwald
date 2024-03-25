@@ -21,9 +21,9 @@ if ( !empty($_POST)) {
   $pdo = Database::connect();
   $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
   
-  $sql = "UPDATE contenedores set id_tipo_contenedor = ?, cantidad_orificios = ?, alto = ?, ancho = ?, activo = ?, id_usuario = ? where id = ?";
+  $sql = "UPDATE contenedores set id_tipo_contenedor = ?, cantidad_orificios = ?, alto = ?, ancho = ?, largo = ?, activo = ?, id_usuario = ? where id = ?";
   $q = $pdo->prepare($sql);
-  $q->execute(array($_POST['id_tipo_contenedor'],$_POST['cantidad_orificios'],$_POST['alto'], $_POST['ancho'], $_POST['activo'], $_SESSION["user"]["id"], $_GET['id']));
+  $q->execute(array($_POST['id_tipo_contenedor'],$_POST['cantidad_orificios'],$_POST['alto'], $_POST['ancho'], $_POST['largo'], $_POST['activo'], $_SESSION["user"]["id"], $_GET['id']));
   
   Database::disconnect();
   
@@ -33,7 +33,7 @@ if ( !empty($_POST)) {
   
   $pdo = Database::connect();
   $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-  $sql = "SELECT id_tipo_contenedor, cantidad_orificios, alto, ancho, activo FROM contenedores WHERE id = ? ";
+  $sql = "SELECT id_tipo_contenedor, cantidad_orificios, alto, ancho, largo, activo FROM contenedores WHERE id = ? ";
   $q = $pdo->prepare($sql);
   $q->execute(array($id));
   $data = $q->fetch(PDO::FETCH_ASSOC);
@@ -145,6 +145,10 @@ if ( !empty($_POST)) {
                           <div class="form-group row">
                             <label class="col-sm-3 col-form-label">Alto</label>
                             <div class="col-sm-9"><input name="alto" type="text" maxlength="199" class="form-control" value="<?=$data['alto']?>" required></div>
+                          </div>
+                          <div class="form-group row">
+                            <label class="col-sm-3 col-form-label">Largo</label>
+                            <div class="col-sm-9"><input name="largo" type="text" maxlength="199" class="form-control" value="<?=$data['largo']?>" required></div>
                           </div>
                           <div class="form-group row">
                             <label class="col-sm-3 col-form-label">Activo</label>

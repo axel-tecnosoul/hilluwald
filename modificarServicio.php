@@ -151,7 +151,7 @@
           <!-- Container-fluid Ends-->
         </div>
         <!-- footer start-->
-		<?php include("footer.php"); ?>
+		    <?php include("footer.php"); ?>
       </div>
     </div>
     <!-- latest jquery-->
