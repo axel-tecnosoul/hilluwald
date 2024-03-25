@@ -924,11 +924,11 @@ Database::disconnect();
 
                   let material=row.material
                   if(material!=""){
-                    material=" - M: "+material
+                    material="<br>M: "+material
                   }
                   return procedencia+material;
                 },
-                //className: "dt-body-right",
+                className: "text-nowrap",
               },
               {"data": "campana"},
               {
