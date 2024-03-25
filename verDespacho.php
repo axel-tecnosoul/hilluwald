@@ -93,37 +93,38 @@ Database::disconnect();?>
                           </div>
                           <div class="form-group row">
                             <label class="col-sm-3 col-form-label">Cliente</label>
-                            <div class="col-sm-9"><input name="fecha" type="text" axlength="99" class="form-control" value="<?=$data['razon_social'];?>"disabled></div>
+                            <div class="col-sm-9"><input name="cliente" type="text" axlength="99" class="form-control" value="<?=$data['razon_social'];?>"disabled></div>
                           </div>
                           <div class="form-group row">
                             <label class="col-sm-3 col-form-label">Transporte</label>
-                            <div class="col-sm-9"><input name="fecha" type="text" axlength="99" class="form-control" value="<?=$data['transporte'];?>"disabled></div>
+                            <div class="col-sm-9"><input name="transporte" type="text" axlength="99" class="form-control" value="<?=$data['transporte'];?>"disabled></div>
                           </div>
                           
                           <div class="form-group row">
                             <label class="col-sm-3 col-form-label">Chofer</label>
-                            <div class="col-sm-9"><input name="fecha" type="text" axlength="99" class="form-control" value="<?=$data['nombre_apellido'];?>"disabled></div>
+                            <div class="col-sm-9"><input name="chofer" type="text" axlength="99" class="form-control" value="<?=$data['nombre_apellido'];?>"disabled></div>
                           </div>
                           <div class="form-group row">
-                            <label class="col-sm-3 col-form-label">Vehiculo</label><div class="col-sm-9"><input name="fecha" type="text" axlength="99" class="form-control" value="<?=$data['descripcion'] . " - " . $data['patente'];?>"disabled></div>
+                            <label class="col-sm-3 col-form-label">Vehiculo</label><div class="col-sm-9"><input name="vehiculo" type="text" axlength="99" class="form-control" value="<?=$data['descripcion'] . " - " . $data['patente'];?>"disabled></div>
                           </div>
                           <div class="form-group row">
                             <label class="col-sm-3 col-form-label">Patente2</label>
-                            <div class="col-sm-9"><input name="fecha" type="text" axlength="99" class="form-control" value="<?=($data['patente2'] == "") ? "Sin Patente" : $data['patente2']; ?>"disabled></div>
+                            <div class="col-sm-9"><input name="patente2" type="text" axlength="99" class="form-control" value="<?=($data['patente2'] == "") ? "Sin Patente" : $data['patente2']; ?>"disabled></div>
                           </div>
                           <div class="form-group row">
                             <label class="col-sm-3 col-form-label">Localidad</label>
-                            <div class="col-sm-9"><input name="fecha" type="text" axlength="99" class="form-control" value="<?=$data['localidad'] . " - ". $data['provincia'];?>"disabled></div>
+                            <div class="col-sm-9"><input name="localidad" type="text" axlength="99" class="form-control" value="<?=$data['localidad'] . " - ". $data['provincia'];?>"disabled></div>
                           </div>
                           <div class="form-group row ">
-                            <div class="col-sm-9 ">
-                              <table class="table display">
+                            <div class="col-sm-12 ">
+                              <table class="table table-bordered">
                                 <thead>
                                   <tr>
                                     <th>Servicio</th>
                                     <th>Especie</th>
                                     <th>Procedencia</th>
                                     <th>Material</th>
+                                    <th>Largo</th>
                                     <th>Cantidad</th>
                                   </tr>
                                 </thead>
@@ -140,6 +141,7 @@ Database::disconnect();?>
                                     echo '<td>'. $row["especie"] . '</td>';
                                     echo '<td>'. $row["procedencia"] . '</td>';
                                     echo '<td>'. $row["material"] . '</td>';
+                                    echo '<td>'. "12" . "cm" . '</td>';
                                     echo '<td>'. $row["cantidad_plantines"] . '</td>';
                                     echo '</tr>';
                                   }
@@ -147,7 +149,7 @@ Database::disconnect();?>
                                 </tbody>
                                 <tfoot>
                                   <tr>
-                                    <th style="text-align:right" colspan="4">Total</th>
+                                    <th style="text-align:right" colspan="5">Total</th>
                                     <th style="text-align:right"><?=$cantidad_plantines; ?></th>
                                   </tr>
                                 </tfoot>

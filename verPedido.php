@@ -15,13 +15,12 @@ if ( !empty($_GET['id'])) {
 }
 
 if ( null==$id ) {
-  header("Location: listarVentas.php");
+  header("Location: listarpedidos.php");
 }
 
 $pdo = Database::connect();
 $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-//$sql = "SELECT v.id, date_format(v.fecha_venta,'%d/%m/%Y') AS fecha_venta, c.razon_social, v.observaciones, v.total, v.tipo_comprobante,v.estado,v.punto_venta,v.numero_comprobante,v.cae,date_format(v.fecha_vencimiento_cae,'%d/%m/%Y') AS fecha_vencimiento_cae,id_venta_cbte_relacionado,v.anulada FROM ventas v LEFT JOIN clientes c on c.id = v.id_cliente WHERE v.id = ? ";
-$sql = "SELECT v.id, date_format(v.fecha_venta,'%d/%m/%Y') AS fecha_venta, c.razon_social, v.observaciones, v.total, v.facturacion,v.anulada,v.modalidad_pago FROM ventas v LEFT JOIN clientes c on c.id = v.id_cliente WHERE v.id = ? ";
+$sql = "SELECT pd.id,date_format(pd.fecha,'%d/%m/%Y') as fecha, c.razon_social as cliente, su.nombre as sucursal, pd.campana, pd.observaciones, pd.pago_completo, pd.despacho_completo, pd.motivo_saldado, pd.id_usuario, pd.fecha_hora_alta FROM pedidos pd INNER JOIN pedidos_detalle pde ON pde.id_pedido= pd.id INNER JOIN clientes c ON pd.id_cliente = c.id LEFT JOIN sucursales su ON pd.id_sucursal = su.id WHERE pd.id = ?";
 $q = $pdo->prepare($sql);
 $q->execute(array($id));
 $data = $q->fetch(PDO::FETCH_ASSOC);
@@ -52,7 +51,7 @@ Database::disconnect();?>
                     <h3><?php include("title.php"); ?></h3>
                     <ol class="breadcrumb">
                       <li class="breadcrumb-item"><a href="#"><i data-feather="home"></i></a></li>
-                      <li class="breadcrumb-item">Ver Venta</li>
+                      <li class="breadcrumb-item">Ver pedido</li>
                     </ol>
                   </div>
                 </div>
@@ -75,21 +74,14 @@ Database::disconnect();?>
                 <div class="card"><?php
                   $style="";
                   $texto="";
-                  $link_volver="listarVentas";
-                  if($data['anulada']==1){
-                    $style="background-color: rgb(255 0 0 / 50%);";
-                    $texto="Anulada";
-                    $link_volver="listarVentasAnuladas";
-                  }?>
-                  <div class="card-header" style="<?=$style?>">
-                    <h5>Ver Venta <?=$texto;
-                      if($data['anulada']==0){?>
-                        <a class="btn btn-sm btn-primary" href="remito.php?id=<?= $id;?>" target="_blank"><i class="fa fa-print fa-lg" aria-hidden="true"></i> Remito</a><?php
-                        if($data['facturacion']!="Sin factura"){?>
-                          <a class="btn btn-sm btn-warning" data-toggle="modal" data-target="#modalGenerarNC"><i class="fa fa-minus-circle fa-lg" aria-hidden="true"></i> Nota de Crédito</a><?php
-                        }
-                      }?>
-                    </h5>
+                  $link_volver="listarpedidos";
+                  // if($data['anulada']==1){
+                  //   $style="background-color: rgb(255 0 0 / 50%);";
+                  //   $texto="Anulada";
+                  //   $link_volver="listarpedidosAnuladas";
+                  // }?>
+                  <div class="card-header">
+                    <h5>Ver pedido</h5>
                   </div>
 				          <form class="form theme-form" role="form" method="post" action="#">
                     <div class="card-body">
@@ -97,134 +89,75 @@ Database::disconnect();?>
                         <div class="col">
                           <div class="form-group row">
                             <label class="col-sm-3 col-form-label">Fecha</label>
-                            <div class="col-sm-9"><?=$data['fecha_venta']; ?></div>
+                            <div class="col-sm-9"><input name="fecha" type="text" axlength="99" class="form-control" value="<?=$data['fecha'];?>" disabled></div>
                           </div>
                           <div class="form-group row">
                             <label class="col-sm-3 col-form-label">Cliente</label>
-                            <div class="col-sm-9"><?=$data['razon_social']; ?></div>
+                            <div class="col-sm-9"><input name="cliente" type="text" axlength="99" class="form-control" value="<?=$data['cliente'];?>"disabled></div>
                           </div>
                           <div class="form-group row">
-                            <label class="col-sm-3 col-form-label">Facturacion</label>
-                            <div class="col-sm-9"><?=$data['facturacion']; ?></div>
+                            <label class="col-sm-3 col-form-label">Campaña</label>
+                            <div class="col-sm-9"><input name="campana" type="text" axlength="99" class="form-control" value="<?=$data['campana'];?>"disabled></div>
                           </div>
                           <div class="form-group row">
-                            <label class="col-sm-3 col-form-label">Productos</label>
-                          <!-- </div>
-                          <div class="form-group row"> -->
-                            <div class="col-sm-9">
-                              <table class="table display">
+                            <label class="col-sm-3 col-form-label">Sucursal</label>
+                            <div class="col-sm-9"><input name="sucursal" type="text" axlength="99" class="form-control" value="<?=($data['sucursal'] == "") ? "Sin Sucursal" : $data['sucursal']; ?>"disabled></div>
+                          </div>
+                          <div class="form-group row">
+                            <label class="col-sm-3 col-form-label">Observaciones</label>
+                            <div class="col-sm-9"><input name="observaciones" type="text" axlength="99" class="form-control" value="<?=$data['observaciones'];?>"disabled></div>
+                          </div>
+                          <div class="form-group row">
+                            <label class="col-sm-3 col-form-label">Pago Completo</label><div class="col-sm-9"><input name="pago_completo" type="text" axlength="99" class="form-control" value="<?=$data['pago_completo'];?>"disabled></div>
+                          </div>
+                          <div class="form-group row">
+                            <label class="col-sm-3 col-form-label">Despacho Completo</label><div class="col-sm-9"><input name="despacho_completo" type="text" axlength="99" class="form-control" value="<?=$data['despacho_completo'];?>"disabled></div>
+                          </div>
+
+                          <div class="form-group row">
+                            <label class="col-sm-3 col-form-label">Motivo saldado</label>
+                            <div class="col-sm-9"><input name="motivo_saldado" type="text" axlength="99" class="form-control" value="<?=($data['motivo_saldado'] == "") ? "Sin motivo saldado" : $data['motivo_saldado']; ?>"disabled></div>
+                          </div>
+                          <div class="form-group row ">
+                            <div class="col-sm-12">
+                              <table class="table table-bordered ">
                                 <thead>
                                   <tr>
-                                    <th>Descripcion</th>
-                                    <th>Precio</th>
+                                    <th>Servicio</th>
+                                    <th>Especie</th>
+                                    <th>Procedencia</th>
+                                    <th>Material</th>
+                                    <th>Largo</th>
                                     <th>Cantidad</th>
-                                    <th>Subtotal</th>
+                                    <th>Cantidad Pagados</th>
+                                    <th>Cantidad Retirados</th>
                                   </tr>
                                 </thead>
                                 <tbody><?php
                                   $pdo = Database::connect();
-                                  $sql = " SELECT p.descripcion, vd.precio, vd.cantidad, vd.subtotal FROM ventas_detalle vd INNER JOIN ventas v ON v.id = vd.id_venta INNER JOIN productos p ON p.id = vd.id_producto WHERE vd.id_venta = ".$id;
+                                  $sql = " SELECT cu.material, se.servicio, es.especie, cu.material, pr.procedencia, pde.cantidad_plantines, pde.plantines_pagados, pde.plantines_retirados FROM pedidos_detalle pde INNER JOIN pedidos pd ON pd.id = pde.id_pedido LEFT JOIN cultivos cu ON pde.id_material = cu.id INNER JOIN servicios se ON pde.id_servicio = se.id INNER JOIN especies es ON pde.id_especie = es.id LEFT JOIN procedencias_especies pr ON pde.id_procedencia = pr.id WHERE pde.id_pedido = ".$id;
+                                  $cantidad_plantines = 0;
                                   //var_dump($sql);
                                   
                                   foreach ($pdo->query($sql) as $row) {
+                                    $cantidad_plantines += $row['cantidad_plantines'];
                                     echo '<tr>';
-                                    echo '<td>'. $row["descripcion"] . '</td>';
-                                    echo '<td style="text-align:right">$'. number_format($row["precio"],2) . '</td>';
-                                    echo '<td style="text-align:center">'. $row["cantidad"] . '</td>';
-                                    echo '<td style="text-align:right">$'. number_format($row["subtotal"],2) . '</td>';
+                                    echo '<td>'. $row["servicio"] . '</td>';
+                                    echo '<td>'. $row["especie"] . '</td>';
+                                    echo '<td>'. $row["procedencia"] . '</td>';
+                                    echo '<td>'. $row["material"] . '</td>';
+                                    echo '<td>'. "12" . "cm" . '</td>';
+                                    echo '<td>'. $row["cantidad_plantines"] . '</td>';
+                                    echo '<td>'. $row["plantines_pagados"] . '</td>';
+                                    echo '<td>'. $row["plantines_retirados"] . '</td>';
                                     echo '</tr>';
                                   }
                                   Database::disconnect();?>
                                 </tbody>
                                 <tfoot>
                                   <tr>
-                                    <th style="text-align:right" colspan="3">Total</th>
-                                    <th style="text-align:right">$<?=number_format($data['total'],2); ?></th>
-                                  </tr>
-                                </tfoot>
-                              </table>
-                            </div>
-                          </div>
-                          <div class="form-group row">
-                            <label class="col-sm-3 col-form-label">Modalidad de pago</label>
-                            <div class="col-sm-9"><?=$data['modalidad_pago']?></div>
-                          </div>
-                          <div class="form-group row">
-                            <label class="col-sm-3 col-form-label">Observaciones</label>
-                            <div class="col-sm-9"><?=$data['observaciones']; ?></div>
-                          </div>
-                          <div class="form-group row">
-                            <label class="col-sm-3 col-form-label">Facturas</label>
-                          </div>
-                          <div class="form-group row">
-                            <div class="col-sm-12">
-                              <table class="table display">
-                                <thead>
-                                  <tr style='text-align:center'>
-                                    <th>Tipo Cbte.</th>
-                                    <th>Nro Cbte.</th>
-                                    <!-- <th>Estado</th> -->
-                                    <th>Bruto</th>
-                                    <th>Iva</th>
-                                    <th>Neto</th>
-                                    <!-- <th>CAE</th>
-                                    <th>Fecha vto. CAE</th> -->
-                                    <th>Cbte. Relacionado</th>
-                                    <th>Acciones</th>
-                                  </tr>
-                                </thead>
-                                <tbody><?php
-                                  $pdo = Database::connect();
-                                  $sql = "SELECT f.id AS id_factura,f.tipo_comprobante,f.total_bruto,f.total_neto,f.total_iva,f.estado,f.punto_venta,f.numero_cbte,f.cae,date_format(f.fecha_vto_cae,'%d/%m/%Y') AS fecha_vencimiento_cae,f.id_cbte_relacionado FROM facturas f WHERE f.id_venta = $id ";
-                                  //echo $sql;
-                                  $sumaTotal=0;
-                                  foreach ($pdo->query($sql) as $row) {
-                                    $estado=get_estado_comprobante($row['estado']);
-                                    $cbte=format_numero_comprobante($row['punto_venta'],$row['numero_cbte']);
-                                    $tipo_cbte=get_nombre_comprobante($row["tipo_comprobante"]);
-                                    $class="";
-                                    if($row['estado']=="A"){
-                                      $class="badge badge-success";
-                                    }
-                                    if($row['estado']=="R" or $row['estado']=="E"){
-                                      $class="badge badge-danger";
-                                    }
-                                    if(in_array($row["tipo_comprobante"],["A","B"])){
-                                      $sumaTotal+=$row["total_bruto"];
-                                    }else{
-                                      $sumaTotal-=$row["total_bruto"];
-                                    }
-                                    echo "<tr>";
-                                    echo "<td><span class='$class'>$tipo_cbte</span></td>";
-                                    echo "<td>$cbte</td>";
-                                    //echo "<td>$cbte</td>";
-                                    //echo "<td>$cbte</td>";
-                                    //echo "<td><span class='$class'>$estado</span></td>";
-                                    echo "<td style='text-align:right'>$".number_format($row["total_bruto"],2) ."</td>";
-                                    echo "<td style='text-align:right'>$".number_format($row["total_iva"],2) ."</td>";
-                                    echo "<td style='text-align:right'>$".number_format($row["total_neto"],2) ."</td>";
-                                    /*echo "<td>".$row["cae"]."</td>";
-                                    echo "<td>".$row["fecha_vencimiento_cae"]."</td>";*/
-                                    echo "<td>";
-                                    if(!is_null($row["id_cbte_relacionado"])){?>
-                                      <a href="verVenta.php?id=<?=$row["id_cbte_relacionado"]?>" target="_blank" title="Ver Comprobante relacionado">
-                                        <img src="img/eye.png" width="24" height="15" border="0" alt="Ver Venta">
-                                        <?=$row['id_cbte_relacionado']?>
-                                      </a><?php
-                                    }
-                                    echo "</td>";
-                                    echo "<td style='text-align:center'>";?>
-                                      <a href="factura.php?id=<?= $row["id_factura"]?>" target="_blank"><img src="img/print.png" width="30" height="25" border="0" alt="Imprimir comprobante" title="Imprimir comprobante"></a><?php
-                                    echo "</td>";
-                                    echo "</tr>";
-                                  }
-                                  Database::disconnect();?>
-                                </tbody>
-                                <tfoot>
-                                  <tr>
-                                    <th colspan="2"></th>
-                                    <th style="text-align:right">$<?=number_format($sumaTotal,2)?></th>
-                                    <th colspan="3"></th>
+                                    <th style="text-align:right" colspan="7">Total</th>
+                                    <th style="text-align:right"><?=$cantidad_plantines; ?></th>
                                   </tr>
                                 </tfoot>
                               </table>
@@ -264,11 +197,11 @@ Database::disconnect();?>
                                 }
                               }?>
                             </h6>
-                            ¿Está seguro que desea generar un Nota de Crédito para esta factura y eliminar la venta?
+                            ¿Está seguro que desea generar un Nota de Crédito para esta factura y eliminar el pedido?
                           </div>
                           <div class="modal-footer">
                             <button data-dismiss="modal" class="btn btn-light">Volver</button>
-                            <a href="nota_credito.php?id=<?=$id?>" id="btnGenerarNC" class="btn btn-primary">Generar NC y eliminar Venta</a>
+                            <a href="nota_credito.php?id=<?=$id?>" id="btnGenerarNC" class="btn btn-primary">Generar NC y eliminar pedido</a>
                           </div>
                         </div>
                       </div>
@@ -276,7 +209,7 @@ Database::disconnect();?>
 
                     <div class="card-footer">
                       <div class="col-sm-9 offset-sm-3"><?php
-                        if(isset($data["tipo_comprobante"]) and $data["tipo_comprobante"]!="R" and $data["estado"]=="A" and is_null($data["id_venta_cbte_relacionado"])){?>
+                        if(isset($data["tipo_comprobante"]) and $data["tipo_comprobante"]!="R" and $data["estado"]=="A" and is_null($data["id_pedido_cbte_relacionado"])){?>
                           <button type="button" class="btn btn-warning" data-toggle="modal" data-target="#modalGenerarNC">Generar NC</button><?php
                         }?>
                         <a href='<?=$link_volver?>.php' class="btn btn-light">Volver</a>
@@ -290,7 +223,7 @@ Database::disconnect();?>
           <!-- Container-fluid Ends-->
         </div>
         <!-- footer start-->
-		<?php include("footer.php"); ?>
+		    <?php include("footer.php"); ?>
       </div>
     </div>
     <!-- latest jquery-->
