@@ -86,11 +86,6 @@ $start = $_GET['start'];
 $countSql = "SELECT count(d.id) as Total $from WHERE $where";
 $countSt = $pdo->query($countSql);
 $total=0;
-//$cant=$pdo->rowCount();
-/*var_dump($countSt);
-if($cant>0){
-  $total = $countSt->fetch()['Total'];
-}*/
 // Verificar si la consulta se ejecutó correctamente y devolvió un valor numérico válido
 if ($countSt !== false) {
   // Obtener el resultado de la consulta
@@ -114,9 +109,6 @@ if ($countSt !== false) {
 // Data set length after filtering
 //$resFilterLength = self::sql_exec( $db, $bindings,"SELECT COUNT(`id`) FROM productos ".($where ? "WHERE $where " : ''));
 $queryFiltered="SELECT COUNT(d.id) AS recordsFiltered $from ".($whereFiltered ? "WHERE $whereFiltered " : '');
-//var_dump($queryFiltered);
-//echo $queryFiltered;
-
 $resFilterLength = $pdo->query($queryFiltered);
 //$recordsFiltered = $resFilterLength->fetch()['recordsFiltered'];
 $recordsFiltered = 0;

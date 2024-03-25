@@ -89,18 +89,51 @@ $start = $_GET['start'];
 $countSql = "SELECT count(p.id) as Total $from WHERE $where";
 $countSt = $pdo->query($countSql);
 //echo $countSql;
-$total = $countSt->fetch()['Total'];
+//$total = $countSt->fetch()['Total'];
+$total=0;
+// Verificar si la consulta se ejecutó correctamente y devolvió un valor numérico válido
+if ($countSt !== false) {
+  // Obtener el resultado de la consulta
+  $countResult = $countSt->fetchColumn();
+  // Comprobar si el resultado es numérico
+  if (is_numeric($countResult)) {
+      // El resultado es un valor numérico válido. Puedes utilizar $countResult en tu código
+      //echo "El resultado es: " . $countResult;
+      $total = $countResult;
+  } else {
+      // La consulta no devolvió un valor numérico válido
+      //echo "La consulta no devolvió un valor numérico válido";
+  }
+} else {
+  // Ocurrió un error al ejecutar la consulta
+  //echo "Ocurrió un error al ejecutar la consulta SQL";
+}
 
 
 //OBTENEMOS EL TOTAL DE REGISTROS CON FILTRO APLICADO
 // Data set length after filtering
 //$resFilterLength = self::sql_exec( $db, $bindings,"SELECT COUNT(`id`) FROM productos ".($where ? "WHERE $where " : ''));
 $queryFiltered="SELECT COUNT(p.id) AS recordsFiltered $from ".($whereFiltered ? "WHERE $whereFiltered " : '');
-//var_dump($queryFiltered);
-//echo $queryFiltered;
-
 $resFilterLength = $pdo->query($queryFiltered);
-$recordsFiltered = $resFilterLength->fetch()['recordsFiltered'];
+//$recordsFiltered = $resFilterLength->fetch()['recordsFiltered'];
+$recordsFiltered = 0;
+// Verificar si la consulta se ejecutó correctamente y devolvió un valor numérico válido
+if ($resFilterLength !== false) {
+  // Obtener el resultado de la consulta
+  $countResult = $resFilterLength->fetchColumn();
+  // Comprobar si el resultado es numérico
+  if (is_numeric($countResult)) {
+      // El resultado es un valor numérico válido. Puedes utilizar $countResult en tu código
+      //echo "El resultado es: " . $countResult;
+      $recordsFiltered = $countResult;
+  } else {
+      // La consulta no devolvió un valor numérico válido
+      //echo "La consulta no devolvió un valor numérico válido";
+  }
+} else {
+  // Ocurrió un error al ejecutar la consulta
+  //echo "Ocurrió un error al ejecutar la consulta SQL";
+}
 
 $campos=implode(",", $fields);
 //$fields = ['cb','codigo','categoria','descripcion','nombre','apellido','precio','p.activo','p.id'];
