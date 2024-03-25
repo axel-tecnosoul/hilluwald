@@ -9,7 +9,7 @@ if(empty($_SESSION['user']))
 <!DOCTYPE html>
 <html lang="en">
   <head>
-	<?php include('head_tables.php');?>
+	  <?php include('head_tables.php');?>
   </head>
   <body class="light-only">
     <!-- page-wrapper Start-->
@@ -66,6 +66,7 @@ if(empty($_SESSION['user']))
                           <tr>
                             <th>ID</th>
                             <th>Especie</th>
+                            <th>Icono</th>
                             <th>Activo</th>
                             <th>Opciones</th>
                           </tr>
@@ -73,7 +74,7 @@ if(empty($_SESSION['user']))
                         <tbody><?php
                           include 'database.php';
                           $pdo = Database::connect();
-                          $sql = " SELECT id, especie, activo, id_usuario, fecha_hora_alta, icono, color FROM especies  WHERE 1 ";
+                          $sql = " SELECT id, especie, activo, id_usuario, fecha_hora_alta, icono, color FROM especies WHERE 1 ";
                           
                           foreach ($pdo->query($sql) as $row) {?>
                             <tr>

@@ -24,6 +24,12 @@ if($id_cliente!=0 and $id_cliente!=""){
   $filtroCliente=" AND p.id_cliente IN ($id_cliente)";
 }
 
+$id_servicio=$_GET["id_servicio"];
+$filtroServicio="";
+if($id_servicio!=0 and $id_servicio!=""){
+  $filtroServicio=" AND pd.id_servicio IN ($id_servicio)";
+}
+
 $id_cultivo=$_GET["id_cultivo"];
 $filtroCultivo="";
 if($id_cultivo!=0 and $id_cultivo!=""){
@@ -81,7 +87,7 @@ if($desde<=$hasta){
 
   //obtenemos los pedidos
   //$sql = " SELECT p.id,date_format(p.fecha,'%d/%m/%Y') AS fecha,p.campana,pd.cantidad_plantines,p.fecha_hora_alta FROM pedidos p INNER JOIN pedidos_detalle pd ON pd.id_pedido=p.id WHERE p.anulado=0 $filtroDesde $filtroHasta $filtroCliente $filtroCultivo";
-  $sql = " SELECT p.id,date_format(p.fecha,'%d/%m/%Y') AS fecha,p.campana,pd.cantidad_plantines,p.fecha_hora_alta FROM pedidos p INNER JOIN pedidos_detalle pd ON pd.id_pedido=p.id WHERE p.anulado=0 $filtroDesde $filtroHasta $filtroCliente $filtroCultivo";
+  $sql = "SELECT p.id,date_format(p.fecha,'%d/%m/%Y') AS fecha,p.campana,pd.cantidad_plantines,pd.plantines_pagados,pd.plantines_retirados,p.fecha_hora_alta,s.servicio,pe.procedencia,c.material FROM pedidos p INNER JOIN pedidos_detalle pd ON pd.id_pedido=p.id INNER JOIN servicios s ON pd.id_servicio=s.id LEFT JOIN procedencias_especies pe ON pd.id_procedencia=pe.id LEFT JOIN cultivos c ON pd.id_material=c.id WHERE p.anulado=0 $filtroDesde $filtroHasta $filtroCliente $filtroServicio $filtroCultivo";
   //echo $sql;
   foreach ($pdo->query($sql) as $row) {
     
@@ -109,7 +115,12 @@ if($desde<=$hasta){
       "id_pedido"=>$row['id'],
       "fecha"=>$row['fecha'],// AS fecha_hora
       "campana"=>$row["campana"],
+      "servicio"=>$row["servicio"],
+      "procedencia"=>$row["procedencia"] ?: "",
+      "material"=>$row["material"] ?: "",
       "cantidad"=>$row['cantidad_plantines'],
+      "plantines_pagados"=>$row['plantines_pagados'],
+      "plantines_retirados"=>$row['plantines_retirados'],
       /*"cantidad_pedido"=>$row['cantidad_plantines'],
       "cantidad_despacho"=>"",
       "cantidad_pago"=>"",*/
@@ -118,7 +129,7 @@ if($desde<=$hasta){
   }
 
   //obtenemos los despachos
-  $sql = " SELECT p.id,date_format(p.fecha,'%d/%m/%Y') AS fecha,p.campana,pd.cantidad_plantines,p.fecha_hora_alta FROM despachos p INNER JOIN despachos_detalle pd ON pd.id_despacho=p.id WHERE 1 $filtroDesde $filtroHasta $filtroCliente $filtroCultivo";//p.anulado=0 
+  $sql = "SELECT p.id,p.id_pedido,date_format(p.fecha,'%d/%m/%Y') AS fecha,p.campana,pd.cantidad_plantines,p.fecha_hora_alta,s.servicio,pe.procedencia,c.material FROM despachos p INNER JOIN despachos_detalle pd ON pd.id_despacho=p.id INNER JOIN servicios s ON pd.id_servicio=s.id LEFT JOIN procedencias_especies pe ON pd.id_procedencia=pe.id LEFT JOIN cultivos c ON pd.id_material=c.id WHERE 1 $filtroDesde $filtroHasta $filtroCliente $filtroServicio $filtroCultivo";//p.anulado=0 
   //echo $sql;
   foreach ($pdo->query($sql) as $row) {
     
@@ -143,9 +154,13 @@ if($desde<=$hasta){
     }*/
     $aCtaCte[]=[
       "tipo_comprobante"=>"Despacho",
-      "id_pedido"=>$row['id'],
+      "id_despacho"=>$row['id'],
+      "id_pedido"=>$row['id_pedido'],
       "fecha"=>$row['fecha'],// AS fecha_hora
       "campana"=>$row["campana"],
+      "servicio"=>$row["servicio"],
+      "procedencia"=>$row["procedencia"],
+      "material"=>$row["material"],
       "cantidad"=>$row['cantidad_plantines'],
       /*"cantidad_pedido"=>"",
       "cantidad_despacho"=>$row['cantidad_plantines'],
@@ -156,16 +171,22 @@ if($desde<=$hasta){
   Database::disconnect();
 
   function date_compare($a, $b){
+    // Comparar por id_pedido
+    if ($a['id_pedido'] != $b['id_pedido']) {
+      return $a['id_pedido'] - $b['id_pedido'];
+    }
+
+    // Si los id_pedido son iguales, comparar por fecha
     $t1 = strtotime($a['fecha']);
     $t2 = strtotime($b['fecha']);
 
     if ($t1 == $t2) {
-      // Si las fechas son iguales, comparar por fecha_hora_alta
-      $t1_alta = strtotime($a['fecha_hora_alta']);
-      $t2_alta = strtotime($b['fecha_hora_alta']);
-      return $t1_alta - $t2_alta;
+        // Si las fechas son iguales, comparar por fecha_hora_alta
+        $t1_alta = strtotime($a['fecha_hora_alta']);
+        $t2_alta = strtotime($b['fecha_hora_alta']);
+        return $t1_alta - $t2_alta;
     } else {
-      return $t1 - $t2;
+        return $t1 - $t2;
     }
   }
 

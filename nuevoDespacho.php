@@ -24,6 +24,7 @@ if ( !empty($_POST)) {
     var_dump($_GET);
   }
 
+  if($_POST['id_localidad']=="") $_POST['id_localidad']=NULL;
   if($_POST['id_lote']=="") $_POST['id_lote']=NULL;
   if($_POST['id_plantador']=="") $_POST['id_plantador']=NULL;
 
@@ -50,7 +51,6 @@ if ( !empty($_POST)) {
   //$cantPrendas = count($_POST["id_cultivo"]);
 
   $aProductos=[];
-
   $cantProdOK=0;
   foreach ($_POST['id_servicio'] as $key => $id_servicio) {
     $cantidad_despachar = $_POST['cantidad_despachar'][$key];
@@ -97,16 +97,65 @@ if ( !empty($_POST)) {
     
   }
 
+  $aContenedores=[];
+  $cantContenedoresOK=0;
+  foreach ($_POST['id_contenedor'] as $key => $id_contenedor) {
+    $cantidad_contenedores = $_POST['cantidad_contenedores'][$key];
+
+    if($cantidad_contenedores>0){
+
+      $aContenedores[]=[
+        "id_contenedor"=>$id_contenedor,
+        "cantidad_contenedores"=>$cantidad_contenedores,
+      ];
+
+      $sql = "INSERT INTO despachos_contenedores (id_despacho, id_contenedor, cantidad_despachada) VALUES (?,?,?)";
+      $q = $pdo->prepare($sql);
+      $params=array($id_despacho,$id_contenedor,$cantidad_contenedores);
+      $q->execute($params);
+      $afe=$q->rowCount();
+
+      if($afe==1){
+        $cantContenedoresOK++;
+      }
+
+      if ($modoDebug==1) {
+        $q->debugDumpParams();
+        echo "<br><br>Afe: ".$q->rowCount();
+        echo "<br><br>";
+      }
+
+      $aDebug[]=[
+        "consulta"=>$sql,
+        "params"=>$params,
+        "afe"=>$q->rowCount(),
+      ];
+
+    }
+    
+  }
+
 
   if ($modoDebug==1) {
     var_dump($aProductos);
-    echo "cantProdOK!=count(aProductos)<br>";
-    echo $cantProdOK."!=".count($aProductos)."<br>";
-    var_dump($cantProdOK!=count($aProductos));
+    echo "cantProdOK==count(aProductos)<br>";
+    echo $cantProdOK."==".count($aProductos)."<br>";
+    var_dump($cantProdOK==count($aProductos));
+
+    var_dump($aContenedores);
+    echo "cantContenedoresOK==count(aContenedores)<br>";
+    echo $cantContenedoresOK."==".count($aContenedores)."<br>";
+    var_dump($cantContenedoresOK==count($aContenedores));
+
     echo "<br><br>";
   }
 
-  if($cantProdOK!=count($aProductos)){
+  $todoOk=0;
+  if($cantProdOK==count($aProductos) and $cantContenedoresOK==count($aContenedores)){
+    $todoOk=1;
+  }
+
+  if($todoOk==0){
     $pdo->rollback();
     var_dump($aDebug);
     die("Ha ocurrido un error al cargar los productos de la venta");

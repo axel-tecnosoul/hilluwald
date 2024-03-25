@@ -10,147 +10,6 @@
       <form class="form theme-form" role="form" method="post" action="nuevoDespacho.php?id_cliente=<?=$id?>">
         <input name="id_pedido_despacho" id="id_pedido_despacho" type="hidden">
         <div class="modal-body">
-          <!-- <div class="row">
-            <div class="form-group col-4">
-              <label for="fecha_despacho">Fecha</label>
-              <input name="fecha_despacho" id="fecha_despacho" type="date" class="form-control multiselect" value="<?=$hoy?>" required>
-            </div>
-            <div class="form-group col-4">
-              <label for="campana_despacho">Campaña</label><br>
-              <select name="campana_despacho" id="campana_despacho" style="width: 100%;" required class="js-example-basic-single"><?php
-              // data-style="multiselect" data-live-search="true"
-                // Generar las opciones del select
-                for ($i = $anio_inicial; $i <= $anio_final; $i++) {
-                  // Si el año es el actual, marcarlo como seleccionado por defecto
-                  $selected = ($i == $anio_actual) ? "selected" : "";
-                  echo "<option value='$i' $selected>$i</option>";
-                }?>
-              </select>
-            </div>
-            <div class="form-group col-4">
-              <label for="id_cliente_retira">Razon social</label>
-              <select name="id_cliente_retira" id="id_cliente_retira" style="width: 100%;" required class="js-example-basic-single"><?php
-                $pdo = Database::connect();
-                $sql = " SELECT id, razon_social FROM clientes";
-                foreach ($pdo->query($sql) as $row) {?>
-                  <option value="<?=$row["id"]?>"><?=$row["razon_social"]?></option><?php
-                }
-                Database::disconnect();?>
-              </select>
-            </div>
-          </div>
-          <div class="row">
-            <div class="form-group col-4">
-              <label>Transporte</label>
-              <select name="id_transporte" id="id_transporte" class="js-example-basic-single" required style="width: 100%;">
-                <option value="">- Seleccione -</option><?php
-                $pdo = Database::connect();
-                $sql = " SELECT id, razon_social FROM transportes";
-                foreach ($pdo->query($sql) as $row) {?>
-                  <option value="<?=$row["id"]?>"><?=$row["razon_social"]?></option><?php
-                }
-                Database::disconnect();?>
-              </select>
-            </div>
-            <div class="form-group col-4">
-              <label for="id_chofer">Chofer</label>
-              <select name="id_chofer" id="id_chofer" class="js-example-basic-single" required disabled style="width: 100%;">
-                <option value="">- Seleccione -</option><?php
-                $pdo = Database::connect();
-                $sql = " SELECT id, nombre_apellido, id_transporte FROM choferes";
-                foreach ($pdo->query($sql) as $row) {?>
-                  <option value="<?=$row["id"]?>" data-id-transporte="<?=$row["id_transporte"]?>"><?=$row["nombre_apellido"]?></option><?php
-                }
-                Database::disconnect();?>
-              </select>
-            </div>
-            <div class="form-group col-4">
-              <label for="id_vehiculo">Vehiculo</label>
-              <select name="id_vehiculo" id="id_vehiculo" class="js-example-basic-single" required disabled style="width: 100%;">
-                <option value="">- Seleccione -</option><?php
-                $pdo = Database::connect();
-                $sql = " SELECT id, descripcion, patente, patente2, id_transporte FROM vehiculos";
-                foreach ($pdo->query($sql) as $row) {
-                  $patente=$row["patente"];
-                  if(!is_null($row["patente2"])){
-                    $patente.=" - ".$row["patente2"];
-                  }
-                  $mostrar=$row["descripcion"]." (".$patente.")"?>
-                  <option value="<?=$row["id"]?>" data-id-transporte="<?=$row["id_transporte"]?>"><?=$mostrar?></option><?php
-                }
-                Database::disconnect();?>
-              </select>
-            </div>
-          </div>
-          <div class="row">
-            <div class="form-group col-4">
-              <label>Lote</label>
-              <select name="id_lote" id="id_lote" class="js-example-basic-single" style="width: 100%;">
-                <option value="">- Seleccione -</option><?php
-                $pdo = Database::connect();
-                $sql = " SELECT l.id, nombre, direccion, localidad, provincia FROM lotes l INNER JOIN localidades l2 ON l.id_localidad=l2.id INNER JOIN provincias p ON l2.id_provincia=p.id WHERE l.id_cliente=".$id;
-                foreach ($pdo->query($sql) as $row) {
-                  $mostrar=$row["nombre"]." (".$row["direccion"]." ".$row["localidad"]." ".$row["provincia"].")"?>
-                  <option value="<?=$row["id"]?>"><?=$mostrar?></option><?php
-                }
-                Database::disconnect();?>
-              </select>
-            </div>
-            <div class="form-group col-4">
-              <label for="id_plantador">Plantador</label>
-              <select name="id_plantador" id="id_plantador" class="js-example-basic-single" style="width: 100%;">
-                <option value="">- Seleccione -</option><?php
-                $pdo = Database::connect();
-                $sql = " SELECT id, nombre FROM plantadores WHERE id_cliente=".$id;
-                foreach ($pdo->query($sql) as $row) {?>
-                  <option value="<?=$row["id"]?>"><?=$row["nombre"]?></option><?php
-                }
-                Database::disconnect();?>
-              </select>
-            </div>
-            <div class="form-group col-4">
-              <label for="id_vehiculo">Patente 2</label>
-              <input type="text" name="patente2" id="patente2" class="form-control" style="width: 100%;">
-            </div>
-          </div>
-          <div class="row">
-            <div class="form-group col-4">
-              <label for="id_provincia">Provincia</label>
-              <select name="id_provincia" id="id_provincia" class="js-example-basic-single" style="width: 100%;">
-                <option value="">- Seleccione -</option><?php
-                $pdo = Database::connect();
-                $sql = " SELECT id, provincia FROM provincias";
-                foreach ($pdo->query($sql) as $row) {?>
-                  <option value="<?=$row["id"]?>"><?=$row["provincia"]?></option><?php
-                }
-                Database::disconnect();?>
-              </select>
-            </div>
-            <div class="form-group col-4">
-              <label for="id_localidad">Localidad</label>
-              <select name="id_localidad" id="id_localidad" class="js-example-basic-single" style="width: 100%;">
-                <option value="">- Seleccione -</option><?php
-                $pdo = Database::connect();
-                $sql = " SELECT id, localidad, id_provincia FROM localidades";
-                foreach ($pdo->query($sql) as $row) {?>
-                  <option value="<?=$row["id"]?>" data-id-provincia="<?=$row["id_provincia"]?>"><?=$row["localidad"]?></option><?php
-                }
-                Database::disconnect();?>
-              </select>
-            </div>
-            <div class="form-group col-4">
-              <label for="id_vehiculo">Lugar de entrega</label>
-              <input type="text" name="lugar_entrega" id="lugar_entrega" class="form-control" style="width: 100%;">
-            </div>
-          </div>
-          <div class="row">
-            <div class="form-group col-2">
-              <label for="observaciones_pedido" class="col-form-label">Observaciones:</label>
-            </div>
-            <div class="form-group col-10">
-              <textarea name="observaciones_pedido" id="observaciones_pedido" class="form-control"></textarea>
-            </div>
-          </div> -->
           <div class="row">
             <div class="form-group col-4">
               <label for="fecha_despacho">Fecha</label>
@@ -229,18 +88,6 @@
             </div>
           </div>
           <div class="row">
-            <!-- <div class="form-group col-3">
-              <label for="id_provincia">Provincia</label>
-              <select name="id_provincia" id="id_provincia" class="js-example-basic-single" style="width: 100%;">
-                <option value="">- Seleccione -</option><?php
-                /*$pdo = Database::connect();
-                $sql = " SELECT id, provincia FROM provincias";
-                foreach ($pdo->query($sql) as $row) {?>
-                  <option value="<?=$row["id"]?>"><?=$row["provincia"]?></option><?php
-                }
-                Database::disconnect();*/?>
-              </select>
-            </div> -->
             <div class="form-group col-3">
               <label for="id_localidad">Localidad</label>
               <select name="id_localidad" id="id_localidad" class="js-example-basic-single" style="width: 100%;">
@@ -295,22 +142,54 @@
             <div class="col">
               <div class="form-group row">
                 <div class="col-sm-12">
-                  <table class="table table-striped table-bordered" id="detallePedido" style="table-layout: fixed;">
+                  <table class="table table-striped table-bordered" id="detallePedido" style="table-layout:fixed"">
                     <thead>
                       <tr>
-                        <th style="width: 12%;">Servicio</th>
-                        <th style="width: 20%;">Especie</th>
-                        <th style="width: 20%;">Procedencia</th>
-                        <th style="width: 20%;">Material</th>
-                        <th style="width: 14%;">Cantidad total pedido</th>
-                        <th style="width: 14%;">Despachar/Pendiente</th>
+                        <th class="text-center" style="width: 10%;">Servicio</th>
+                        <th class="text-center" style="width: 20%;">Especie</th>
+                        <th class="text-center" style="width: 20%;">Procedencia</th>
+                        <th class="text-center" style="width: 20%;">Material</th>
+                        <th class="text-center" style="width: 10%;">Total pedido</th>
+                        <th class="text-center" style="width: 20%;">Despachar/Pendiente</th>
                       </tr>
                     </thead>
                     <tbody></tbody>
                   </table>
-                  <div class="mensajeError" style="color: red; display: none;">Por favor, ingrese al menos una cantidad.</div>
                 </div>
               </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="form-group col-2">
+              <label for="id_contenedor">Contenedores</label>
+            </div>
+            <div class="form-group col-10">
+              <select name="id_contenedor" id="id_contenedor" class="js-example-basic-single" style="width: 100%;" multiple required>
+                <option value="">- Seleccione -</option><?php
+                $pdo = Database::connect();
+                $sql = "SELECT c.id AS id_contenedor,tp.tipo,c.cantidad_orificios,c.ancho,c.alto FROM contenedores c INNER JOIN tipos_contenedores tp ON c.id_tipo_contenedor=tp.id WHERE c.activo=1";
+                foreach ($pdo->query($sql) as $row) {
+                  $mostrar=$row["tipo"]." ".$row["cantidad_orificios"]."u. ".$row["ancho"]."x".$row["alto"]."x[LARGO]"?>
+                  <option value="<?=$row["id_contenedor"]?>"><?=$mostrar?></option><?php
+                }
+                Database::disconnect();?>
+              </select>
+            </div>
+          </div>
+          <div class="row">
+            <div class="form-gropu col-12">
+              <!-- HTML de la tabla -->
+              <table id="tablaContenedores" class="table table-striped table-bordered">
+                <thead>
+                  <tr>
+                    <th>Contenedor</th>
+                    <th>Cantidad</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <!-- Aquí se agregarán dinámicamente las filas -->
+                </tbody>
+              </table>
             </div>
           </div>
         </div>
@@ -328,6 +207,137 @@
 <script>
 
   function getDetallePedido(id_pedido){
+    $.ajax({
+      //data: datosIniciales,
+      url: 'ajaxGetDetallePedidoNuevoDespacho.php?id_pedido='+id_pedido,
+      method: "post",
+      cache: false,
+      contentType: false,
+      processData: false,
+      success: function(respuesta){
+        //console.log(respuesta);
+        /*Convierto en json la respuesta del servidor*/
+        respuestaJson = JSON.parse(respuesta);
+        console.log(respuestaJson);
+
+        // Obtener una referencia al tbody de la tabla
+        var tbody = document.querySelector('#detallePedido tbody');
+        tbody.innerHTML="";
+
+        //Genero los options del select de prioridades
+        respuestaJson.forEach(cultivos => {
+          let id_material = cultivos.id_material;
+          let id_procedencia = cultivos.id_procedencia;
+
+          let cantidad_plantines = parseInt(cultivos.cantidad_plantines);
+          let plantines_retirados = parseInt(cultivos.plantines_retirados);
+          let pendiente = cantidad_plantines - plantines_retirados;
+
+          // Plantilla para cada fila
+          let contenidoFila = `
+            <td class="align-middle">
+              <input type='hidden' name="id_servicio[]" value='${cultivos.id_servicio}'>${cultivos.servicio}
+            </td>
+            <td class="align-middle">
+              <input type='hidden' name="id_especie[]" class='id_especie' value='${cultivos.id_especie}'>${cultivos.especie}
+            </td>
+            <td class="align-middle">
+              ${id_procedencia > 0 ? `
+                <input type='hidden' name="id_procedencia[]" value='${cultivos.id_procedencia}'>${cultivos.procedencia}
+              ` : `
+                <select name="id_procedencia[]" class="js-example-basic-single id_procedencia" required style="width:100%">
+                  ${generarOpciones(cultivos.aProcedencias, 'id', 'procedencia')}
+                </select>
+              `}
+            </td>
+            <td class="align-middle">
+              ${id_material > 0 ? `
+                <input type='hidden' name="id_material[]" value='${cultivos.id_material}'>${cultivos.material}
+              ` : `
+                <select name="id_material[]" class="js-example-basic-single id_material" required style="width:100%" ${id_procedencia > 0 ? '' : 'disabled'}>
+                  ${generarOpciones(cultivos.aMateriales, 'id', 'material')}
+                </select>
+              `}
+            </td>
+            <td class="align-middle text-right">
+              ${Intl.NumberFormat("de-DE").format(cultivos.cantidad_plantines)}
+            </td>
+            <td class="align-middle">
+              <div class="input-group">
+                <input type="number" name="cantidad_despachar[]" class="form-control" required>
+                <div class="input-group-append">
+                  <span class="input-group-text">/ ${Intl.NumberFormat("de-DE").format(pendiente)}</span>
+                </div>
+              </div>
+            </td>`;
+
+          // Crear una nueva fila
+          var newRow = document.createElement('tr');
+          // Insertar el contenido HTML en la nueva fila
+          newRow.innerHTML = contenidoFila;
+          // Agregar la fila al tbody
+          tbody.appendChild(newRow);
+        });
+
+
+        $("#detallePedido").find(".id_procedencia").select2()
+        $("#detallePedido").find(".id_material").select2()
+
+      }
+    });
+  }
+
+  // Función para generar las opciones de los select
+  function generarOpciones(arr, valueKey, textKey) {
+    let opciones = `<option value="">Seleccione...</option>`;
+    arr.forEach(item => {
+      opciones += `<option value="${item[valueKey]}">${item[textKey]}</option>`;
+    });
+    return opciones;
+  }
+
+  $(document).ready(function() {
+    // Inicializar Select2
+    //$('#selectContenedores').select2();
+
+    // Manejar evento de selección en Select2
+    $('#id_contenedor').on('select2:select', function(e) {
+      var contenedorSeleccionado = e.params.data.text;
+      var valorContenedor = e.params.data.id;
+
+      // Crear una nueva fila en la tabla
+      var newRow = $('<tr>');
+      newRow.append('<td>' + contenedorSeleccionado + '</td>');
+      newRow.append('<td><input type="hidden" name="id_contenedor[]" value="' + valorContenedor + '">' +
+                    '<label><input type="number" class="form-control" name="cantidad_contenedores[]" required placeholder="Cantidad"></label></td>');
+      $('#tablaContenedores tbody').append(newRow);
+    });
+
+    // Manejar evento de deselección en Select2
+    $('#id_contenedor').on('select2:unselect', function(e) {
+      var valorContenedor = e.params.data.id;
+
+      // Eliminar la fila correspondiente en la tabla
+      $('#tablaContenedores tbody tr').each(function() {
+        if ($(this).find('input[name="id_contenedor[]"]').val() == valorContenedor) {
+          $(this).remove();
+          return false; // Salir del bucle each
+        }
+      });
+    });
+
+    // Manejar evento de cambio en la cantidad
+    $('#cantidadInput').on('input', function() {
+      var cantidad = $(this).val();
+
+      // Actualizar la cantidad en los labels de la tabla
+      $('#tablaContenedores tbody label').text(function() {
+        return $(this).prev('input').val() + ' (' + cantidad + ')';
+      });
+    });
+  });
+
+  function getDetallePedido2(id_pedido){
     let table=$('#detallePedido')
     table.DataTable().destroy();
     table.DataTable({
@@ -377,7 +387,8 @@
           if(id_procedencia>0){
             return `<input type='hidden' name="id_procedencia[]" value='${row.id_procedencia}'>`+row.procedencia;
           }else{
-            let selectProcedencia=`<select name="id_procedencia[]" class="js-example-basic-single id_procedencia" required style="width:100%">
+            // style="width:100%"
+            let selectProcedencia=`<select name="id_procedencia[]" class="js-example-basic-single id_procedencia" required>
               <option value="">Seleccione...</option>`;
               row.aProcedencias.forEach((procedencia)=>{
                 selectProcedencia+=`<option value="${procedencia.id}">${procedencia.procedencia}</option>`;
@@ -394,11 +405,11 @@
             return `<input type='hidden' name="id_material[]" value='${row.id_material}'>`+row.material;
           }else{
             let disabled="disabled";
-            console.log(row.id_procedencia);
             if(row.id_procedencia>0){
               disabled=""
             }
-            let selectMaterial=`<select name="id_material[]" class="js-example-basic-single id_material" required ${disabled} style="width:100%">
+            // style="width:100%"
+            let selectMaterial=`<select name="id_material[]" class="js-example-basic-single id_material" required ${disabled}>
               <option value="">Seleccione una procedencia...</option>`;
               row.aMateriales.forEach((material)=>{
                 selectMaterial+=`<option value="${material.id}">${material.material}</option>`;
@@ -422,14 +433,21 @@
           </div>`;
         }},
       ],
-      initComplete: function(settings, json){
-        $("#detallePedido").find(".id_procedencia").select2()
-        $("#detallePedido").find(".id_material").select2()
-      },
       "columnDefs": [
         { "className": "dt-body-right align-middle", "targets": [4] },
         { "className": "align-middle", "targets": "_all" },
+        /*{ width: "12%", targets: 0 }, // Primera columna (Servicio)
+        { width: "20%", targets: 1 }, // Segunda columna (Especie)
+        { width: "20%", targets: 2 }, // Tercera columna (Procedencia)
+        { width: "20%", targets: 3 }, // Cuarta columna (Material)
+        { width: "14%", targets: 4 }, // Quinta columna (Cantidad total pedido)
+        { width: "14%", targets: 5 }  // Sexta columna (Despachar/Pendiente)*/
       ],
+      initComplete: function(settings, json){
+        $("#detallePedido").find(".id_procedencia").select2()
+        $("#detallePedido").find(".id_material").select2()
+        //table.css("table-layout","fixed")
+      },
     })
   }
 

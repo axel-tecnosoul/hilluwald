@@ -44,3 +44,25 @@ function get_estado_comprobante($estado_abreviado){
 function format_numero_comprobante($punto_venta,$numero_comprobante){
   return str_pad($punto_venta,4,"0",STR_PAD_LEFT)."-".str_pad($numero_comprobante,8,"0",STR_PAD_LEFT);
 }
+
+function acortarPalabras($texto) {
+  // Convertimos el texto en un array de palabras
+  $palabras = explode(" ", $texto);
+  
+  // Creamos un array para almacenar las palabras acortadas
+  $palabrasAcortadas = array();
+
+  // Recorremos cada palabra y la acortamos si tiene más de dos letras
+  foreach ($palabras as $palabra) {
+      if (strlen($palabra) > 2) {
+          // Obtenemos la primera letra de la palabra y la agregamos al array de palabras acortadas
+          $palabrasAcortadas[] = $palabra[0];
+      } else {
+          // Si la palabra tiene dos letras o menos, la agregamos sin modificar al array de palabras acortadas
+          $palabrasAcortadas[] = $palabra;
+      }
+  }
+  
+  // Unimos las palabras acortadas en una sola cadena separada por espacios
+  return implode("", $palabrasAcortadas);
+}

@@ -5,6 +5,7 @@ if(empty($_SESSION['user'])){
   die("Redirecting to index.php"); 
 }
 require 'database.php';
+require 'funciones.php';
 
 $id = null;
 if ( !empty($_GET['id'])) {
@@ -126,14 +127,16 @@ Database::disconnect();
     .dropdown-menu{
       padding: 0;
     }
+    .ctaCteCellHeader{
+      text-align: center !important;
+      vertical-align: middle !important;
+    }
   </style>
 
   <!-- latest jquery-->
   <script src="assets/js/jquery-3.2.1.min.js"></script>
-
-  <!-- Plugins JS Ends-->
-  <!-- Plugins JS Ends-->
-  <!-- Theme js-->
+  <script src="assets/js/select2/select2.full.min.js"></script>
+  <script src="assets/js/select2/select2-custom.js"></script>
   
   <body class="light-only">
     <!-- Loader ends-->
@@ -179,27 +182,12 @@ Database::disconnect();
                 //echo $sql;?>
                   
                   <div class="card-header">
-                    <!-- <h5><?=$data['razon_social']; ?></h5>
-                    <div class="row mt-3">
-                      <div class="col-12">
-                        
-                        <button class="btn pedidos" style="text-transform: none;" title="Nuevo Pedido" data-toggle="modal" data-target="#nuevoPedido"><i class="fa fa-plus"></i> Pedido</button>
-
-                      </div>
-                    </div> -->
-
                     <div class="row">
                       <div class="col-md-4">
                         <h5><?=$data['razon_social']; ?></h5>
                         <button class="btn pedidos mt-3" style="text-transform: none;" title="Nuevo Pedido" data-toggle="modal" data-target="#nuevoPedido">
                           <i class="fa fa-plus"></i> Pedido
                         </button>
-
-                        <!-- <button class="btn despachos" style="text-transform: none;" title="Nuevo Despacho" data-toggle="modal" data-target="#nuevoDespacho"><i class="fa fa-plus"></i> Despacho</button>
-                        
-                        <button class="btn pagos" style="text-transform: none;" title="Nuevo Pago" data-toggle="modal" data-target="#nuevoPago"><i class="fa fa-plus"></i> Pago</button>
-
-                        <button class="btn contenedores" style="text-transform: none;" title="Nueva devolucion de contenedores" data-toggle="modal" data-target="#nuevaDevolucionContenedores"><i class="fa fa-plus"></i> Contenedores</button> -->
                       </div>
                       <div class="col-md-8">
                         <div class="row">
@@ -229,10 +217,12 @@ Database::disconnect();
                               }?>
                               <i class="<?=$cultivo_pedido["icono"]?>" style=<?=$style?>></i><?php
                             }
-                            echo $cultivo_pedido["nombre"]?>
+                            echo acortarPalabras($cultivo_pedido["nombre"])?>
                           </a>
                         </li><?php
                       }?>
+
+                      <li class="nav-item"><a class="nav-link" id="pills-contenedores-tab" data-toggle="pill" href="#pills-contenedores" role="tab" aria-controls="pills-contenedores" aria-selected="false"><i class="fa fa-th"></i>Contenedores</a></li>
 
                       <li class="nav-item"><a class="nav-link" id="pills-contacto-tab" data-toggle="pill" href="#pills-contacto" role="tab" aria-controls="pills-contacto" aria-selected="true"><i class="icofont icofont-ui-user"></i>Datos</a></li>
 
@@ -240,9 +230,7 @@ Database::disconnect();
 
                     <div class="tab-content" id="pills-tabContent">
 
-                      <div class="tab-pane fade show active" id="pills-resumen" role="tabpanel" aria-labelledby="pills-resumen-tab">
-
-                      </div>
+                      <div class="tab-pane fade show active" id="pills-resumen" role="tabpanel" aria-labelledby="pills-resumen-tab"></div>
                       
                       <div class="tab-pane fade show" id="pills-contacto" role="tabpanel" aria-labelledby="pills-contacto-tab">
                         <div class="form-group row">
@@ -281,14 +269,33 @@ Database::disconnect();
                         </div>
                       </div>
 
+                      <!-- INICIO CTA CTE -->
                       <div class="tab-pane fade" id="pills-cta_cte" role="tabpanel" aria-labelledby="pills-cta_cte-tab">
                         <table class="table mb-3">
                           <tr>
                             <td class="text-right border-0 p-1">Desde: </td>
-                            <td class="border-0 p-1"><input type="date" id="desde" value="<?=date("Y-m-d",strtotime(date("Y-m-d")." -1 year"))?>" class="form-control form-control-sm filtraTabla"></td>
+                            <td class="border-0 p-1">
+                              <input type="date" id="desde_cta_cte" value="<?=date("Y-m-d",strtotime(date("Y-m-d")." -1 year"))?>" class="form-control form-control-sm filtraTablaCtaCte">
+                              <input type="hidden" id="id_cultivo_cta_cte">
+                            </td>
+                            <td rowspan="2" style="vertical-align: middle;" class="text-right border-0 p-1">Servicio:</td>
+                            <td rowspan="2" style="vertical-align: middle;" class="border-0 p-1">
+                              <select id="id_servicio" class="form-control form-control-sm filtraTablaCtaCte selectpicker" data-style="multiselect"><?php
+                                $pdo = Database::connect();
+                                $sql = "SELECT id,servicio FROM servicios WHERE activo=1";
+                                foreach ($pdo->query($sql) as $row) {
+                                  echo "<option value='".$row['id']."'";
+                                  if($row["id"]==2){
+                                    echo " selected";
+                                  }
+                                  echo ">".$row['servicio']."</option>";
+                                }
+                                Database::disconnect();?>
+                              </select>
+                            </td>
                             <td rowspan="2" style="vertical-align: middle;" class="text-right border-0 p-1">Comprobante:</td>
                             <td rowspan="2" style="vertical-align: middle;" class="border-0 p-1">
-                              <select id="tipo_comprobante" class="form-control form-control-sm filtraTabla selectpicker" data-style="multiselect" data-selected-text-format="count > 1" multiple>
+                              <select id="tipo_comprobante" class="form-control form-control-sm filtraTablaCtaCte selectpicker" data-style="multiselect" data-selected-text-format="count > 1" multiple>
                                 <option value="Pedido">Pedido</option>
                                 <option value="Despacho">Despacho</option>
                                 <option value="Pago">Pago</option>
@@ -297,36 +304,31 @@ Database::disconnect();
                           </tr>
                           <tr>
                             <td class="text-right border-0 p-1">Hasta: </td>
-                            <td class="border-0 p-1"><input type="date" id="hasta" value="<?=date("Y-m-d")?>" class="form-control form-control-sm filtraTabla"></td>
+                            <td class="border-0 p-1"><input type="date" id="hasta_cta_cte" value="<?=date("Y-m-d")?>" class="form-control form-control-sm filtraTabla"></td>
                           </tr>
                         </table>
-
                         <table class="table table-striped table-bordered tablas_cta_cte" style="width:100%">
                           <thead>
                             <tr>
-                              <th style="text-align: center;vertical-align: middle;" rowspan="2">Fecha</th>
-                              <th style="text-align: center;vertical-align: middle;" rowspan="2">Comprobante</th>
-                              <th style="text-align: center;vertical-align: middle;" rowspan="2">Campaña</th>
-                              <th style="text-align: center;vertical-align: middle;" rowspan="2">Cantidad pedida</th>
-                              <th style="text-align: center;vertical-align: middle;"class="borderDespachoLeft borderDespachoRight" colspan="2">Despachos</th>
-                              <th style="text-align: center;vertical-align: middle;" class="borderPagoLeft borderPagoRight" colspan="2">Pagos</th>
-                              <th style="text-align: center;vertical-align: middle;" class="borderPagoLeft borderPagoRight" colspan="2">Contenedores</th>
+                              <th class="ctaCteCellHeader" rowspan="2">Fecha</th>
+                              <th class="ctaCteCellHeader" rowspan="2">Comprobante</th>
+                              <th class="ctaCteCellHeader" rowspan="2">Detalle</th>
+                              <th class="ctaCteCellHeader" rowspan="2">Campaña</th>
+                              <th class="ctaCteCellHeader" rowspan="2">Cantidad pedida</th>
+                              <th class="ctaCteCellHeader" colspan="2">Despachos</th>
+                              <th class="ctaCteCellHeader" colspan="2">Pagos</th>
                             </tr>
                             <tr>
-                              <th style="text-align: center;vertical-align: middle;">Cantidad</th>
-                              <th style="text-align: center;vertical-align: middle;">Saldo</th>
-                              <th style="text-align: center;vertical-align: middle;">Cantidad</th>
-                              <th style="text-align: center;vertical-align: middle;">Saldo</th>
-                              <th style="text-align: center;vertical-align: middle;">Cantidad</th>
-                              <th style="text-align: center;vertical-align: middle;">Saldo</th>
+                              <th>Cantidad</th>
+                              <th>Saldo</th>
+                              <th>Cantidad</th>
+                              <th>Saldo</th>
                             </tr>
                           </thead>
                           <tbody></tbody>
                           <tfoot>
                             <tr>
-                              <th class="text-right" colspan="3">Totales</th>
-                              <th class="text-right"></th>
-                              <th class="text-right"></th>
+                              <th class="text-right" colspan="4">Totales</th>
                               <th class="text-right"></th>
                               <th class="text-right"></th>
                               <th class="text-right"></th>
@@ -336,6 +338,58 @@ Database::disconnect();
                           </tfoot>
                         </table>
                       </div>
+                      <!-- FIN CTA CTE -->
+
+                      <!-- INICIO CONTENEDORES -->
+                      <div class="tab-pane fade" id="pills-contenedores" role="tabpanel" aria-labelledby="pills-contenedores-tab">
+                        <table class="table mb-3">
+                          <tr>
+                            <td class="text-right border-0 p-1">Desde: </td>
+                            <td class="border-0 p-1"><input type="date" id="desde_contenedores" value="<?=date("Y-m-d",strtotime(date("Y-m-d")." -1 year"))?>" class="form-control form-control-sm filtraTablaContenedores"></td>
+                            <td rowspan="2" style="vertical-align: middle;" class="text-right border-0 p-1">Contenedores:</td>
+                            <td rowspan="2" style="vertical-align: middle;" class="border-0 p-1">
+                              <select id="id_contenedor" class="form-control form-control-sm filtraTablaContenedores selectpicker" data-style="multiselect"><?php
+                                $pdo = Database::connect();
+                                $sql = "SELECT c.id AS id_contenedor,tp.tipo,c.cantidad_orificios,c.ancho,c.alto FROM contenedores c INNER JOIN tipos_contenedores tp ON c.id_tipo_contenedor=tp.id WHERE c.activo=1";
+                                foreach ($pdo->query($sql) as $row) {
+                                  $mostrar=$row["tipo"]." ".$row["cantidad_orificios"]."u. ".$row["ancho"]."x".$row["alto"]."x[LARGO]"?>
+                                  <option value="<?=$row["id_contenedor"]?>"><?=$mostrar?></option><?php
+                                }
+                                Database::disconnect();?>
+                              </select>
+                            </td>
+                            <td rowspan="2" style="vertical-align: middle;" class="text-right border-0 p-1"></td>
+                            <td rowspan="2" style="vertical-align: middle;" class="border-0 p-1"></td>
+                          </tr>
+                          <tr>
+                            <td class="text-right border-0 p-1">Hasta: </td>
+                            <td class="border-0 p-1"><input type="date" id="hasta_contenedores" value="<?=date("Y-m-d")?>" class="form-control form-control-sm filtraTablaContenedores"></td>
+                          </tr>
+                        </table>
+                        <table class="table table-striped table-bordered" id="tabla_contenedores" style="width:100%">
+                          <thead>
+                            <tr>
+                              <th class="ctaCteCellHeader">Fecha</th>
+                              <th class="ctaCteCellHeader">Comprobante</th>
+                              <!-- <th class="ctaCteCellHeader">Detalle</th> -->
+                              <!-- <th class="ctaCteCellHeader">Campaña</th> -->
+                              <th class="ctaCteCellHeader">Cantidad despachada</th>
+                              <th class="ctaCteCellHeader">Cantidad devuelta</th>
+                              <th class="ctaCteCellHeader">Saldo</th>
+                            </tr>
+                          </thead>
+                          <tbody></tbody>
+                          <tfoot>
+                            <tr>
+                              <th class="text-right" colspan="2">Totales</th>
+                              <th class="text-right"></th>
+                              <th class="text-right"></th>
+                              <th class="text-right"></th>
+                            </tr>
+                          </tfoot>
+                        </table>
+                      </div>
+                      <!-- FIN CONTENEDORES -->
 
                     </div>
                   </div>
@@ -389,10 +443,7 @@ Database::disconnect();
     <!-- Theme js-->
     <script src="assets/js/script.js"></script>
 
-    <!-- Plugin used-->
-    <script src="assets/js/select2/select2.full.min.js"></script>
-    <script src="assets/js/select2/select2-custom.js"></script>
-    
+    <!-- Plugin used-->    
     <script src="assets/js/datatable/datatables/jquery.dataTables.min.js"></script>
     <script src="assets/js/datatable/datatable-extension/dataTables.buttons.min.js"></script>
     <script src="assets/js/datatable/datatable-extension/jszip.min.js"></script>
@@ -415,6 +466,9 @@ Database::disconnect();
     <script src="assets/js/datatable/datatable-extension/custom.js"></script>
     <script src="assets/js/chat-menu.js"></script>
     <script src="assets/js/tooltip-init.js"></script>
+    <!-- Plugins JS Ends-->
+    <!-- Plugins JS Ends-->
+    <!-- Theme js-->
     <script>
       $(document).ready(function() {
         //$("#nuevoPedido").modal("show")
@@ -606,102 +660,6 @@ Database::disconnect();
           }
         }
 
-        $("#addRowCultivos").on('click', function(event) {
-          event.preventDefault();
-          addRowCultivos();
-        }).click();
-
-        function addRowCultivos(){
-          //alert("hola");
-          var newid = 0;
-          var primero="";
-          var ultimoRegistro=0;
-          $.each($("#tableCultivos tr"), function() {
-            if (parseInt($(this).data("id")) > newid) {
-              newid = parseInt($(this).data("id"));
-            }
-          });
-          //debugger;
-          newid++;
-          //console.log(newid);
-          var tr = $("<tr></tr>", {
-            "id": "addr"+newid,
-            "data-id": newid
-          });
-          //console.log(newid);
-          var p=0;
-          $.each($("#tableCultivos tbody tr:nth(0) td"),function(){//loop through each td and create new elements with name of newid
-            var cur_td = $(this); 
-            var children = cur_td.children();
-            if($(this).data("name")!=undefined){// add new td and element if it has a name
-              var td = $("<td></td>", {
-                "data-name": $(cur_td).data("name"),
-                "class": this.className
-              });
-              var c = $(cur_td).find($(children[0]).prop('tagName')).clone();//.val("")
-              
-              var id=$(c).attr("id");
-              if($(c).data("required")==1){
-                $(c).attr("required",true);
-              }
-              ultimoRegistro=id;
-              if(id!=undefined){
-                //console.log("id1: ");
-                //console.log(id);
-                id=id.split("-");
-                c.attr("id", id[0]+"-"+newid);//modificamos el id de cada input
-                if(p==0){
-                  primero=c;
-                  p++;
-                }
-              }
-              c.appendTo($(td));
-              td.appendTo($(tr));
-              
-            }else {
-              //console.log("<td></td>",{'text':$('#tab_logic tr').length})
-              var td = $("<td></td>", {
-                'text': $('#tableCultivos tr').length
-              }).appendTo($(tr));
-            }
-          });
-          //console.log($(tr).find($("input[name='detalledireccion[]']")));
-          //console.log(tr);//.find($("input"))
-          $(tr).appendTo($('#tableCultivos'));// add the new row
-          if(newid>0){
-            //primero.focus();
-            let sel5=$("#id_servicio-"+newid)
-            sel5.select2();//llamamos para inicializar select2
-            //lo destruimos para que elimine las clases que arrastra de la clonacion y volvemos a inicializar
-            sel5.select2('destroy');
-            sel5.select2();
-            sel5.css('width', '100%');
-
-            let sel2=$("#id_especie-"+newid)
-            sel2.select2();//llamamos para inicializar select2
-            //lo destruimos para que elimine las clases que arrastra de la clonacion y volvemos a inicializar
-            sel2.select2('destroy');
-            sel2.select2();
-            sel2.css('width', '100%');
-
-            let sel3=$("#id_procedencia-"+newid)
-            sel3.select2();//llamamos para inicializar select2
-            //lo destruimos para que elimine las clases que arrastra de la clonacion y volvemos a inicializar
-            sel3.select2('destroy');
-            sel3.select2();
-            sel3.css('width', '100%');
-
-            let sel4=$("#id_material-"+newid)
-            sel4.select2();//llamamos para inicializar select2
-            //lo destruimos para que elimine las clases que arrastra de la clonacion y volvemos a inicializar
-            sel4.select2('destroy');
-            sel4.select2();
-            sel4.css('width', '100%');
-            
-          }
-          return tr.attr("id");
-        }
-
         $(document).on("click",".btnNuevoDespacho",function(){
           let id_pedido=this.dataset.idPedido;
           let modal=$("#nuevoDespacho")
@@ -717,37 +675,37 @@ Database::disconnect();
           modal.modal("show")
           modal.find("span.idPedido").html(this.dataset.idPedido)
         })
+
         $(document).on("click",".btnNuevaDevolucionContenedores",function(){
           let modal=$("#nuevaDevolucionContenedores")
           modal.modal("show")
           modal.find("span.idPedido").html(this.dataset.idPedido)
         })
+
         $(document).on("click",".btnNuevaDevolucionPlantines",function(){
           let modal=$("#nuevaDevolucionPlantines")
           modal.modal("show")
           modal.find("span.idPedido").html(this.dataset.idPedido)
         })
 
-        $(".nav_id_cultivo").on("click",function(){
-          let id_cultivo=this.dataset.id_cultivo
-          console.log(id_cultivo);
+        $("#pills-contenedores-tab").on("click",getCtaCteContenedores)
 
-          getCtaCte(id_cultivo);
-        })
+        $(".filtraTablaContenedores").on("change",getCtaCteContenedores)
 
-        function getCtaCte(id_cultivo){
-          let desde=$("#desde").val();
-          let hasta=$("#hasta").val();
-          let tipo_comprobante=$("#tipo_comprobante").val();
+        function getCtaCteContenedores(){
+          let desde=$("#desde_contenedores").val();
+          let hasta=$("#hasta_contenedores").val();
+          //let tipo_comprobante=$("#tipo_comprobante").val();
+          let id_contenedor=$("#id_contenedor").val();
           let id_cliente=<?=$id?>;
 
-          let table=$('.tablas_cta_cte')
+          let table=$('#tabla_contenedores')
           table.DataTable().destroy();
           table.DataTable({
             //dom: 'rtip',
             //serverSide: true,
             processing: true,
-            ajax:{url:'ajaxGetCtaCte.php?desde='+desde+'&hasta='+hasta+'&tipo_comprobante='+tipo_comprobante+'&id_cliente='+id_cliente+'&id_cultivo='+id_cultivo,dataSrc:""},
+            ajax:{url:'ajaxGetCtaCteContenedores.php?desde='+desde+'&hasta='+hasta+'&id_cliente='+id_cliente+'&id_contenedor='+id_contenedor,dataSrc:""},
             stateSave: true,
             responsive: true,
 
@@ -790,10 +748,145 @@ Database::disconnect();
                 if(tipo_comprobante=="Pago"){
                   clase="pagos";
                 }
-                //<span class="badge '+clase+'">'++'</span>
-                //<a class="dropdown-item" href="#">Action</a>
-                //<a class="dropdown-item" href="#">Another action</a>
-                //<a class="dropdown-item" href="#">Something else here</a>
+                if(tipo_comprobante=="Despacho"){
+                  return `
+                    <div class="dropdown">
+                      <button class="btn btn-sm ${clase} dropdown-toggle" type="button" data-toggle="dropdown" aria-expanded="false" style="white-space: nowrap;">
+                        ${tipo_comprobante+' N° '+row.id_despacho}
+                      </button>
+                      <div class="dropdown-menu">
+                        <a href="#" class="dropdown-item contenedores btnNuevaDevolucionContenedores" data-id-pedido="${row.id_despacho}">
+                          <i class="fa fa-plus"></i> Devolucion
+                        </a>
+                      </div>
+                    </div>
+                  `;
+                }else{
+                  return '<button class="btn btn-sm '+clase+'">'+tipo_comprobante+' N° '+row.id_despacho+'</button>'
+                }
+              }},
+              /*{
+                render: function(data, type, row, meta) {
+                  let procedencia=row.procedencia
+                  if(procedencia!=""){
+                    procedencia="P: "+procedencia
+                  }
+
+                  let material=row.material
+                  if(material!=""){
+                    material=" - M: "+material
+                  }
+                  return procedencia+material;
+                },
+                //className: "dt-body-right",
+              },*/
+              //{"data": "campana"},
+              {
+                render: function(data, type, row, meta) {
+                  return Intl.NumberFormat("de-DE").format(row.cantidad_despachada)
+                },
+                className: "dt-body-right",
+              },
+              {
+                render: function(data, type, row, meta) {
+                  return Intl.NumberFormat("de-DE").format(row.cantidad_devuelta)
+                },
+                className: "dt-body-right borderDespachoLeft",
+              },
+              {
+                render: function(data, type, row, meta) {
+                  return Intl.NumberFormat("de-DE").format(row.saldo_contenedores)
+                },
+                className: "dt-body-right borderDespachoRight",
+              },
+            ],
+            "columnDefs": [
+              { "className": "dt-body-right", "targets": [0,3] },
+              { "className": "dt-body-center", "targets": 2 }
+            ],
+            initComplete: function(settings, json){
+              /*let total_facturas_recibos=json.queryInfo.total_facturas_recibos*/
+
+              let ultimoSaldo=0
+              json.forEach(item => {
+                ultimoSaldo=item.saldo_contenedores
+              });
+              var api = this.api();
+              // Update footer
+              $(api.column(4).footer()).html(Intl.NumberFormat("de-DE").format(ultimoSaldo));
+
+              $('[title]').tooltip();
+            }
+          })
+        }
+
+        $(".nav_id_cultivo").on("click",function(){
+          let id_cultivo=this.dataset.id_cultivo
+          console.log(id_cultivo);
+          $("#id_cultivo_cta_cte").val(id_cultivo)
+
+          getCtaCteEspecies();
+        })
+
+        $(".filtraTablaCtaCte").on("change",getCtaCteEspecies)
+
+        function getCtaCteEspecies(){
+          let id_cultivo=$("#id_cultivo_cta_cte").val()
+          let desde=$("#desde_cta_cte").val();
+          let hasta=$("#hasta_cta_cte").val();
+          let tipo_comprobante=$("#tipo_comprobante").val();
+          let id_servicio=$("#id_servicio").val();
+          let id_cliente=<?=$id?>;
+
+          let table=$('.tablas_cta_cte')
+          table.DataTable().destroy();
+          table.DataTable({
+            //dom: 'rtip',
+            //serverSide: true,
+            processing: true,
+            ajax:{url:'ajaxGetCtaCteEspecies.php?desde='+desde+'&hasta='+hasta+'&tipo_comprobante='+tipo_comprobante+'&id_cliente='+id_cliente+'&id_servicio='+id_servicio+'&id_cultivo='+id_cultivo,dataSrc:""},
+            stateSave: true,
+            responsive: true,
+
+            dom: 'rtip',
+            ordering: false,
+            paginate: false,
+            //scrollY: '100vh',
+            scrollCollapse: true,
+            language: {
+              "decimal": "",
+              "emptyTable": "No hay información",
+              "info": "Mostrando _START_ a _END_ de _TOTAL_ Registros",
+              "infoEmpty": "Mostrando 0 to 0 of 0 Registros",
+              "infoFiltered": "(Filtrado de _MAX_ total registros)",
+              "infoPostFix": "",
+              "thousands": ",",
+              "lengthMenu": "Mostrar _MENU_ Registros",
+              "loadingRecords": "Cargando...",
+              "processing": "Procesando...",
+              "search": "Buscar:",
+              "zeroRecords": "No hay resultados",
+              "paginate": {
+                  "first": "Primero",
+                  "last": "Ultimo",
+                  "next": "Siguiente",
+                  "previous": "Anterior"
+              }
+            },
+            "columns":[
+              {"data": "fecha"},
+              {render: function(data, type, row, meta) {
+                let tipo_comprobante=row.tipo_comprobante;
+                let clase;
+                if(tipo_comprobante=="Pedido"){
+                  clase="pedidos";
+                }
+                if(tipo_comprobante=="Despacho"){
+                  clase="despachos";
+                }
+                if(tipo_comprobante=="Pago"){
+                  clase="pagos";
+                }
                 if(tipo_comprobante=="Pedido"){
                   return `
                     <div class="dropdown">
@@ -807,19 +900,36 @@ Database::disconnect();
                         <a href="#" class="dropdown-item pagos btnNuevoPago" data-id-pedido="${row.id_pedido}">
                           <i class="fa fa-plus"></i> Pago
                         </a>
-                        <a href="#" class="dropdown-item contenedores btnNuevaDevolucionContenedores" data-id-pedido="${row.id_pedido}">
-                          <i class="fa fa-plus"></i> Devolucion de contenedores
-                        </a>
                         <a href="#" class="dropdown-item plantines btnNuevaDevolucionPlantines" data-id-pedido="${row.id_pedido}">
                           <i class="fa fa-plus"></i> Devolucion de plantines
                         </a>
                       </div>
                     </div>
                   `;
+                  /*
+                    <a href="#" class="dropdown-item contenedores btnNuevaDevolucionContenedores" data-id-pedido="${row.id_pedido}">
+                      <i class="fa fa-plus"></i> Devolucion de contenedores
+                    </a>
+                  */
                 }else{
                   return '<button class="btn btn-sm '+clase+'">'+tipo_comprobante+' N° '+row.id_pedido+'</button>'
                 }
               }},
+              {
+                render: function(data, type, row, meta) {
+                  let procedencia=row.procedencia
+                  if(procedencia!=""){
+                    procedencia="P: "+procedencia
+                  }
+
+                  let material=row.material
+                  if(material!=""){
+                    material=" - M: "+material
+                  }
+                  return procedencia+material;
+                },
+                //className: "dt-body-right",
+              },
               {"data": "campana"},
               {
                 render: function(data, type, row, meta) {
@@ -851,7 +961,7 @@ Database::disconnect();
                 },
                 className: "dt-body-right borderPagoRight",
               },
-              {
+              /*{
                 render: function(data, type, row, meta) {
                   //return Intl.NumberFormat("de-DE").format(row.cantidad_pago)
                   return 0;
@@ -864,7 +974,7 @@ Database::disconnect();
                   return 0;
                 },
                 className: "dt-body-right borderPagoRight",
-              },
+              },*/
             ],
             "columnDefs": [
               { "className": "dt-body-right", "targets": [0,3] },
@@ -881,13 +991,13 @@ Database::disconnect();
               //console.log(ultimosSaldos);
               // Update footer
               //$(api.column(3).footer()).html(new Intl.NumberFormat('es-AR', {currency: 'ARS', style: 'currency'}).format(total_cantidad));
-              $(api.column(3).footer()).html(Intl.NumberFormat("de-DE").format(totales.totalPedido));
-              $(api.column(4).footer()).html(Intl.NumberFormat("de-DE").format(totales.totalDespacho));
-              $(api.column(5).footer()).html(Intl.NumberFormat("de-DE").format(ultimosSaldos.saldoDespacho));
-              $(api.column(6).footer()).html(Intl.NumberFormat("de-DE").format(totales.totalPago));
-              $(api.column(7).footer()).html(Intl.NumberFormat("de-DE").format(ultimosSaldos.saldoPago));
-              $(api.column(8).footer()).html(Intl.NumberFormat("de-DE").format(totales.totalPago));
-              $(api.column(9).footer()).html(Intl.NumberFormat("de-DE").format(ultimosSaldos.saldoPago));
+              $(api.column(4).footer()).html(Intl.NumberFormat("de-DE").format(totales.totalPedido));
+              $(api.column(5).footer()).html(Intl.NumberFormat("de-DE").format(totales.totalDespacho));
+              $(api.column(6).footer()).html(Intl.NumberFormat("de-DE").format(ultimosSaldos.saldoDespacho));
+              $(api.column(7).footer()).html(Intl.NumberFormat("de-DE").format(totales.totalPago));
+              $(api.column(8).footer()).html(Intl.NumberFormat("de-DE").format(ultimosSaldos.saldoPago));
+              /*$(api.column(9).footer()).html(Intl.NumberFormat("de-DE").format(totales.totalPago));
+              $(api.column(10).footer()).html(Intl.NumberFormat("de-DE").format(ultimosSaldos.saldoPago));*/
 
               $('[title]').tooltip();
             }
@@ -896,38 +1006,38 @@ Database::disconnect();
 
         // Función para sumar las cantidades de pedidos, despachos y pagos
         function sumarCantidades(datos) {
-            let totalPedido = 0;
-            let totalDespacho = 0;
-            let totalPago = 0;
+          let totalPedido = 0;
+          let totalDespacho = 0;
+          let totalPago = 0;
 
-            datos.forEach(item => {
-                if (item.cantidad_pedido !== "") {
-                    totalPedido += parseInt(item.cantidad_pedido);
-                }
-                if (item.cantidad_despacho !== "") {
-                    totalDespacho += parseInt(item.cantidad_despacho);
-                }
-                if (item.cantidad_pago !== "") {
-                    totalPago += parseInt(item.cantidad_pago);
-                }
-            });
+          datos.forEach(item => {
+            if (item.cantidad_pedido !== "") {
+              totalPedido += parseInt(item.cantidad_pedido);
+            }
+            if (item.cantidad_despacho !== "") {
+              totalDespacho += parseInt(item.cantidad_despacho);
+            }
+            if (item.cantidad_pago !== "") {
+              totalPago += parseInt(item.cantidad_pago);
+            }
+          });
 
-            return {
-                totalPedido,
-                totalDespacho,
-                totalPago
-            };
+          return {
+            totalPedido,
+            totalDespacho,
+            totalPago
+          };
         }
 
         // Función para obtener el último saldo de despacho y pago
         function obtenerUltimosSaldos(datos) {
-            const ultimoDespacho = datos.filter(item => item.saldo_despacho !== "").pop();
-            const ultimoPago = datos.filter(item => item.saldo_pago !== "").pop();
+          const ultimoDespacho = datos.filter(item => item.saldo_despacho !== "").pop();
+          const ultimoPago = datos.filter(item => item.saldo_pago !== "").pop();
 
-            return {
-                saldoDespacho: ultimoDespacho ? ultimoDespacho.saldo_despacho : 0,
-                saldoPago: ultimoPago ? ultimoPago.saldo_pago : 0
-            };
+          return {
+            saldoDespacho: ultimoDespacho ? ultimoDespacho.saldo_despacho : 0,
+            saldoPago: ultimoPago ? ultimoPago.saldo_pago : 0
+          };
         }
 
         // Escuchar el evento input del textarea para guardar automáticamente el contenido

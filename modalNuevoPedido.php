@@ -193,4 +193,105 @@
     $(".cantidad").attr("disabled",false)
     //console.log($(".id_material"));
   })
+
+  $("#addRowCultivos").on('click', function(event) {
+    event.preventDefault();
+    addRowCultivos();
+  }).click();
+
+  function addRowCultivos(){
+    //alert("hola");
+    var newid = 0;
+    var primero="";
+    var ultimoRegistro=0;
+    $.each($("#tableCultivos tr"), function() {
+      if (parseInt($(this).data("id")) > newid) {
+        newid = parseInt($(this).data("id"));
+      }
+    });
+    //debugger;
+    newid++;
+    //console.log(newid);
+    var tr = $("<tr></tr>", {
+      "id": "addr"+newid,
+      "data-id": newid
+    });
+    //console.log(newid);
+    var p=0;
+    $.each($("#tableCultivos tbody tr:nth(0) td"),function(){//loop through each td and create new elements with name of newid
+      var cur_td = $(this); 
+      var children = cur_td.children();
+      if($(this).data("name")!=undefined){// add new td and element if it has a name
+        var td = $("<td></td>", {
+          "data-name": $(cur_td).data("name"),
+          "class": this.className
+        });
+        var c = $(cur_td).find($(children[0]).prop('tagName')).clone();//.val("")
+        
+        var id=$(c).attr("id");
+        if($(c).data("required")==1){
+          $(c).attr("required",true);
+        }
+        ultimoRegistro=id;
+        if(id!=undefined){
+          //console.log("id1: ");
+          //console.log(id);
+          id=id.split("-");
+          c.attr("id", id[0]+"-"+newid);//modificamos el id de cada input
+          if(p==0){
+            primero=c;
+            p++;
+          }
+        }
+        c.appendTo($(td));
+        td.appendTo($(tr));
+        
+      }else {
+        //console.log("<td></td>",{'text':$('#tab_logic tr').length})
+        var td = $("<td></td>", {
+          'text': $('#tableCultivos tr').length
+        }).appendTo($(tr));
+      }
+    });
+    //console.log($(tr).find($("input[name='detalledireccion[]']")));
+    //console.log(tr);//.find($("input"))
+    $(tr).appendTo($('#tableCultivos'));// add the new row
+    if(newid>0){
+      //primero.focus();
+      let sel2=$("#id_especie-"+newid)
+      sel2.select2();//llamamos para inicializar select2
+      //lo destruimos para que elimine las clases que arrastra de la clonacion y volvemos a inicializar
+      sel2.select2('destroy');
+      sel2.select2();
+      sel2.css('width', '100%');
+
+      let sel3=$("#id_procedencia-"+newid)
+      sel3.select2();//llamamos para inicializar select2
+      //lo destruimos para que elimine las clases que arrastra de la clonacion y volvemos a inicializar
+      sel3.select2('destroy');
+      sel3.select2();
+      sel3.css('width', '100%');
+
+      let sel4=$("#id_material-"+newid)
+      sel4.select2();//llamamos para inicializar select2
+      //lo destruimos para que elimine las clases que arrastra de la clonacion y volvemos a inicializar
+      sel4.select2('destroy');
+      sel4.select2();
+      sel4.css('width', '100%');
+
+      let sel5=$("#id_servicio-"+newid)
+      sel5.select2();//llamamos para inicializar select2
+      //lo destruimos para que elimine las clases que arrastra de la clonacion y volvemos a inicializar
+      sel5.select2('destroy');
+      sel5.select2();
+      sel5.css('width', '100%');
+      
+    }
+    return tr.attr("id");
+  }
+
+  function eliminarFila(t){
+    var fila=$(t).closest("tr");
+    fila.remove();
+  }
 </script>
