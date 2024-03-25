@@ -11,9 +11,9 @@ if ( !empty($_POST)) {
   $pdo = Database::connect();
   $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-  $sql = "INSERT INTO contenedores (id_tipo_contenedor, cantidad_orificios, ancho, alto, activo, id_usuario, fecha_hora_alta) VALUES (?,?,?,?,1,?,NOW())";
+  $sql = "INSERT INTO contenedores (id_tipo_contenedor, cantidad_orificios, ancho, alto, largo, activo, id_usuario, fecha_hora_alta) VALUES (?,?,?,?,1,?,NOW())";
   $q = $pdo->prepare($sql);
-  $q->execute(array($_POST['id_tipo_contenedor'], $_POST['cantidad_orificios'], $_POST['ancho'] ,$_POST['alto'],$_SESSION["user"]["id"]));
+  $q->execute(array($_POST['id_tipo_contenedor'], $_POST['cantidad_orificios'], $_POST['ancho'] ,$_POST['alto'], $_POST['largo'],$_SESSION["user"]["id"]));
 
   Database::disconnect();
 
@@ -102,6 +102,10 @@ if ( !empty($_POST)) {
                           <div class="form-group row">
                             <label class="col-sm-3 col-form-label">Alto</label>
                             <div class="col-sm-9"><input name="alto" type="number" maxlength="199" class="form-control" required></div>
+                          </div>
+                          <div class="form-group row">
+                            <label class="col-sm-3 col-form-label">Largo</label>
+                            <div class="col-sm-9"><input name="largo" type="number" maxlength="199" class="form-control" required></div>
                           </div>
                         </div>
                       </div>

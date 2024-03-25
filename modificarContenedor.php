@@ -147,6 +147,10 @@ if ( !empty($_POST)) {
                             <div class="col-sm-9"><input name="alto" type="text" maxlength="199" class="form-control" value="<?=$data['alto']?>" required></div>
                           </div>
                           <div class="form-group row">
+                            <label class="col-sm-3 col-form-label">Largo</label>
+                            <div class="col-sm-9"><input name="largo" type="text" maxlength="199" class="form-control" value="<?=$data['largo']?>" required></div>
+                          </div>
+                          <div class="form-group row">
                             <label class="col-sm-3 col-form-label">Activo</label>
                             <div class="col-sm-9"><?php
                               foreach ($aOptionsActivo as $option) {?>
