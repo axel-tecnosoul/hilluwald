@@ -124,7 +124,6 @@ Database::disconnect();?>
                                     <th>Especie</th>
                                     <th>Procedencia</th>
                                     <th>Material</th>
-                                    <th>Largo</th>
                                     <th>Cantidad</th>
                                   </tr>
                                 </thead>
@@ -141,18 +140,11 @@ Database::disconnect();?>
                                     echo '<td>'. $row["especie"] . '</td>';
                                     echo '<td>'. $row["procedencia"] . '</td>';
                                     echo '<td>'. $row["material"] . '</td>';
-                                    echo '<td>'. "12" . "cm" . '</td>';
                                     echo '<td>'. $row["cantidad_plantines"] . '</td>';
                                     echo '</tr>';
                                   }
                                   Database::disconnect();?>
                                 </tbody>
-                                <tfoot>
-                                  <tr>
-                                    <th style="text-align:right" colspan="5">Total</th>
-                                    <th style="text-align:right"><?=$cantidad_plantines; ?></th>
-                                  </tr>
-                                </tfoot>
                               </table>
                             </div>
                           </div>
