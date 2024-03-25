@@ -264,7 +264,7 @@ $desde=date("Y-m-d",strtotime($hoy." -1 year"))?>
           {"data": "despacho_completo"},*/
           {render: function(data, type, row, meta) {
             let btnVer='<a href="verPedido.php?id='+row.id_pedido+'"><img src="img/eye.png" width="24" height="15" border="0" alt="Ver Pedido" title="Ver Pedido"></a>&nbsp;&nbsp;'
-            let btnImprimir='<a href="remito.php?id='+row.id_pedido+'" target="_blank"><img src="img/print.png" width="30" height="20" border="0" alt="Imprimir Remito" title="Imprimir Remito"></a>&nbsp;&nbsp;'
+            let btnImprimir='<a href="PDFPedido.php?id='+row.id_pedido+'" target="_blank"><img src="img/print.png" width="30" height="20" border="0" alt="Imprimir Remito" title="Imprimir Remito"></a>&nbsp;&nbsp;'
             let btnAnular="";
             console.log(id_perfil);
             console.log(row.facturacion);

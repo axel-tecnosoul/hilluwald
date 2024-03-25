@@ -24,9 +24,9 @@
 		$pdo = Database::connect();
 		$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 		
-		$sql = "UPDATE clientes set razon_social = ?, direccion = ?, telefono = ?, email = ?, cuit = ?, cond_fiscal = ?, id_usuario = ? where id = ?";
+		$sql = "UPDATE clientes set razon_social = ?, direccion = ?, telefono = ?, email = ?, cuit = ?, cond_fiscal = ?, id_localidad = ?, id_usuario = ? where id = ?";
 		$q = $pdo->prepare($sql);
-		$q->execute(array($_POST['razon_social'],$_POST['direccion'],$_POST['telefono'],$_POST['email'],$_POST['cuit'],$_POST['cond_fiscal'],$_SESSION['user']['id'],$id_cliente));
+		$q->execute(array($_POST['razon_social'],$_POST['direccion'],$_POST['telefono'],$_POST['email'],$_POST['cuit'],$_POST['cond_fiscal'], $_POST['localidad'], $_SESSION['user']['id'],$id_cliente));
 
     $sql = "DELETE FROM cliente_sucursal WHERE id_cliente = ?";
     $q = $pdo->prepare($sql);
@@ -79,7 +79,7 @@
 		$pdo = Database::connect();
 		$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 		
-    $sql = "SELECT c.id, c.razon_social, c.direccion, c.telefono, c.email, c.cuit, c.cond_fiscal, c.activo, c.id_usuario FROM clientes c WHERE c.id = ? ";
+    $sql = "SELECT c.id, c.razon_social, c.direccion, c.telefono, c.email, c.cuit, c.cond_fiscal, c.id_localidad, c.activo, c.id_usuario FROM clientes c WHERE c.id = ? ";
 		$q = $pdo->prepare($sql);
 		$q->execute(array($id_cliente));
 		$data = $q->fetch(PDO::FETCH_ASSOC);
@@ -211,29 +211,50 @@
                             </div>
 
                             <div class="form-group col-4">
+                              <label class="cond_fiscal">Condicion Fiscal</label>
+                              <select name="cond_fiscal" class="form-control">
+                              <option value="">- Seleccione -</option><?php
+                                foreach ($aCondicionesFiscales as $value) {
+                                  $selected="";
+                                  if($value==$data["cond_fiscal"]){
+                                    $selected="selected";
+                                  }?>
+                                  <option <?=$selected?>><?=$value?></option><?php
+                                  }?>
+                              </select>
+                            </div>
+
+                            <div class="form-group col-4">
+                              <label for="cuit">CUIT</label>
+                              <input type="text" class="form-control" id="cuit" name="cuit" aria-describedby="cuit" placeholder="Introduzca el CUIT" value="<?= $data['cuit']; ?>">
+                              <!-- <small id="cuit" class="form-text text-muted">We'll never share your text with anyone else.</small> -->
+                            </div>
+
+                            <div class="form-group col-4">
+                              <label for="localidad">Localidad</label>
+                              <select name="localidad" id="localidad" class="js-example-basic-single col-sm-12" data-required="1">
+                                <option value="">Seleccione...</option><?php
+                                $pdo = Database::connect();
+                                $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+                                $sqlZon = "SELECT l.id, l.localidad, p.provincia FROM `localidades` l left join provincias p on l.id_provincia = p.id  WHERE 1";
+                                $q = $pdo->prepare($sqlZon);
+                                $q->execute();
+                                while ($fila = $q->fetch(PDO::FETCH_ASSOC)) {
+                                  echo "<option value='".$fila['id']."'";
+                                  if ($fila['id'] == $data['id_localidad']) {
+                                    echo " selected ";
+                                  }
+                                  
+                                  echo ">".$fila['localidad'] . " - " . $fila['provincia']."</option>";
+                                }
+                                Database::disconnect();?>
+                              </select>
+                            </div>
+
+                            <div class="form-group col-4">
                               <label for="direccion">Direccion</label>
                               <input type="text" class="form-control" id="direccion" name="direccion" aria-describedby="direccion" placeholder="Introduzca el direccion" value="<?= $data['direccion']; ?>">
                               <!-- <small id="direccion" class="form-text text-muted">We'll never share your text with anyone else.</small> -->
-                            </div>
-
-                            <div class="form-group col-4">
-                              <label for="telefono">Telefono</label>
-                              <input type="text" class="form-control" id="telefono" name="telefono" aria-describedby="telefono" placeholder="Introduzca el telefono" value="<?= $data['telefono']; ?>">
-                              <!-- <small id="direccion" class="form-text text-muted">We'll never share your text with anyone else.</small> -->
-                            </div>
-
-                            <div class="form-group col-4">
-                              <label class="cond_fiscal">Condicion Fiscal</label>
-                                <select name="cond_fiscal" class="form-control">
-                                  <option value="">- Seleccione -</option><?php
-                                  foreach ($aCondicionesFiscales as $value) {
-                                    $selected="";
-                                    if($value==$data["cond_fiscal"]){
-                                      $selected="selected";
-                                    }?>
-                                    <option <?=$selected?>><?=$value?></option><?php
-                                    }?>
-                                </select>
                             </div>
 
                             <div class="form-group col-4">
@@ -243,10 +264,11 @@
                             </div>
 
                             <div class="form-group col-4">
-                              <label for="cuit">CUIT</label>
-                              <input type="text" class="form-control" id="cuit" name="cuit" aria-describedby="cuit" placeholder="Introduzca el CUIT" value="<?= $data['cuit']; ?>">
-                              <!-- <small id="cuit" class="form-text text-muted">We'll never share your text with anyone else.</small> -->
+                              <label for="telefono">Telefono</label>
+                              <input type="text" class="form-control" id="telefono" name="telefono" aria-describedby="telefono" placeholder="Introduzca el telefono" value="<?= $data['telefono']; ?>">
+                              <!-- <small id="direccion" class="form-text text-muted">We'll never share your text with anyone else.</small> -->
                             </div>
+                            
                             <div class="form-group col-4">
                                 <label for="sucursales">Sucursales</label>
                                 <select name="sucursales[]" class="js-example-basic-single col-12" multiple>

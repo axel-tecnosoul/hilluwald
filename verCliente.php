@@ -18,7 +18,7 @@ if ( null==$id ) {
 
 $pdo = Database::connect();
 $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-$sql = "SELECT id, razon_social, cuit, cond_fiscal, direccion, email, telefono, notas, activo FROM clientes WHERE id = ? ";
+$sql = "SELECT c.id, c.razon_social, c.cuit, c.cond_fiscal, c.direccion, c.email, c.telefono, c.notas, lo.localidad, pr.provincia, c.activo FROM clientes c INNER JOIN localidades lo ON c.id_localidad = lo.id INNER JOIN provincias pr ON lo.id_provincia = pr.id WHERE c.id = ? ";
 $q = $pdo->prepare($sql);
 $q->execute(array($id));
 $data = $q->fetch(PDO::FETCH_ASSOC);
@@ -244,6 +244,10 @@ Database::disconnect();
                         <div class="form-group row">
                           <label class="col-sm-3 col-form-label">Condicion fiscal</label>
                           <div class="col-sm-9"><input name="cond_fiscal" type="text" maxlength="99" class="form-control" value="<?=$data['cond_fiscal']; ?>" readonly="readonly"></div>
+                        </div>
+                        <div class="form-group row">
+                          <label class="col-sm-3 col-form-label">Localidad</label>
+                          <div class="col-sm-9"><input name="id_localidad" type="text" maxlength="99" class="form-control" value="<?=$data['localidad'] . " - " . $data['provincia']; ?>" readonly="readonly"></div>
                         </div>
                         <div class="form-group row">
                           <label class="col-sm-3 col-form-label">Direccion</label>
