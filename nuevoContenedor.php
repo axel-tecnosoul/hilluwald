@@ -11,7 +11,7 @@ if ( !empty($_POST)) {
   $pdo = Database::connect();
   $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-  $sql = "INSERT INTO contenedores (id_tipo_contenedor, cantidad_orificios, ancho, alto, largo, activo, id_usuario, fecha_hora_alta) VALUES (?,?,?,?,1,?,NOW())";
+  $sql = "INSERT INTO contenedores (id_tipo_contenedor, cantidad_orificios, ancho, alto, largo, activo, id_usuario, fecha_hora_alta) VALUES (?,?,?,?,?,1,?,NOW())";
   $q = $pdo->prepare($sql);
   $q->execute(array($_POST['id_tipo_contenedor'], $_POST['cantidad_orificios'], $_POST['ancho'] ,$_POST['alto'], $_POST['largo'],$_SESSION["user"]["id"]));
 

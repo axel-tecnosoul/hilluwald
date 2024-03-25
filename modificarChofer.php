@@ -94,25 +94,25 @@
                   <div class="card-header">
                     <h5>Modificar Chofer</h5>
                   </div>
-				  <form class="form theme-form" role="form" method="post" action="modificarChofer.php?id=<?php echo $id?>">
+				          <form class="form theme-form" role="form" method="post" action="modificarChofer.php?id=<?php echo $id?>">
                     <div class="card-body">
                       <div class="row">
                         <div class="col">
-							<div class="form-group row">
-								<label class="col-sm-3 col-form-label">Nombre</label>
-								<div class="col-sm-9"><input name="nombre" type="text" maxlength="99" class="form-control" value="<?php echo $data['nombre']; ?>" required="required"></div>
-							</div>
-                            <div class="form-group row">
-								<label class="col-sm-3 col-form-label">Apellido</label>
-								<div class="col-sm-9"><input name="apellido" type="text" maxlength="99" class="form-control" value="<?php echo $data['apellido']; ?>" required="required"></div>
-							</div>
+                          <div class="form-group row">
+                            <label class="col-sm-3 col-form-label">Nombre</label>
+                            <div class="col-sm-9"><input name="nombre" type="text" maxlength="99" class="form-control" value="<?php echo $data['nombre']; ?>" required="required"></div>
+                          </div>
+                                        <div class="form-group row">
+                            <label class="col-sm-3 col-form-label">Apellido</label>
+                            <div class="col-sm-9"><input name="apellido" type="text" maxlength="99" class="form-control" value="<?php echo $data['apellido']; ?>" required="required"></div>
+                          </div>
                         </div>
                       </div>
                     </div>
                     <div class="card-footer">
                       <div class="col-sm-9 offset-sm-3">
                         <button class="btn btn-primary" type="submit">Modificar</button>
-						<a onclick="document.location.href='listarChoferes.php'" class="btn btn-light">Volver</a>
+						            <a onclick="document.location.href='listarChoferes.php'" class="btn btn-light">Volver</a>
                       </div>
                     </div>
                   </form>
@@ -123,7 +123,7 @@
           <!-- Container-fluid Ends-->
         </div>
         <!-- footer start-->
-		<?php include("footer.php"); ?>
+		    <?php include("footer.php"); ?>
       </div>
     </div>
     <!-- latest jquery-->
