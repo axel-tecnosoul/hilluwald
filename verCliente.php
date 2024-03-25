@@ -17,7 +17,7 @@ if ( null==$id ) {
 
 $pdo = Database::connect();
 $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-$sql = "SELECT id, razon_social, cuit, cond_fiscal, direccion, email, telefono, notas, activo FROM clientes WHERE id = ? ";
+$sql = "SELECT c.id, c.razon_social, c.cuit, c.cond_fiscal, c.direccion, c.email, c.telefono, c.notas, lo.localidad, pr.provincia, c.activo FROM clientes c INNER JOIN localidades lo ON c.id_localidad = lo.id INNER JOIN provincias pr ON lo.id_provincia = pr.id WHERE c.id = ? ";
 $q = $pdo->prepare($sql);
 $q->execute(array($id));
 $data = $q->fetch(PDO::FETCH_ASSOC);
@@ -29,7 +29,7 @@ $anio_actual = date("Y");
 $anio_inicial = $anio_actual - 2;
 $anio_final = $anio_actual + 2;
 
-$sql = " SELECT c.id AS id_cultivo, e.id AS id_especie, pe.id AS id_procedencia, e.especie, pe.procedencia, c.material, c.nombre_corto, e.icono, e.color FROM pedidos_detalle pd INNER JOIN pedidos p ON pd.id_pedido=p.id INNER JOIN especies e ON pd.id_especie=e.id LEFT JOIN procedencias_especies pe ON pd.id_procedencia=pe.id LEFT JOIN cultivos c ON pd.id_material=c.id WHERE p.anulado=0 AND p.id_cliente=".$id." GROUP BY c.id";
+$sql = " SELECT c.id AS id_cultivo,  e.id AS id_especie, pe.id AS id_procedencia, e.especie, pe.procedencia, c.material, c.nombre_corto, e.icono, e.color FROM pedidos_detalle pd INNER JOIN pedidos p ON pd.id_pedido=p.id INNER JOIN especies e ON pd.id_especie=e.id LEFT JOIN procedencias_especies pe ON pd.id_procedencia=pe.id LEFT JOIN cultivos c ON pd.id_material=c.id WHERE p.anulado=0 AND p.id_cliente=".$id." GROUP BY c.id";
 //$sql = " SELECT c.id, c.nombre FROM cultivos c";
 $aCultivosPedidos=[];
 foreach ($pdo->query($sql) as $row) {
@@ -247,6 +247,10 @@ Database::disconnect();
                         <div class="form-group row">
                           <label class="col-sm-3 col-form-label">Condicion fiscal</label>
                           <div class="col-sm-9"><input name="cond_fiscal" type="text" maxlength="99" class="form-control" value="<?=$data['cond_fiscal']; ?>" readonly="readonly"></div>
+                        </div>
+                        <div class="form-group row">
+                          <label class="col-sm-3 col-form-label">Localidad</label>
+                          <div class="col-sm-9"><input name="id_localidad" type="text" maxlength="99" class="form-control" value="<?=$data['localidad'] . " - " . $data['provincia']; ?>" readonly="readonly"></div>
                         </div>
                         <div class="form-group row">
                           <label class="col-sm-3 col-form-label">Direccion</label>

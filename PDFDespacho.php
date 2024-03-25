@@ -20,9 +20,8 @@ class PDF extends FPDF{
       
     $pdo = Database::connect();
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-    //$sql = "SELECT v.id, v.nombre_cliente,v.direccion, v.cae, v.fecha_vencimiento_cae, v.numero_comprobante, v.tipo_comprobante, vd.id_producto, p.codigo, p.descripcion, p.precio, vd.cantidad,vd.precio as precio_vd, vd.subtotal FROM ventas_detalle vd LEFT JOIN ventas v ON v.id = vd.id_venta INNER JOIN productos p ON p.id = vd.id_producto WHERE vd.id_venta = ?";
-    //$sql = "SELECT * FROM ventas v INNER JOIN clientes c ON v.id_cliente=c.id WHERE v.id = ?";
-    $sql = "SELECT v.id, date_format(v.fecha_venta,'%d/%m/%Y') AS fecha, c.razon_social, c.direccion, c.cuit, v.total, v.observaciones FROM ventas v INNER JOIN clientes c ON v.id_cliente=c.id WHERE v.id = ?";
+
+    $sql = "SELECT d.id,date_format(d.fecha,'%d/%m/%Y') as fecha, c.razon_social as cliente, c.cuit, c.direccion, d.id_pedido, d.id_cliente_retira,d.campana,d.id_transporte, ch.nombre_apellido,ve.descripcion,ve.patente, ve.patente2, lo.nombre, d.id_plantador, t.razon_social as transporte, l.localidad, p.provincia, d.id_usuario, d.fecha_hora_alta FROM despachos d INNER JOIN despachos_detalle dd ON dd.id_despacho= d.id LEFT JOIN clientes c ON c.id = d.id_cliente INNER JOIN especies es ON dd.id_cultivo=es.id INNER JOIN transportes t ON d.id_transporte=t.id INNER JOIN choferes ch ON d.id_chofer=ch.id LEFT JOIN lotes lo ON d.id_lote = lo.id INNER JOIN localidades l ON d.id_localidad = l.id INNER JOIN provincias p on l.id_provincia = p.id INNER JOIN vehiculos ve ON d.id_vehiculo=ve.id INNER JOIN cultivos cu ON dd.id_cultivo=cu.id INNER JOIN especies e ON dd.id_especie=e.id INNER JOIN procedencias_especies pr ON dd.id_procedencia=pr.id WHERE d.id = ?";
     //echo $sql;
     $q = $pdo->prepare($sql);
     $q->execute(array($id));
@@ -34,13 +33,13 @@ class PDF extends FPDF{
 
     /* Variables*/
     $punto_venta = "4";
-    $nombre = "MATTJE MAURICIO SEBASTIAN";
-    $cuit = "20-34149121-6";
+    $nombre = $data['cliente'];
+    $cuit = $data['cuit'];
     $fecha_inicio_actividad = "13/03/2023";
     $fecha_vto_pago = "05/04/2023";
     $ingresos_brutos = "20-34149121-6";
     
-    $obs=$data["observaciones"];
+    $obs="";
     if(strlen($obs)>100){
       $obs=substr($obs,0,100)."[...]";
     }
@@ -89,7 +88,7 @@ class PDF extends FPDF{
 
     // Filas 
     //$this->Image('img/logoMaury2.png',0 + $x,13,36);
-    $this->Image('img/tu logo azul.jpg',5 + $x,13,26);
+    $this->Image('img/logo horizontal.jpeg',5 + $x,22,26);
     $this->Ln(6);
 
     // Domicilio 
@@ -140,7 +139,7 @@ class PDF extends FPDF{
     //$this->Ln(0);
     //$this->Cell(-29+ $x2);
     $this->SetFont('Arial', '', 8);
-    $this->Cell(70, 4, utf8_decode($data['razon_social']), 0, 0, '', 0);
+    $this->Cell(70, 4, utf8_decode($data['cliente']), 0, 0, '', 0);
     $this->SetFont('Arial', 'B', 8);
     $this->Cell(10, 4, utf8_decode("CUIT: "), 0, 0, '', 0);
     //$this->Ln(0);
@@ -187,22 +186,22 @@ class PDF extends FPDF{
     $this->SetDrawColor(0, 0, 0); //colorBorde
     $this->SetFont('Arial', '', 8);
 
-    $sql2 = " SELECT p.descripcion, vd.cantidad,vd.precio as precio, vd.subtotal FROM ventas_detalle vd LEFT JOIN ventas v ON v.id = vd.id_venta INNER JOIN productos p ON p.id = vd.id_producto WHERE vd.id_venta = $id ";
+    $sql2 = "SELECT cu.material, se.servicio, es.especie, cu.material, pr.procedencia, dd.cantidad_plantines FROM despachos_detalle dd INNER JOIN despachos v ON v.id = dd.id_despacho INNER JOIN cultivos cu ON dd.id_material = cu.id INNER JOIN servicios se ON dd.id_servicio = se.id INNER JOIN especies es ON dd.id_especie = es.id INNER JOIN procedencias_especies pr ON dd.id_procedencia = pr.id WHERE dd.id_despacho = $id ";
     $total = 0;
     $ln = 0;
     
     foreach ($pdo->query($sql2) as $row){
-      $descripcion=$row["descripcion"];
+      $descripcion=$row["especie"];
       if(strlen($descripcion)>105){
           $descripcion=substr($descripcion,0,105)."[...]";
       }
-      $subtotal=$row["subtotal"];
+      $subtotal=$row["cantidad_plantines"];
       $this->Cell(-63 + $x2);
-      $this->Cell(15, 7, utf8_decode($row["cantidad"]), 1, 0, 'C', 0);
+      $this->Cell(15, 7, utf8_decode($row["cantidad_plantines"]), 1, 0, 'C', 0);
       $this->Cell(85, 7, utf8_decode($descripcion), 1, 0, 'L', 0);
-      $this->Cell(22, 7, utf8_decode("$".number_format($row["precio"], 2,',', '.')), 1, 0, 'R', 0);
-      $this->Cell(22, 7, utf8_decode("$".number_format($row["subtotal"], 2,',', '.')), 1, 1, 'R', 0);
-      $total= $subtotal + $total;
+      $this->Cell(22, 7, utf8_decode("$".number_format(/*$row[""]*/ 2000, 2,',', '.')), 1, 0, 'R', 0);
+      $this->Cell(22, 7, utf8_decode("$".number_format(/*$row[""]*/ 2000, 2,',', '.')), 1, 1, 'R', 0);
+      $total= $subtotal * 2000;
       $ln = $ln + 7;//Salto de linea que resta del total
     }
 
@@ -251,7 +250,7 @@ class PDF extends FPDF{
     $this->Cell(-63 + $x2);
     //$this->SetY(-125+ $x2); // Posición: a 1,5 cm del final
     $this->SetFont('Arial', 'I', 8); //tipo fuente, cursiva, tamañoTexto
-    $this->Cell(144, 8,utf8_decode('2023 @ Desarrollado por Misiones Software'), 0, 0, 'C'); // pie de pagina(fecha de pagina)
+    $this->Cell(144, 8,utf8_decode('2024 @ Desarrollado por Misiones Software'), 0, 0, 'C'); // pie de pagina(fecha de pagina)
   }
 }
 
