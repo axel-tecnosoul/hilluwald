@@ -86,30 +86,10 @@ if($desde<=$hasta){
   //INICIO OBTENCION DE REGISTROS A MOSTRAR EN LA TABLA
 
   //obtenemos los pedidos
-  //$sql = " SELECT p.id,date_format(p.fecha,'%d/%m/%Y') AS fecha,p.campana,pd.cantidad_plantines,p.fecha_hora_alta FROM pedidos p INNER JOIN pedidos_detalle pd ON pd.id_pedido=p.id WHERE p.anulado=0 $filtroDesde $filtroHasta $filtroCliente $filtroCultivo";
   $sql = "SELECT p.id,date_format(p.fecha,'%d/%m/%Y') AS fecha,p.campana,pd.cantidad_plantines,pd.plantines_pagados,pd.plantines_retirados,p.fecha_hora_alta,s.servicio,pe.procedencia,c.material FROM pedidos p INNER JOIN pedidos_detalle pd ON pd.id_pedido=p.id INNER JOIN servicios s ON pd.id_servicio=s.id LEFT JOIN procedencias_especies pe ON pd.id_procedencia=pe.id LEFT JOIN cultivos c ON pd.id_material=c.id WHERE p.anulado=0 $filtroDesde $filtroHasta $filtroCliente $filtroServicio $filtroCultivo";
   //echo $sql;
   foreach ($pdo->query($sql) as $row) {
     
-    //$iconVer="<a href='verMovimientoCajaChica.php?id=".$row["id_movimiento"]."' target='_blank' class='badge badge-primary'><i class='fa fa-eye' aria-hidden='true'></i></a>";
-    //$iconVer="<span data-id='".$row["id_movimiento"]."' data-tipo='movimiento' class='ver badge badge-primary'><i class='fa fa-eye' aria-hidden='true'></i></span>";
-
-    /*$iconEdit="";
-    $cerrado="<i class='fa fa-lock' aria-hidden='true'></i> ";
-    if($row["id_cierre_caja"]==0){
-      $iconEdit="<a href='modificarMovimientoCajaChica.php?id=".$row["id_movimiento"]."' target='_blank' class='badge badge-secondary'><i class='fa fa-pencil-square-o' aria-hidden='true'></i></a>";
-      $cerrado="<i class='fa fa-unlock' aria-hidden='true'></i> ";
-    }
-
-    if($row["tipo_movimiento"]=="Ingreso"){
-      $credito=$row["total"];
-      $debito=0;
-      $saldo=0;
-    }else{
-      $credito=0;
-      $debito=$row["total"];
-      $saldo=0;
-    }*/
     $aCtaCte[]=[
       "tipo_comprobante"=>"Pedido",
       "id_pedido"=>$row['id'],
@@ -133,25 +113,6 @@ if($desde<=$hasta){
   //echo $sql;
   foreach ($pdo->query($sql) as $row) {
     
-    //$iconVer="<a href='verMovimientoCajaChica.php?id=".$row["id_movimiento"]."' target='_blank' class='badge badge-primary'><i class='fa fa-eye' aria-hidden='true'></i></a>";
-    //$iconVer="<span data-id='".$row["id_movimiento"]."' data-tipo='movimiento' class='ver badge badge-primary'><i class='fa fa-eye' aria-hidden='true'></i></span>";
-
-    /*$iconEdit="";
-    $cerrado="<i class='fa fa-lock' aria-hidden='true'></i> ";
-    if($row["id_cierre_caja"]==0){
-      $iconEdit="<a href='modificarMovimientoCajaChica.php?id=".$row["id_movimiento"]."' target='_blank' class='badge badge-secondary'><i class='fa fa-pencil-square-o' aria-hidden='true'></i></a>";
-      $cerrado="<i class='fa fa-unlock' aria-hidden='true'></i> ";
-    }
-
-    if($row["tipo_movimiento"]=="Ingreso"){
-      $credito=$row["total"];
-      $debito=0;
-      $saldo=0;
-    }else{
-      $credito=0;
-      $debito=$row["total"];
-      $saldo=0;
-    }*/
     $aCtaCte[]=[
       "tipo_comprobante"=>"Despacho",
       "id_despacho"=>$row['id'],
@@ -161,6 +122,29 @@ if($desde<=$hasta){
       "servicio"=>$row["servicio"],
       "procedencia"=>$row["procedencia"],
       "material"=>$row["material"],
+      "cantidad"=>$row['cantidad_plantines'],
+      /*"cantidad_pedido"=>"",
+      "cantidad_despacho"=>$row['cantidad_plantines'],
+      "cantidad_pago"=>"",*/
+      "fecha_hora_alta"=>$row['fecha_hora_alta'],
+    ];
+  }
+
+  //obtenemos los despachos
+  $sql = "SELECT p.id,p.id_pedido,date_format(p.fecha,'%d/%m/%Y') AS fecha,pd.cantidad_plantines,p.fecha_hora_alta,s.servicio,pe.procedencia,c.material FROM pagos p INNER JOIN pagos_detalle pd ON pd.id_pago=p.id INNER JOIN servicios s ON pd.id_servicio=s.id LEFT JOIN procedencias_especies pe ON pd.id_procedencia=pe.id LEFT JOIN cultivos c ON pd.id_material=c.id WHERE 1 $filtroDesde $filtroHasta $filtroCliente $filtroServicio $filtroCultivo";//p.anulado=0 
+  //echo $sql;
+  foreach ($pdo->query($sql) as $row) {
+    
+    $aCtaCte[]=[
+      "tipo_comprobante"=>"Pago",
+      "id_pago"=>$row['id'],
+      "id_pedido"=>$row['id_pedido'],
+      "fecha"=>$row['fecha'],// AS fecha_hora
+      //"campana"=>$row["campana"],
+      "campana"=>"",
+      "servicio"=>$row["servicio"],
+      "procedencia"=>$row["procedencia"] ?: "",
+      "material"=>$row["material"] ?: "",
       "cantidad"=>$row['cantidad_plantines'],
       /*"cantidad_pedido"=>"",
       "cantidad_despacho"=>$row['cantidad_plantines'],
@@ -225,7 +209,18 @@ if($desde<=$hasta){
         $aCtaCte[$key]["saldo_pago"]=$saldo_pago;
         break;
       case 'Pago':
-        # code...
+        $saldo_despacho=0;
+        $saldo_pago=$cantidad;
+        if($key>0){
+          $saldo_despacho=$aCtaCte[$key-1]["saldo_despacho"];
+          $saldo_pago=$aCtaCte[$key-1]["saldo_pago"]-$cantidad;
+        }
+
+        $aCtaCte[$key]["cantidad_pedido"]="";
+        $aCtaCte[$key]["cantidad_despacho"]="";
+        $aCtaCte[$key]["saldo_despacho"]=$saldo_despacho;
+        $aCtaCte[$key]["cantidad_pago"]=$cantidad;
+        $aCtaCte[$key]["saldo_pago"]=$saldo_pago;
         break;
     }
   }

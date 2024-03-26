@@ -142,7 +142,7 @@
             <div class="col">
               <div class="form-group row">
                 <div class="col-sm-12">
-                  <table class="table table-striped table-bordered" id="detallePedido" style="table-layout:fixed"">
+                  <table class="table table-striped table-bordered" id="detallePedidoParaDespacho" style="table-layout:fixed"">
                     <thead>
                       <tr>
                         <th class="text-center" style="width: 10%;">Servicio</th>
@@ -206,7 +206,7 @@
 
 <script>
 
-  function getDetallePedido(id_pedido){
+  function getDetallePedidoParaDespacho(id_pedido){
     $.ajax({
       //data: datosIniciales,
       url: 'ajaxGetDetallePedidoNuevoDespacho.php?id_pedido='+id_pedido,
@@ -221,7 +221,7 @@
         console.log(respuestaJson);
 
         // Obtener una referencia al tbody de la tabla
-        var tbody = document.querySelector('#detallePedido tbody');
+        var tbody = document.querySelector('#detallePedidoParaDespacho tbody');
         tbody.innerHTML="";
 
         //Genero los options del select de prioridades
@@ -280,8 +280,8 @@
         });
 
 
-        $("#detallePedido").find(".id_procedencia").select2()
-        $("#detallePedido").find(".id_material").select2()
+        $("#detallePedidoParaDespacho").find(".id_procedencia").select2()
+        $("#detallePedidoParaDespacho").find(".id_material").select2()
 
       }
     });
@@ -338,7 +338,7 @@
   });
 
   function getDetallePedido2(id_pedido){
-    let table=$('#detallePedido')
+    let table=$('#detallePedidoParaDespacho')
     table.DataTable().destroy();
     table.DataTable({
       //dom: 'rtip',
@@ -444,8 +444,8 @@
         { width: "14%", targets: 5 }  // Sexta columna (Despachar/Pendiente)*/
       ],
       initComplete: function(settings, json){
-        $("#detallePedido").find(".id_procedencia").select2()
-        $("#detallePedido").find(".id_material").select2()
+        $("#detallePedidoParaDespacho").find(".id_procedencia").select2()
+        $("#detallePedidoParaDespacho").find(".id_material").select2()
         //table.css("table-layout","fixed")
       },
     })

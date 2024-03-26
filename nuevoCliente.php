@@ -328,12 +328,12 @@
       $(document).ready(function(){
         $("#addRowLotes").on('click', function(event) {
           event.preventDefault();
-          addRowLotes();
+          //addRowLotes();
         }).click();
 
         $("#addRowPlantadores").on('click', function(event) {
           event.preventDefault();
-          addRowPlantadores();
+          //addRowPlantadores();
         }).click();
       });
 

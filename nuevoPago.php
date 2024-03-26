@@ -22,19 +22,16 @@ if ( !empty($_POST)) {
   if ($modoDebug==1) {
     var_dump($_POST);
     var_dump($_GET);
+    var_dump($_FILES);
   }
-
-  if($_POST['id_localidad']=="") $_POST['id_localidad']=NULL;
-  if($_POST['id_lote']=="") $_POST['id_lote']=NULL;
-  if($_POST['id_plantador']=="") $_POST['id_plantador']=NULL;
 
   //$id_cliente=($_POST['id_cliente']) ?: NULL;
 
-  $sql = "INSERT INTO despachos (fecha, id_cliente, id_pedido, id_cliente_retira, campana, id_transporte, id_chofer, id_vehiculo, patente2, id_lote, id_plantador, id_localidad, lugar_entrega, observaciones, id_usuario) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+  $sql = "INSERT INTO pagos (fecha, id_cliente, id_pedido, monto_total,observaciones, id_usuario) VALUES (?,?,?,?,?,?)";
   $q = $pdo->prepare($sql);
-  $params=array($_POST['fecha_despacho'],$_GET['id_cliente'],$_POST['id_pedido_despacho'],$_POST['id_cliente_retira'],$_POST['campana_despacho'],$_POST['id_transporte'],$_POST['id_chofer'],$_POST['id_vehiculo'],$_POST['patente2'],$_POST['id_lote'],$_POST['id_plantador'],$_POST['id_localidad'],$_POST['lugar_entrega'],$_POST['observaciones_despacho'],$_SESSION['user']['id']);
+  $params=array($_POST['fecha_pago'],$_GET['id_cliente'],$_POST['id_pedido_pago'],array_sum($_POST['subtotal']),$_POST['observaciones_pago'],$_SESSION['user']['id']);
   $q->execute($params);
-  $id_despacho = $pdo->lastInsertId();
+  $id_pago = $pdo->lastInsertId();
 
   $aDebug[]=[
     "consulta"=>$sql,
@@ -47,76 +44,119 @@ if ( !empty($_POST)) {
     echo "<br><br>Afe: ".$q->rowCount();
     echo "<br><br>";
   }
+
+  /*foreach ($_FILES as $key => $value) {
+    var_dump($value);
+    if (is_uploaded_file($value['tmp_name'])) {
+      $cantArchivos++;
+      $nombre_imagen=$value['name'];
+      //INGRESO ARCHIVOS EN EL DIRECTORIO
+      $directorio = "assets/images/cbte_pago/$id_pago/";
+      //$path = "sample/path/newfolder";
+
+      if (!file_exists($directorio)) {
+          mkdir($directorio, 0777, true);
+      }
+
+      $subidaOK=move_uploaded_file($value['tmp_name'], $directorio.$nombre_imagen);
+      //$ruta_completa_imagen = $directorio.$nombreFinalArchivo;
+      //var_dump($subidaOK);
+      
+      if($subidaOK){
+        //INSERTO DATOS EN LA TABLA ADJUNTOS ORDEN_COMPRA
+        $sql = "INSERT INTO cbtes_pago (id_pago,ruta) VALUES (?,?)";
+        $q = $pdo->prepare($sql);
+        $q->execute([$id_pago,$nombre_imagen]);
+        $afe=$q->rowCount();
+
+        if($afe==1){
+          $cantArchivosSubidos++;
+        }
+      }else{
+        if($value['error']){
+          return "Ha ocurrido un error: Cod. ".$value['error'];
+        }
+      }
+    }
+  }*/
+
+  $cantArchivosSubidos=$cantArchivos=0;
+  //foreach ($_FILES as $key => $value) {
+  foreach ($_FILES['cbtes']['tmp_name'] as $key => $tmp_name) {
+    if (is_uploaded_file($tmp_name)) {
+      $value = $_FILES['cbtes'];
+      $nombre_imagen = $value['name'][$key];
+
+      $cantArchivos++;
+      //$nombre_imagen = $value['name'];
+      $directorio = "assets/images/cbte_pago/$id_pago/";
+
+      if (!file_exists($directorio)) {
+        mkdir($directorio, 0777, true);
+      }
+
+      // Verificar si el archivo se subió correctamente
+      if (move_uploaded_file($tmp_name, $directorio . $nombre_imagen)) {
+        // Realizar la inserción en la base de datos
+        $sql = "INSERT INTO cbtes_pago (id_pago, ruta) VALUES (?,?)";
+        $q = $pdo->prepare($sql);
+        if ($q->execute([$id_pago, $nombre_imagen])) {
+          $cantArchivosSubidos++;
+        } else {
+          // Manejar el error en caso de que la inserción falle
+          // Puedes mostrar un mensaje al usuario o registrar el error
+        }
+
+        if ($modoDebug==1) {
+          $q->debugDumpParams();
+          echo "<br><br>Afe: ".$q->rowCount();
+          echo "<br><br>";
+        }
+      } else {
+        // Manejar el error en caso de que la subida del archivo falle
+        // Puedes mostrar un mensaje al usuario o registrar el error
+      }
+    }
+  }
   
   //$cantPrendas = count($_POST["id_cultivo"]);
 
   $aProductos=[];
   $cantProdOK=0;
   foreach ($_POST['id_servicio'] as $key => $id_servicio) {
-    $cantidad_despachar = $_POST['cantidad_despachar'][$key];
+    $cantidad_pagar = $_POST['cantidad_pagar'][$key];
 
-    if($cantidad_despachar>0){
+    if($cantidad_pagar>0){
 
       $id_servicio = $_POST['id_servicio'][$key];
       $id_especie = $_POST['id_especie'][$key];
       $id_procedencia = $_POST['id_procedencia'][$key];
       $id_material = $_POST['id_material'][$key];
+      $precio_unitario = $_POST['precio_unitario'][$key];
+      $subtotal = $_POST['subtotal'][$key];
+
+      if($id_procedencia<1) $id_procedencia=NULL;
+      if($id_material<1) $id_material=NULL;
 
       $aProductos[]=[
         "id_servicio"=>$id_servicio,
         "id_especie"=>$id_especie,
         "id_procedencia"=>$id_procedencia,
         "id_material"=>$id_material,
-        "cantidad_despachar"=>$cantidad_despachar,
+        "cantidad_pagar"=>$cantidad_pagar,
+        "precio_unitario"=>$precio_unitario,
+        "subtotal"=>$subtotal,
       ];
 
-      $sql = "INSERT INTO despachos_detalle (id_despacho, id_servicio, id_especie, id_procedencia, id_material, cantidad_plantines) VALUES (?,?,?,?,?,?)";
+      $sql = "INSERT INTO pagos_detalle (id_pago, id_servicio, id_especie, id_procedencia, id_material, cantidad_plantines, precio_unitario, subtotal) VALUES (?,?,?,?,?,?,?,?)";
       $q = $pdo->prepare($sql);
-      //$q->execute(array($idVenta,$id_servicio,$cantidad_despachar,$precio,$subtotal,$modalidad,$pagado));
-      $params=array($id_despacho,$id_servicio,$id_especie,$id_procedencia,$id_material,$cantidad_despachar);
+      //$q->execute(array($idVenta,$id_servicio,$cantidad_pagar,$precio,$subtotal,$modalidad,$pagado));
+      $params=array($id_pago,$id_servicio,$id_especie,$id_procedencia,$id_material,$cantidad_pagar,$precio_unitario,$subtotal);
       $q->execute($params);
       $afe=$q->rowCount();
 
       if($afe==1){
         $cantProdOK++;
-      }
-
-      if ($modoDebug==1) {
-        $q->debugDumpParams();
-        echo "<br><br>Afe: ".$q->rowCount();
-        echo "<br><br>";
-      }
-
-      $aDebug[]=[
-        "consulta"=>$sql,
-        "params"=>$params,
-        "afe"=>$q->rowCount(),
-      ];
-
-    }
-    
-  }
-
-  $aContenedores=[];
-  $cantContenedoresOK=0;
-  foreach ($_POST['id_contenedor'] as $key => $id_contenedor) {
-    $cantidad_contenedores = $_POST['cantidad_contenedores'][$key];
-
-    if($cantidad_contenedores>0){
-
-      $aContenedores[]=[
-        "id_contenedor"=>$id_contenedor,
-        "cantidad_contenedores"=>$cantidad_contenedores,
-      ];
-
-      $sql = "INSERT INTO despachos_contenedores (id_despacho, id_contenedor, cantidad_despachada) VALUES (?,?,?)";
-      $q = $pdo->prepare($sql);
-      $params=array($id_despacho,$id_contenedor,$cantidad_contenedores);
-      $q->execute($params);
-      $afe=$q->rowCount();
-
-      if($afe==1){
-        $cantContenedoresOK++;
       }
 
       if ($modoDebug==1) {
@@ -142,31 +182,44 @@ if ( !empty($_POST)) {
     echo $cantProdOK."==".count($aProductos)."<br>";
     var_dump($cantProdOK==count($aProductos));
 
-    var_dump($aContenedores);
-    echo "cantContenedoresOK==count(aContenedores)<br>";
-    echo $cantContenedoresOK."==".count($aContenedores)."<br>";
-    var_dump($cantContenedoresOK==count($aContenedores));
-
+    echo "cantArchivosSubidos==cantArchivos<br>";
+    echo $cantArchivosSubidos."==".$cantArchivos."<br>";
     echo "<br><br>";
   }
 
   $todoOk=0;
-  if($cantProdOK==count($aProductos) and $cantContenedoresOK==count($aContenedores)){
+  if($cantProdOK==count($aProductos) and $cantArchivosSubidos==$cantArchivos){
     $todoOk=1;
   }
 
-  if($todoOk==0){
-    $pdo->rollback();
-    var_dump($aDebug);
-    die("Ha ocurrido un error al cargar el despacho");
+
+  $commit=0;
+  if($todoOk==1){
+    if ($modoDebug==1) {
+      $commit=0;
+    }else{
+      $commit=1;
+    }
   }
 
-  if ($modoDebug==1) {
+  if($commit==1){
+    $pdo->commit();
+  }else{
     $pdo->rollBack();
-    die();
-  }
+    
+    // Eliminar los archivos subidos en caso de error
+    foreach ($_FILES['cbtes']['tmp_name'] as $tmp_name) {
+      if (is_uploaded_file($tmp_name)) {
+          unlink($tmp_name); // Eliminar el archivo temporal
+      }
+    }
 
-  $pdo->commit();
+    if ($modoDebug==1) {
+      var_dump($aDebug);
+    }else{
+      die("Ha ocurrido un error al cargar el pago");
+    }
+  }
   Database::disconnect();
   
   header("Location: verCliente.php?id=".$_GET["id_cliente"]);

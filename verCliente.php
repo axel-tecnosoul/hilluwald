@@ -46,6 +46,12 @@ foreach ($pdo->query($sql) as $row) {
   ];
 }
 
+$sql = " SELECT COUNT(dc.id) AS cantidad_despachos_contenedores FROM despachos_contenedores dc INNER JOIN despachos d ON dc.id_despacho=d.id WHERE d.anulado=0 AND d.id_cliente=".$id;
+//$sql = " SELECT c.id, c.nombre FROM cultivos c";
+$q = $pdo->prepare($sql);
+$q->execute(array($id));
+$data2 = $q->fetch(PDO::FETCH_ASSOC);
+$cantidad_despachos_contenedores=$data2["cantidad_despachos_contenedores"];
 Database::disconnect();
 ?>
 <!DOCTYPE html>
@@ -203,10 +209,13 @@ Database::disconnect();
                   </div>
 
                   <div class="card-body">
-                    <ul class="nav nav-tabs border-tab" id="pills-tab" role="tablist" style="margin-top: -20px;">
-                    
-                      <li class="nav-item"><a class="nav-link active" id="pills-resumen-tab" data-toggle="pill" href="#pills-resumen" role="tab" aria-controls="pills-resumen" aria-selected="true"><i class="fa fa-server"></i>Resumen</a></li><?php
-                      
+                    <ul class="nav nav-tabs border-tab" id="pills-tab" role="tablist" style="margin-top: -20px;"><?php
+                      if(!empty($aCultivosPedidos)){
+                        $activeDatos=false;?>
+                        <li class="nav-item"><a class="nav-link active" id="pills-resumen-tab" data-toggle="pill" href="#pills-resumen" role="tab" aria-controls="pills-resumen" aria-selected="true"><i class="fa fa-server"></i>Resumen</a></li><?php
+                      }else{
+                        $activeDatos=true;
+                      }
                       foreach ($aCultivosPedidos as $cultivo_pedido) {?>
                         <li class="nav-item">
                           <a class="nav-link nav_id_cultivo" id="pills-cta_cte-tab" data-toggle="pill" href="#pills-cta_cte" role="tab" aria-controls="pills-cta_cte" aria-selected="false" data-id_cultivo="<?=$cultivo_pedido["id_cultivo"]?>"><?php
@@ -220,11 +229,17 @@ Database::disconnect();
                             echo acortarPalabras($cultivo_pedido["nombre"])?>
                           </a>
                         </li><?php
+                      }
+                      if($cantidad_despachos_contenedores>0){?>
+                        <li class="nav-item"><a class="nav-link" id="pills-contenedores-tab" data-toggle="pill" href="#pills-contenedores" role="tab" aria-controls="pills-contenedores" aria-selected="false"><i class="fa fa-th"></i>Contenedores</a></li><?php
+                      }
+                      
+                      $classActiveDatos="";
+                      if($activeDatos){
+                        $classActiveDatos="active";
                       }?>
 
-                      <li class="nav-item"><a class="nav-link" id="pills-contenedores-tab" data-toggle="pill" href="#pills-contenedores" role="tab" aria-controls="pills-contenedores" aria-selected="false"><i class="fa fa-th"></i>Contenedores</a></li>
-
-                      <li class="nav-item"><a class="nav-link" id="pills-contacto-tab" data-toggle="pill" href="#pills-contacto" role="tab" aria-controls="pills-contacto" aria-selected="true"><i class="icofont icofont-ui-user"></i>Datos</a></li>
+                      <li class="nav-item"><a class="nav-link <?=$classActiveDatos?>" id="pills-contacto-tab" data-toggle="pill" href="#pills-contacto" role="tab" aria-controls="pills-contacto" aria-selected="true"><i class="icofont icofont-ui-user"></i>Datos</a></li>
 
                     </ul>
 
@@ -232,7 +247,7 @@ Database::disconnect();
 
                       <div class="tab-pane fade show active" id="pills-resumen" role="tabpanel" aria-labelledby="pills-resumen-tab"></div>
                       
-                      <div class="tab-pane fade show" id="pills-contacto" role="tabpanel" aria-labelledby="pills-contacto-tab">
+                      <div class="tab-pane fade show <?=$classActiveDatos?>" id="pills-contacto" role="tabpanel" aria-labelledby="pills-contacto-tab">
                         <div class="form-group row">
                           <label class="col-sm-3 col-form-label">Razon Social</label>
                           <div class="col-sm-9"><input name="razon_social" type="text" maxlength="99" class="form-control" value="<?=$data['razon_social']; ?>" readonly="readonly"></div>
@@ -671,13 +686,17 @@ Database::disconnect();
           modal.find("span.idPedido").html(id_pedido)
           $("#id_pedido_despacho").val(id_pedido)
 
-          getDetallePedido(id_pedido)
+          getDetallePedidoParaDespacho(id_pedido)
         })
 
         $(document).on("click",".btnNuevoPago",function(){
+          let id_pedido=this.dataset.idPedido;
           let modal=$("#nuevoPago")
           modal.modal("show")
-          modal.find("span.idPedido").html(this.dataset.idPedido)
+          modal.find("span.idPedido").html(id_pedido)
+          $("#id_pedido_pago").val(id_pedido)
+
+          getDetallePedidoParaPagos(id_pedido)
         })
 
         $(document).on("click",".btnNuevaDevolucionContenedores",function(){
@@ -881,21 +900,25 @@ Database::disconnect();
               {"data": "fecha"},
               {render: function(data, type, row, meta) {
                 let tipo_comprobante=row.tipo_comprobante;
+                let id_mostrar
                 let clase;
                 if(tipo_comprobante=="Pedido"){
                   clase="pedidos";
+                  id_mostrar=row.id_pedido;
                 }
                 if(tipo_comprobante=="Despacho"){
                   clase="despachos";
+                  id_mostrar=row.id_despacho;
                 }
                 if(tipo_comprobante=="Pago"){
                   clase="pagos";
+                  id_mostrar=row.id_pago;
                 }
                 if(tipo_comprobante=="Pedido"){
                   return `
                     <div class="dropdown">
                       <button class="btn btn-sm ${clase} dropdown-toggle" type="button" data-toggle="dropdown" aria-expanded="false" style="white-space: nowrap;">
-                        ${tipo_comprobante+' N° '+row.id_pedido}
+                        ${tipo_comprobante+' N° '+id_mostrar}
                       </button>
                       <div class="dropdown-menu">
                         <a href="#" class="dropdown-item despachos btnNuevoDespacho" data-id-pedido="${row.id_pedido}">
@@ -916,7 +939,7 @@ Database::disconnect();
                     </a>
                   */
                 }else{
-                  return '<button class="btn btn-sm '+clase+'">'+tipo_comprobante+' N° '+row.id_pedido+'</button>'
+                  return '<button class="btn btn-sm '+clase+'">'+tipo_comprobante+' N° '+id_mostrar+'</button>'
                 }
               }},
               {
