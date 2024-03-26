@@ -13,9 +13,9 @@ if ( !empty($_POST)) {
   $pdo = Database::connect();
   $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
   
-  $sql = "INSERT INTO tipos_contenedores (tipo, id_usuario) VALUES (?,?)";
+  $sql = "INSERT INTO tipos_contenedores (tipo, requiere_devolucion, id_usuario) VALUES (?,1,?)";
   $q = $pdo->prepare($sql);
-  $q->execute(array($_POST['tipo'],$_SESSION['user']['id']));
+  $q->execute(array($_POST['tipo'], $_SESSION['user']['id']));
   
   Database::disconnect();
   

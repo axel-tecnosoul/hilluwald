@@ -23,9 +23,9 @@ if ( !empty($_POST)) {
   $pdo = Database::connect();
   $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
   
-  $sql = "UPDATE tipos_contenedores set tipo = ?, id_usuario = ? where id = ?";
+  $sql = "UPDATE tipos_contenedores set tipo = ?, requiere_devolucion = ?, id_usuario = ? where id = ?";
   $q = $pdo->prepare($sql);
-  $q->execute(array($_POST['tipo'],$_SESSION['user']['id'],$_GET['id']));
+  $q->execute(array($_POST['tipo'],$_POST['requiere_devolucion'],$_SESSION['user']['id'],$_GET['id']));
   
   Database::disconnect();
   
@@ -35,12 +35,29 @@ if ( !empty($_POST)) {
   
   $pdo = Database::connect();
   $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-  $sql = "SELECT id, tipo, id_usuario FROM tipos_contenedores WHERE id = ? ";
+  $sql = "SELECT id, tipo, requiere_devolucion, id_usuario FROM tipos_contenedores WHERE id = ? ";
   $q = $pdo->prepare($sql);
   $q->execute(array($id));
   $data = $q->fetch(PDO::FETCH_ASSOC);
   
   Database::disconnect();
+
+  $aOptionsRequiere_devolucion = [
+    [
+      "value"=>0,
+      "id"=>"requiere_devolucion_no",
+      "label"=>"No",
+      "checked"=>$data['requiere_devolucion'] ==0? true : false,
+      "disabled" => false,
+    ],
+    [
+      "value" => 1,
+      "id" => "requiere_devolucion_si",
+      "label" => "Si",
+      "checked" => $data['requiere_devolucion'] ==1 ? true : false,
+      "disabled" => false,
+    ],
+  ];
 }?>
 <!DOCTYPE html>
 <html lang="en">
@@ -97,6 +114,20 @@ if ( !empty($_POST)) {
                       <div class="form-group row">
                         <label class="col-sm-3 col-form-label">Tipo</label>
                         <div class="col-sm-9"><input name="tipo" type="text" maxlength="99" class="form-control" value="<?=$data['tipo']; ?>" required="required"></div>
+                      </div>
+                      <div class="form-group row">
+                        <label class="col-sm-3 col-form-label">Requiere Devolucion</label>
+                        <div class="col-sm-9"><?php
+                          foreach ($aOptionsRequiere_devolucion as $option) {?>
+                            <label class="d-block" for="<?=$option["id"]?>">
+                              <input type="radio" name="requiere_devolucion" class="radio_animated" id="<?=$option["id"]?>" value="<?=$option["value"]?>" required<?php
+                                if($option["checked"]) echo " checked";
+                                if($option["disabled"]) echo " disabled";?>
+                              >
+                              <label for="<?=$option["id"]?>"><?=$option["label"]?></label>
+                            </label><?php
+                          }?>
+                        </div>
                       </div>
                     </div>
                     <div class="card-footer">

@@ -66,18 +66,24 @@ if(empty($_SESSION['user']))
                           <tr>
                             <th>ID</th>
                             <th>Tipo</th>
+                            <th>Requiere Devolucion</th>
                             <th>Opciones</th>
                           </tr>
                         </thead>
                         <tbody><?php
                           include 'database.php';
                           $pdo = Database::connect();
-                          $sql = " SELECT id, tipo, id_usuario, fecha_hora_alta FROM tipos_contenedores  WHERE 1 ";
+                          $sql = " SELECT id, tipo, requiere_devolucion, id_usuario, fecha_hora_alta FROM tipos_contenedores  WHERE 1 ";
                           
                           foreach ($pdo->query($sql) as $row) {?>
                             <tr>
                               <td><?=$row['id']?></td>
-                              <td><?=$row['tipo']?></td>
+                              <td><?=$row['tipo']?></td><?php
+                                if($row['requiere_devolucion'] == 0){?>
+                                  <td>No</td><?php
+                                }else{?>
+                                  <td>Si</td><?php
+                                }?>
                               <td>
                                 <a href="modificarTipoContenedor.php?id=<?=$row["id"]?>"><img src="img/icon_modificar.png" width="24" height="25" border="0" alt="Modificar" title="Modificar"></a>
                                 &nbsp;&nbsp;
