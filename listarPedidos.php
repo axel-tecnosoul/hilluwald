@@ -202,7 +202,7 @@ $desde=date("Y-m-d",strtotime($hoy." -1 year"))?>
     <!-- Plugins JS Ends-->
     <!-- Theme js-->
     <script src="assets/js/script.js"></script>
-	<script>
+	  <script>
 
     function openModalEliminarPedido(idPedido){
       $('#eliminarModal').modal("show");

@@ -3,17 +3,14 @@ session_start();
 if(empty($_SESSION['user'])){
 	header("Location: index.php");
 	die("Redirecting to index.php"); 
-}?>
+}
+include_once("funciones.php");?>
 <!DOCTYPE html>
 <html lang="en">
-  <head><?php 
-    include('head_tables.php');?>
+  <head>
+	  <?php include('head_tables.php');?>
+    <link rel="stylesheet" type="text/css" href="vendor/bootstrap-select-1.13.14/dist/css/bootstrap-select.min.css">
   </head>
-  <style>
-    td.child {
-      background-color: beige;
-    }
-  </style>
   <body class="light-only">
     <!-- page-wrapper Start-->
     <div class="page-wrapper">
@@ -41,15 +38,6 @@ if(empty($_SESSION['user'])){
                     </ol>
                   </div>
                 </div>
-                <!-- Bookmark Start-->
-                <div class="col-2">
-                  <div class="bookmark pull-right">
-                    <ul>
-                      <li><a  target="_blank" data-container="body" data-toggle="popover" data-placement="top" title="" data-original-title="<?php echo date('d-m-Y');?>"><i data-feather="calendar"></i></a></li>
-                    </ul>
-                  </div>
-                </div>
-                <!-- Bookmark Ends-->
               </div>
             </div>
           </div>
@@ -60,60 +48,29 @@ if(empty($_SESSION['user'])){
               <div class="col-sm-12">
                 <div class="card">
                   <div class="card-header">
-                    <h5>Clientes&nbsp;
-                      <a href="nuevoCliente.php"><img src="img/icon_alta.png" width="24" height="25" border="0" alt="Nuevo" title="Nuevo"></a>
-                      <!-- &nbsp;<a href="exportClientes.php"><img src="img/xls.png" width="24" height="25" border="0" alt="Exportar" title="Exportar"></a> -->
-                    </h5>
+                    <h5>Clientes
                   </div>
                   <div class="card-body">
+                    <!--  -->
                     <div class="dt-ext table-responsive">
                       <table class="display" id="dataTables-example666">
                         <thead>
                           <tr>
                             <th>ID</th>
                             <th>Razon Social</th>
-                            <th>CUIT</th>
                             <th>Condicion fiscal</th>
-                            <th>Teléfono</th>
+                            <th>Localidad</th>
                             <th>Activo</th>
                             <th>Opciones</th>
-                            <th class="none">Direccion</th>
-                            <th class="none">E-Mail</th>
                           </tr>
                         </thead>
-                        <tbody><?php
-                        
-                          include 'database.php';
-                          $pdo = Database::connect();
-                          $sql = " SELECT id, razon_social, direccion, cuit, cond_fiscal, email, activo, telefono FROM clientes WHERE 1 ";
-                          
-                          foreach ($pdo->query($sql) as $row) {
-                            echo '<tr>';
-                            echo '<td>'. $row["id"] . '</td>';
-                            echo '<td>'. $row["razon_social"] . '</td>';
-                            echo '<td>'. $row["cuit"] . '</td>';
-                            echo '<td>'. $row["cond_fiscal"] . '</td>';
-                            echo '<td>'. $row["telefono"] . '</td>';
-                            //echo '<td>'. number_format($row[8],2) . '</td>';
-                            if ($row["activo"] == 1) {
-                              echo '<td>Si</td>';
-                            } else {
-                              echo '<td>No</td>';
-                            }
-                            echo '<td>';
-                            echo '<a href="modificarCliente.php?id='.$row["id"].'"><img src="img/icon_modificar.png" width="24" height="25" border="0" alt="Modificar" title="Modificar"></a>';
-                            echo '&nbsp;&nbsp;';
-                            echo '<a href="#" title="Eliminar" onclick="openModalEliminar('.$row["id"].')"><img src="img/icon_baja.png" width="24" height="25" border="0" alt="Eliminar"></a>';
-                            echo '&nbsp;&nbsp;';
-                            echo '<a href="verCliente.php?id='.$row["id"].'"><img src="img/eye.png" width="30" border="0" alt="Ver Operaciones" title="Ver Cliente"></a>';
-                            //echo '&nbsp;&nbsp;';
-                            echo '</td>';
-                            echo '<td>'. $row["direccion"] . '</td>';
-                            echo '<td>'. $row["email"] . '</td>';
-                            echo '</tr>';
-                          }
-                          Database::disconnect();?>
-                        </tbody>
+                        <!-- <tfoot>
+                          <tr>
+                            <th colspan="6">Total</th>
+                            <th></th>
+                          </tr>
+                        </tfoot> -->
+                        <tbody></tbody>
                       </table>
                     </div>
                   </div>
@@ -137,7 +94,7 @@ if(empty($_SESSION['user'])){
             <h5 class="modal-title" id="exampleModalLabel">Confirmación</h5>
             <button class="close" type="button" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
           </div>
-          <div class="modal-body">¿Está seguro que desea eliminar el cliente?</div>
+          <div class="modal-body">¿Está seguro que desea eliminar el Cliente?</div>
           <div class="modal-footer">
             <a id="btnEliminar" class="btn btn-primary">Eliminar</a>
             <button class="btn btn-light" type="button" data-dismiss="modal" aria-label="Close">Volver</button>
@@ -184,39 +141,63 @@ if(empty($_SESSION['user'])){
     <!-- Plugins JS Ends-->
     <!-- Theme js-->
     <script src="assets/js/script.js"></script>
-	<script>
-		$(document).ready(function() {
-			$('#dataTables-example666').DataTable({
-				stateSave: true,
-				responsive: true,
-				language: {
-         "decimal": "",
-        "emptyTable": "No hay información",
-        "info": "Mostrando _START_ a _END_ de _TOTAL_ Registros",
-        "infoEmpty": "Mostrando 0 to 0 of 0 Registros",
-        "infoFiltered": "(Filtrado de _MAX_ total registros)",
-        "infoPostFix": "",
-        "thousands": ",",
-        "lengthMenu": "Mostrar _MENU_ Registros",
-        "loadingRecords": "Cargando...",
-        "processing": "Procesando...",
-        "search": "Buscar:",
-        "zeroRecords": "No hay resultados",
-        "paginate": {
-            "first": "Primero",
-            "last": "Ultimo",
-            "next": "Siguiente",
-            "previous": "Anterior"
-				}}
-			});
-		});
+    <script>
+      function openModalEliminar(idCliente){
+        $('#eliminarModal').modal("show");
+        document.getElementById("btnEliminar").href="eliminarCliente.php?id="+idCliente;
+      }
 
-    function openModalEliminar(idCliente){
-      $('#eliminarModal').modal("show");
-      document.getElementById("btnEliminar").href="eliminarCliente.php?id="+idCliente;
-    }
-		
-		</script>
+      $(document).ready(function() {
+
+        getClientes();
+
+      });
+
+      function getClientes(){
+
+        let table=$('#dataTables-example666');
+        table.DataTable().destroy();
+        table.DataTable({
+          //dom: 'rtip',
+          serverSide: true,
+          processing: true,
+          ajax:{url:'ajaxListarClientes.php'},
+          stateSave: true,
+          responsive: true,
+          language: {
+            "decimal": "",
+            "emptyTable": "No hay información",
+            "info": "Mostrando _START_ a _END_ de _TOTAL_ Registros",
+            "infoEmpty": "Mostrando 0 to 0 of 0 Registros",
+            "infoFiltered": "(Filtrado de _MAX_ total registros)",
+            "infoPostFix": "",
+            "thousands": ",",
+            "lengthMenu": "Mostrar _MENU_ Registros",
+            "loadingRecords": "Cargando...",
+            "processing": "Procesando...",
+            "search": "Buscar:",
+            "zeroRecords": "No hay resultados",
+            "paginate": {
+                "first": "Primero",
+                "last": "Ultimo",
+                "next": "Siguiente",
+                "previous": "Anterior"
+            }
+          },
+          "columns":[
+            {"data": "id_cliente"},
+            {"data": "razon_social"},
+            {"data": "cond_fiscal"},
+            {"data": "localidad"},
+            {"data": "activo"},
+            {render: function(data, type, row, meta) {
+              let btnVer='<a href="verCliente.php?id='+row.id_cliente+'"><img src="img/eye.png" width="24" height="15" border="0" alt="Ver Cliente" title="Ver Cliente"></a>&nbsp;&nbsp;'
+              return btnVer;
+            }}
+          ]
+        })
+      }
+    </script>
 		<script src="https://cdn.datatables.net/plug-ins/1.10.15/i18n/Spanish.json"></script>
     <!-- Plugin used-->
   </body>
