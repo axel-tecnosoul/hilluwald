@@ -60,6 +60,8 @@ include_once("funciones.php");?>
                             <th>ID</th>
                             <th>Razon Social</th>
                             <th>Condicion fiscal</th>
+                            <th>CUIT</th>
+                            <th>Telefono</th>
                             <th>Localidad</th>
                             <th>Activo</th>
                             <th>Opciones</th>
@@ -189,6 +191,8 @@ include_once("funciones.php");?>
             {"data": "id_cliente"},
             {"data": "razon_social"},
             {"data": "cond_fiscal"},
+            {"data": "cuit"},
+            {"data": "telefono"},
             {"data": "localidad"},
             {"data": "activo"},
             {render: function(data, type, row, meta) {

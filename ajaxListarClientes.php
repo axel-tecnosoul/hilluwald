@@ -162,6 +162,8 @@ if ($st) {
         "id_cliente"=>$row['id'],
         "razon_social"=>$row["razon_social"],
         "cond_fiscal"=>$row["cond_fiscal"],
+        "cuit"=>$row["cuit"],
+        "telefono"=>$row["telefono"],
         "localidad"=>$row["localidad"],
         "activo"=>$activo,
       ];
