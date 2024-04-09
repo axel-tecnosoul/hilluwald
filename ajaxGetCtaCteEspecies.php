@@ -86,7 +86,7 @@ if($desde<=$hasta){
   //INICIO OBTENCION DE REGISTROS A MOSTRAR EN LA TABLA
 
   //obtenemos los pedidos
-  $sql = "SELECT p.id,date_format(p.fecha,'%d/%m/%Y') AS fecha,p.campana,pd.cantidad_plantines,pd.plantines_pagados,pd.plantines_retirados,p.fecha_hora_alta,s.servicio,pe.procedencia,c.material FROM pedidos p INNER JOIN pedidos_detalle pd ON pd.id_pedido=p.id INNER JOIN servicios s ON pd.id_servicio=s.id LEFT JOIN procedencias_especies pe ON pd.id_procedencia=pe.id LEFT JOIN cultivos c ON pd.id_material=c.id WHERE p.anulado=0 $filtroDesde $filtroHasta $filtroCliente $filtroServicio $filtroCultivo";
+  $sql = "SELECT p.id,date_format(p.fecha,'%d/%m/%Y') AS fecha,p.campana,pd.cantidad_plantines,pd.plantines_pagados,pd.plantines_retirados,p.fecha_hora_alta,s.servicio,pd.id_procedencia,pe.procedencia,pd.id_material,c.material FROM pedidos p INNER JOIN pedidos_detalle pd ON pd.id_pedido=p.id INNER JOIN servicios s ON pd.id_servicio=s.id LEFT JOIN procedencias_especies pe ON pd.id_procedencia=pe.id LEFT JOIN cultivos c ON pd.id_material=c.id WHERE p.anulado=0 $filtroDesde $filtroHasta $filtroCliente $filtroServicio $filtroCultivo";
   //echo $sql;
   foreach ($pdo->query($sql) as $row) {
     
@@ -96,7 +96,9 @@ if($desde<=$hasta){
       "fecha"=>$row['fecha'],// AS fecha_hora
       "campana"=>$row["campana"],
       "servicio"=>$row["servicio"],
+      "id_procedencia"=>$row["id_procedencia"],
       "procedencia"=>$row["procedencia"] ?: "",
+      "id_material"=>$row["id_material"],
       "material"=>$row["material"] ?: "",
       "cantidad"=>$row['cantidad_plantines'],
       "plantines_pagados"=>$row['plantines_pagados'],
@@ -109,7 +111,7 @@ if($desde<=$hasta){
   }
 
   //obtenemos los despachos
-  $sql = "SELECT p.id,p.id_pedido,date_format(p.fecha,'%d/%m/%Y') AS fecha,p.campana,pd.cantidad_plantines,p.fecha_hora_alta,s.servicio,pe.procedencia,c.material FROM despachos p INNER JOIN despachos_detalle pd ON pd.id_despacho=p.id INNER JOIN servicios s ON pd.id_servicio=s.id LEFT JOIN procedencias_especies pe ON pd.id_procedencia=pe.id LEFT JOIN cultivos c ON pd.id_material=c.id WHERE 1 $filtroDesde $filtroHasta $filtroCliente $filtroServicio $filtroCultivo";//p.anulado=0 
+  $sql = "SELECT p.id,p.id_pedido,date_format(p.fecha,'%d/%m/%Y') AS fecha,p.campana,pd.cantidad_plantines,p.fecha_hora_alta,s.servicio,pd.id_procedencia,pe.procedencia,pd.id_material,c.material FROM despachos p INNER JOIN despachos_detalle pd ON pd.id_despacho=p.id INNER JOIN servicios s ON pd.id_servicio=s.id LEFT JOIN procedencias_especies pe ON pd.id_procedencia=pe.id LEFT JOIN cultivos c ON pd.id_material=c.id WHERE 1 $filtroDesde $filtroHasta $filtroCliente $filtroServicio $filtroCultivo";//p.anulado=0 
   //echo $sql;
   foreach ($pdo->query($sql) as $row) {
     
@@ -120,7 +122,9 @@ if($desde<=$hasta){
       "fecha"=>$row['fecha'],// AS fecha_hora
       "campana"=>$row["campana"],
       "servicio"=>$row["servicio"],
+      "id_procedencia"=>$row["id_procedencia"],
       "procedencia"=>$row["procedencia"],
+      "id_material"=>$row["id_material"],
       "material"=>$row["material"],
       "cantidad"=>$row['cantidad_plantines'],
       /*"cantidad_pedido"=>"",
@@ -131,7 +135,7 @@ if($desde<=$hasta){
   }
 
   //obtenemos los despachos
-  $sql = "SELECT p.id,p.id_pedido,date_format(p.fecha,'%d/%m/%Y') AS fecha,pd.cantidad_plantines,p.fecha_hora_alta,s.servicio,pe.procedencia,c.material FROM pagos p INNER JOIN pagos_detalle pd ON pd.id_pago=p.id INNER JOIN servicios s ON pd.id_servicio=s.id LEFT JOIN procedencias_especies pe ON pd.id_procedencia=pe.id LEFT JOIN cultivos c ON pd.id_material=c.id WHERE 1 $filtroDesde $filtroHasta $filtroCliente $filtroServicio $filtroCultivo";//p.anulado=0 
+  $sql = "SELECT p.id,p.id_pedido,date_format(p.fecha,'%d/%m/%Y') AS fecha,pd.cantidad_plantines,p.fecha_hora_alta,s.servicio,pd.id_procedencia,pe.procedencia,pd.id_material,c.material FROM pagos p INNER JOIN pagos_detalle pd ON pd.id_pago=p.id INNER JOIN servicios s ON pd.id_servicio=s.id LEFT JOIN procedencias_especies pe ON pd.id_procedencia=pe.id LEFT JOIN cultivos c ON pd.id_material=c.id WHERE 1 $filtroDesde $filtroHasta $filtroCliente $filtroServicio $filtroCultivo";//p.anulado=0 
   //echo $sql;
   foreach ($pdo->query($sql) as $row) {
     
@@ -143,7 +147,9 @@ if($desde<=$hasta){
       //"campana"=>$row["campana"],
       "campana"=>"",
       "servicio"=>$row["servicio"],
+      "id_procedencia"=>$row["id_procedencia"],
       "procedencia"=>$row["procedencia"] ?: "",
+      "id_material"=>$row["id_material"],
       "material"=>$row["material"] ?: "",
       "cantidad"=>$row['cantidad_plantines'],
       /*"cantidad_pedido"=>"",
@@ -160,17 +166,27 @@ if($desde<=$hasta){
       return $a['id_pedido'] - $b['id_pedido'];
     }
 
-    // Si los id_pedido son iguales, comparar por fecha
+    // Si los id_pedido son iguales, comparar por id_procedencia
+    if ($a['id_procedencia'] != $b['id_procedencia']) {
+      return $a['id_procedencia'] - $b['id_procedencia'];
+    }
+
+    // Si los id_procedencia son iguales, comparar por id_material
+    if ($a['id_material'] != $b['id_material']) {
+      return $a['id_material'] - $b['id_material'];
+    }
+
+    // Si los id_material son iguales, comparar por fecha
     $t1 = strtotime($a['fecha']);
     $t2 = strtotime($b['fecha']);
 
     if ($t1 == $t2) {
-        // Si las fechas son iguales, comparar por fecha_hora_alta
-        $t1_alta = strtotime($a['fecha_hora_alta']);
-        $t2_alta = strtotime($b['fecha_hora_alta']);
-        return $t1_alta - $t2_alta;
+      // Si las fechas son iguales, comparar por fecha_hora_alta
+      $t1_alta = strtotime($a['fecha_hora_alta']);
+      $t2_alta = strtotime($b['fecha_hora_alta']);
+      return $t1_alta - $t2_alta;
     } else {
-        return $t1 - $t2;
+      return $t1 - $t2;
     }
   }
 
@@ -225,5 +241,5 @@ if($desde<=$hasta){
     }
   }
 }
-
+//var_dump($aCtaCte);
 echo json_encode($aCtaCte);

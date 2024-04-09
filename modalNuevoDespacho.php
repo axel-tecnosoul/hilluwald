@@ -7,7 +7,7 @@
           <span aria-hidden="true">&times;</span>
         </button>
       </div>
-      <form class="form theme-form" role="form" method="post" action="nuevoDespacho.php?id_cliente=<?=$id?>">
+      <form class="form theme-form" id="form_nuevo_despacho" role="form" method="post" action="nuevoDespacho.php?id_cliente=<?=$id?>">
         <input name="id_pedido_despacho" id="id_pedido_despacho" type="hidden">
         <div class="modal-body">
           <div class="row">
@@ -155,21 +155,22 @@
                     </thead>
                     <tbody></tbody>
                   </table>
+                  <div class="mensajeError" style="color: red; display: none;">Por favor, ingrese al menos una cantidad mayor a 0.</div>
                 </div>
               </div>
             </div>
           </div>
           <div class="row">
             <div class="form-group col-2">
-              <label for="id_contenedor">Contenedores</label>
+              <label for="id_contenedor_despachar">Contenedores</label>
             </div>
             <div class="form-group col-10">
-              <select name="id_contenedor" id="id_contenedor" class="js-example-basic-single" style="width: 100%;" multiple required>
+              <select name="id_contenedor_despachar[]" id="id_contenedor_despachar" class="js-example-basic-single" style="width: 100%;" multiple required>
                 <option value="">- Seleccione -</option><?php
                 $pdo = Database::connect();
-                $sql = "SELECT c.id AS id_contenedor,tp.tipo,c.cantidad_orificios,c.ancho,c.alto FROM contenedores c INNER JOIN tipos_contenedores tp ON c.id_tipo_contenedor=tp.id WHERE c.activo=1";
+                $sql = "SELECT c.id AS id_contenedor,tp.tipo,c.cantidad_orificios,c.ancho,c.alto,c.largo FROM contenedores c INNER JOIN tipos_contenedores tp ON c.id_tipo_contenedor=tp.id WHERE c.activo=1";
                 foreach ($pdo->query($sql) as $row) {
-                  $mostrar=$row["tipo"]." ".$row["cantidad_orificios"]."u. ".$row["ancho"]."x".$row["alto"]."x[LARGO]"?>
+                  $mostrar=$row["tipo"]." ".$row["cantidad_orificios"]."u. ".$row["ancho"]."x".$row["alto"]."x".$row["largo"]?>
                   <option value="<?=$row["id_contenedor"]?>"><?=$mostrar?></option><?php
                 }
                 Database::disconnect();?>
@@ -233,9 +234,14 @@
           let plantines_retirados = parseInt(cultivos.plantines_retirados);
           let pendiente = cantidad_plantines - plantines_retirados;
 
+          if(pendiente==0){
+
+          }
+
           // Plantilla para cada fila
           let contenidoFila = `
             <td class="align-middle">
+              <input type='hidden' name="id_pedido_detalle[]" value='${cultivos.id_pedido_detalle}'>
               <input type='hidden' name="id_servicio[]" value='${cultivos.id_servicio}'>${cultivos.servicio}
             </td>
             <td class="align-middle">
@@ -245,18 +251,26 @@
               ${id_procedencia > 0 ? `
                 <input type='hidden' name="id_procedencia[]" value='${cultivos.id_procedencia}'>${cultivos.procedencia}
               ` : `
-                <select name="id_procedencia[]" class="js-example-basic-single id_procedencia" required style="width:100%">
-                  ${generarOpciones(cultivos.aProcedencias, 'id', 'procedencia')}
-                </select>
+                ${pendiente > 0 ? `
+                  <select name="id_procedencia[]" class="js-example-basic-single id_procedencia" style="width:100%">
+                    ${generarOpciones(cultivos.aProcedencias, 'id', 'procedencia')}
+                  </select>
+                ` : `
+                  <input type='hidden' name="id_procedencia[]">
+                `}
               `}
             </td>
             <td class="align-middle">
               ${id_material > 0 ? `
                 <input type='hidden' name="id_material[]" value='${cultivos.id_material}'>${cultivos.material}
               ` : `
-                <select name="id_material[]" class="js-example-basic-single id_material" required style="width:100%" ${id_procedencia > 0 ? '' : 'disabled'}>
-                  ${generarOpciones(cultivos.aMateriales, 'id', 'material')}
-                </select>
+                ${pendiente > 0 ? `
+                  <select name="id_material[]" class="js-example-basic-single id_material" style="width:100%" ${id_procedencia > 0 ? '' : 'disabled'}>
+                    ${generarOpciones(cultivos.aMateriales, 'id', 'material')}
+                  </select>
+                ` : `
+                  <input type='hidden' name="id_material[]">
+                `}
               `}
             </td>
             <td class="align-middle text-right">
@@ -264,9 +278,15 @@
             </td>
             <td class="align-middle">
               <div class="input-group">
-                <input type="number" name="cantidad_despachar[]" class="form-control" required>
+                ${pendiente > 0 ? `
+                  <input type="number" name="cantidad_despachar[]" class="form-control cantidad_despachar" value="0" required>
+                ` : `
+                  <input type="number" class="form-control disabled" value="0" required disabled readonly>
+                  <input type="hidden" name="cantidad_despachar[]" value="0">
+                `}
                 <div class="input-group-append">
                   <span class="input-group-text">/ ${Intl.NumberFormat("de-DE").format(pendiente)}</span>
+                  <input type="hidden" name="pendiente_despachar[]" value="${pendiente}">
                 </div>
               </div>
             </td>`;
@@ -287,6 +307,14 @@
     });
   }
 
+  $(document).on("keyup change",".cantidad_despachar",function(){
+    if(this.value>0){
+      let fila=$(this).parents("tr")
+      fila.find("select").attr("required",true)
+
+    }
+  })
+
   // Función para generar las opciones de los select
   function generarOpciones(arr, valueKey, textKey) {
     let opciones = `<option value="">Seleccione...</option>`;
@@ -301,20 +329,23 @@
     //$('#selectContenedores').select2();
 
     // Manejar evento de selección en Select2
-    $('#id_contenedor').on('select2:select', function(e) {
+    $('#id_contenedor_despachar').on('select2:select', function(e) {
       var contenedorSeleccionado = e.params.data.text;
       var valorContenedor = e.params.data.id;
 
+      console.log($('#tablaContenedores'));
+      console.log($('#tablaContenedores tbody'));
       // Crear una nueva fila en la tabla
       var newRow = $('<tr>');
       newRow.append('<td>' + contenedorSeleccionado + '</td>');
       newRow.append('<td><input type="hidden" name="id_contenedor[]" value="' + valorContenedor + '">' +
                     '<label><input type="number" class="form-control" name="cantidad_contenedores[]" required placeholder="Cantidad"></label></td>');
+      console.log(newRow);
       $('#tablaContenedores tbody').append(newRow);
     });
 
     // Manejar evento de deselección en Select2
-    $('#id_contenedor').on('select2:unselect', function(e) {
+    $('#id_contenedor_despachar').on('select2:unselect', function(e) {
       var valorContenedor = e.params.data.id;
 
       // Eliminar la fila correspondiente en la tabla
@@ -509,5 +540,28 @@
 
   $("#id_vehiculo").on("change",function(){
     resetPatente2()
+  })
+
+  $("#form_nuevo_despacho").submit(function(e){
+    e.preventDefault()
+    let hay_cantidad=0
+    let cantidad_despachar=$(".cantidad_despachar")
+    cantidad_despachar.each(function(){
+      if(this.value>0){
+        hay_cantidad=1
+      }
+    })
+
+    if(hay_cantidad==1){
+      this.submit();
+    }else{
+      // Mostrar mensaje de error
+      $(this).find('.mensajeError').fadeIn();
+      // Resaltar los inputs vacíos temporalmente
+      cantidad_despachar.addClass('input-error');
+      setTimeout(function() {
+          cantidad_despachar.removeClass('input-error');
+      }, 2000);
+    }
   })
 </script>

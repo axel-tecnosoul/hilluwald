@@ -231,7 +231,7 @@
                                   <tfoot>
                                     <tr>
                                       <td colspan="4" align='right'>
-                                        <input type="button" class="btn btn-dark" id="addRowLotes" value="Agregar Lotes">
+                                        <input type="button" class="btn btn-dark" id="addRowLotes" value="Agregar Lote">
                                       </td>
                                     </tr>
                                   </tfoot>
@@ -276,7 +276,7 @@
                                   <tfoot>
                                     <tr>
                                       <td colspan="4" align='right'>
-                                        <input type="button" class="btn btn-dark " id="addRowPlantadores" value="Agregar Plantadores">
+                                        <input type="button" class="btn btn-dark " id="addRowPlantadores" value="Agregar Plantador">
                                       </td>
                                     </tr>
                                   </tfoot>
@@ -328,13 +328,13 @@
       $(document).ready(function(){
         $("#addRowLotes").on('click', function(event) {
           event.preventDefault();
-          //addRowLotes();
-        }).click();
+          addRowLotes();
+        });
 
         $("#addRowPlantadores").on('click', function(event) {
           event.preventDefault();
-          //addRowPlantadores();
-        }).click();
+          addRowPlantadores();
+        });
       });
 
       function eliminarFila(t){

@@ -49,7 +49,7 @@ foreach ($pdo->query($sql) as $row) {
 $sql = " SELECT COUNT(dc.id) AS cantidad_despachos_contenedores FROM despachos_contenedores dc INNER JOIN despachos d ON dc.id_despacho=d.id WHERE d.anulado=0 AND d.id_cliente=".$id;
 //$sql = " SELECT c.id, c.nombre FROM cultivos c";
 $q = $pdo->prepare($sql);
-$q->execute(array($id));
+$q->execute();
 $data2 = $q->fetch(PDO::FETCH_ASSOC);
 $cantidad_despachos_contenedores=$data2["cantidad_despachos_contenedores"];
 Database::disconnect();
@@ -369,9 +369,9 @@ Database::disconnect();
                             <td rowspan="2" style="vertical-align: middle;" class="border-0 p-1">
                               <select id="id_contenedor" class="form-control form-control-sm filtraTablaContenedores selectpicker" data-style="multiselect"><?php
                                 $pdo = Database::connect();
-                                $sql = "SELECT c.id AS id_contenedor,tp.tipo,c.cantidad_orificios,c.ancho,c.alto FROM contenedores c INNER JOIN tipos_contenedores tp ON c.id_tipo_contenedor=tp.id WHERE c.activo=1";
+                                $sql = "SELECT c.id AS id_contenedor,tp.tipo,c.cantidad_orificios,c.ancho,c.alto,c.largo FROM contenedores c INNER JOIN tipos_contenedores tp ON c.id_tipo_contenedor=tp.id WHERE c.activo=1";
                                 foreach ($pdo->query($sql) as $row) {
-                                  $mostrar=$row["tipo"]." ".$row["cantidad_orificios"]."u. ".$row["ancho"]."x".$row["alto"]."x[LARGO]"?>
+                                  $mostrar=$row["tipo"]." ".$row["cantidad_orificios"]."u. ".$row["ancho"]."x".$row["alto"]."x".$row["largo"]?>
                                   <option value="<?=$row["id_contenedor"]?>"><?=$mostrar?></option><?php
                                 }
                                 Database::disconnect();?>
@@ -435,6 +435,10 @@ Database::disconnect();
           <!-- MODAL PARA NUEVO PAGO -->
           <?php include_once("modalNuevoPago.php")?>
           <!-- FIN MODAL PARA NUEVO PAGO -->
+
+          <!-- MODAL PARA NUEVA DEVOLUCION CONTENEDORES -->
+          <?php include_once("modalNuevaDevolucionContenedores.php")?>
+          <!-- FIN MODAL PARA NUEVA DEVOLUCION CONTENEDORES -->
 
           <!-- Container-fluid Ends-->
         </div>

@@ -164,36 +164,36 @@
 
       }
     });
+  }
 
-    $(document).on("keyup change",".cantidad_pagar, .precio_unitario",function(){
-      let fila=$(this).parents("tr");
-      let inputSubtotal=fila.find(".subtotal")
-      let mostrarSubtotal=fila.find(".subtotal_formatted")
-      let cantidad_pagar=parseFloat(fila.find(".cantidad_pagar").val())
-      let precio_unitario=parseFloat(fila.find(".precio_unitario").val())
-      let subtotal=cantidad_pagar*precio_unitario;
-      console.log(subtotal);
-      if(isNaN(subtotal)){
-        subtotal=0;
+  $(document).on("keyup change",".cantidad_pagar, .precio_unitario",function(){
+    let fila=$(this).parents("tr");
+    let inputSubtotal=fila.find(".subtotal")
+    let mostrarSubtotal=fila.find(".subtotal_formatted")
+    let cantidad_pagar=parseFloat(fila.find(".cantidad_pagar").val())
+    let precio_unitario=parseFloat(fila.find(".precio_unitario").val())
+    let subtotal=cantidad_pagar*precio_unitario;
+    console.log(subtotal);
+    if(isNaN(subtotal)){
+      subtotal=0;
+    }
+    console.log(subtotal);
+    inputSubtotal.val(subtotal)
+    mostrarSubtotal.html(Intl.NumberFormat('es-AR', {currency: 'ARS', style: 'currency'}).format(subtotal))
+
+    calcularTotal();
+  })
+
+  function calcularTotal(){
+    let total_pago=0;
+    $(".subtotal").each(function(){
+      let valor=parseFloat(this.value);
+      if(isNaN(valor)){
+        valor=0;
       }
-      console.log(subtotal);
-      inputSubtotal.val(subtotal)
-      mostrarSubtotal.html(Intl.NumberFormat('es-AR', {currency: 'ARS', style: 'currency'}).format(subtotal))
-
-      calcularTotal();
+      total_pago+=valor;
     })
 
-    function calcularTotal(){
-      let total_pago=0;
-      $(".subtotal").each(function(){
-        let valor=parseFloat(this.value);
-        if(isNaN(valor)){
-          valor=0;
-        }
-        total_pago+=valor;
-      })
-
-      $(".total_pago").html(Intl.NumberFormat('es-AR', {currency: 'ARS', style: 'currency'}).format(total_pago))
-    }
+    $(".total_pago").html(Intl.NumberFormat('es-AR', {currency: 'ARS', style: 'currency'}).format(total_pago))
   }
 </script>
