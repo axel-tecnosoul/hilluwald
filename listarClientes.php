@@ -48,7 +48,8 @@ include_once("funciones.php");?>
               <div class="col-sm-12">
                 <div class="card">
                   <div class="card-header">
-                    <h5>Clientes
+                    <h5>Clientes&nbsp;
+                      <a href="nuevoCliente.php"><img src="img/icon_alta.png" width="24" height="25" border="0" alt="Nuevo" title="Nuevo"></a>
                   </div>
                   <div class="card-body">
                     <!--  -->
@@ -191,8 +192,10 @@ include_once("funciones.php");?>
             {"data": "localidad"},
             {"data": "activo"},
             {render: function(data, type, row, meta) {
+              let btnModificar='<a href="modificarCliente.php?id='+row.id_cliente+'"><img src="img/icon_modificar.png" width="24 height="25" border="0" alt="Modificar Cliente" title="Modificar Cliente"></a>&nbsp;&nbsp;'
               let btnVer='<a href="verCliente.php?id='+row.id_cliente+'"><img src="img/eye.png" width="24" height="15" border="0" alt="Ver Cliente" title="Ver Cliente"></a>&nbsp;&nbsp;'
-              return btnVer;
+              let btnDelete = '<a href="#" title="Elminar" onclick="openModalEliminar(' + row.id_cliente + ')"><img src="img/icon_baja.png" width="24" height="25" border="0" alt="Elminiar"></a>&nbsp;&nbsp;'
+              return btnVer + btnModificar +  btnDelete;
             }}
           ]
         })
