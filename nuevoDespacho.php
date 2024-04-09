@@ -8,6 +8,7 @@ if(empty($_SESSION['user'])){
   die("Redirecting to index.php"); 
 }
 require 'database.php';
+include_once("funciones.php");
 
 if ( !empty($_POST)) {
   // insert data
@@ -28,11 +29,14 @@ if ( !empty($_POST)) {
   if($_POST['id_lote']=="") $_POST['id_lote']=NULL;
   if($_POST['id_plantador']=="") $_POST['id_plantador']=NULL;
 
-  //$id_cliente=($_POST['id_cliente']) ?: NULL;
+  $id_cliente=$_GET['id_cliente'];
+  $fecha=$_POST['fecha_despacho'];
+  $campana=$_POST['campana_despacho'];
+  $id_pedido=$_POST['id_pedido_despacho'];
 
   $sql = "INSERT INTO despachos (fecha, id_cliente, id_pedido, id_cliente_retira, campana, id_transporte, id_chofer, id_vehiculo, patente2, id_lote, id_plantador, id_localidad, lugar_entrega, observaciones, id_usuario) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
   $q = $pdo->prepare($sql);
-  $params=array($_POST['fecha_despacho'],$_GET['id_cliente'],$_POST['id_pedido_despacho'],$_POST['id_cliente_retira'],$_POST['campana_despacho'],$_POST['id_transporte'],$_POST['id_chofer'],$_POST['id_vehiculo'],$_POST['patente2'],$_POST['id_lote'],$_POST['id_plantador'],$_POST['id_localidad'],$_POST['lugar_entrega'],$_POST['observaciones_despacho'],$_SESSION['user']['id']);
+  $params=array($fecha,$id_cliente,$id_pedido,$_POST['id_cliente_retira'],$campana,$_POST['id_transporte'],$_POST['id_chofer'],$_POST['id_vehiculo'],$_POST['patente2'],$_POST['id_lote'],$_POST['id_plantador'],$_POST['id_localidad'],$_POST['lugar_entrega'],$_POST['observaciones_despacho'],$_SESSION['user']['id']);
   $q->execute($params);
   $id_despacho = $pdo->lastInsertId();
 
@@ -50,17 +54,37 @@ if ( !empty($_POST)) {
   
   //$cantPrendas = count($_POST["id_cultivo"]);
 
-  $aProductos=[];
+  $aProductos=$aDetalleNuevoPedido=[];
   $cantProdOK=0;
   foreach ($_POST['id_servicio'] as $key => $id_servicio) {
+
     $cantidad_despachar = $_POST['cantidad_despachar'][$key];
+    $pendiente_despachar = $_POST['pendiente_despachar'][$key];
 
     if($cantidad_despachar>0){
-
+      $id_pedido_detalle = $_POST['id_pedido_detalle'][$key];
       $id_servicio = $_POST['id_servicio'][$key];
       $id_especie = $_POST['id_especie'][$key];
       $id_procedencia = $_POST['id_procedencia'][$key];
       $id_material = $_POST['id_material'][$key];
+      $cantidad_descontar_detalle_pedido=$cantidad_despachar;
+
+      if($cantidad_despachar>$pendiente_despachar){
+        $cantidad_descontar_detalle_pedido=$pendiente_despachar;
+      
+        $cantidad_nuevo_pedido=$cantidad_despachar-$pendiente_despachar;
+
+        $aDetalleNuevoPedido[]=[
+          "id_servicio"=>$id_servicio,
+          "id_especie"=>$id_especie,
+          "id_procedencia"=>$id_procedencia,
+          "id_material"=>$id_material,
+          "cantidad"=>$cantidad_nuevo_pedido,
+          "plantines_retirados"=>$cantidad_nuevo_pedido,
+        ];
+  
+        //$cantidad_despachar=$pendiente_despachar;
+      }
 
       $aProductos[]=[
         "id_servicio"=>$id_servicio,
@@ -77,10 +101,6 @@ if ( !empty($_POST)) {
       $q->execute($params);
       $afe=$q->rowCount();
 
-      if($afe==1){
-        $cantProdOK++;
-      }
-
       if ($modoDebug==1) {
         $q->debugDumpParams();
         echo "<br><br>Afe: ".$q->rowCount();
@@ -93,25 +113,54 @@ if ( !empty($_POST)) {
         "afe"=>$q->rowCount(),
       ];
 
+      if($afe==1){
+        $sql2 = "UPDATE pedidos_detalle SET plantines_retirados = plantines_retirados + ? WHERE id = ?";
+        $q2 = $pdo->prepare($sql2);
+        $params2=array($cantidad_descontar_detalle_pedido,$id_pedido_detalle);
+        $q2->execute($params2);
+        $afe2=$q2->rowCount();
+
+        if ($modoDebug==1) {
+          $q2->debugDumpParams();
+          echo "<br><br>Afe: ".$q2->rowCount();
+          echo "<br><br>";
+        }
+  
+        $aDebug[]=[
+          "consulta"=>$sql2,
+          "params"=>$params2,
+          "afe"=>$q2->rowCount(),
+        ];
+
+        if($afe2==1){
+          $cantProdOK++;
+        }
+      }
+
     }
     
   }
 
   $aContenedores=[];
   $cantContenedoresOK=0;
-  foreach ($_POST['id_contenedor'] as $key => $id_contenedor) {
+  foreach ($_POST['id_contenedor_despachar'] as $key => $id_contenedor_despachar) {
     $cantidad_contenedores = $_POST['cantidad_contenedores'][$key];
 
     if($cantidad_contenedores>0){
 
+      $sql = "SELECT tc.requiere_devolucion FROM contenedores c INNER JOIN tipos_contenedores tc ON c.id_tipo_contenedor=tc.id WHERE c.id = ? ";
+      $q = $pdo->prepare($sql);
+      $q->execute(array($id_contenedor_despachar));
+      $data = $q->fetch(PDO::FETCH_ASSOC);
+
       $aContenedores[]=[
-        "id_contenedor"=>$id_contenedor,
+        "id_contenedor_despachar"=>$id_contenedor_despachar,
         "cantidad_contenedores"=>$cantidad_contenedores,
       ];
 
-      $sql = "INSERT INTO despachos_contenedores (id_despacho, id_contenedor, cantidad_despachada) VALUES (?,?,?)";
+      $sql = "INSERT INTO despachos_contenedores (id_despacho, id_contenedor, requiere_devolucion, cantidad_despachada) VALUES (?,?,?,?)";
       $q = $pdo->prepare($sql);
-      $params=array($id_despacho,$id_contenedor,$cantidad_contenedores);
+      $params=array($id_despacho,$id_contenedor_despachar,$data["requiere_devolucion"],$cantidad_contenedores);
       $q->execute($params);
       $afe=$q->rowCount();
 
@@ -130,11 +179,9 @@ if ( !empty($_POST)) {
         "params"=>$params,
         "afe"=>$q->rowCount(),
       ];
-
     }
     
   }
-
 
   if ($modoDebug==1) {
     var_dump($aProductos);
@@ -150,8 +197,22 @@ if ( !empty($_POST)) {
     echo "<br><br>";
   }
 
+  $okNuevoPedido=1;
+  if(!empty($aDetalleNuevoPedido)){
+    
+    $sql = "SELECT id_sucursal FROM pedidos WHERE id = ? ";
+    $q = $pdo->prepare($sql);
+    $q->execute(array($id_pedido));
+    $data = $q->fetch(PDO::FETCH_ASSOC);
+    
+    $sucursal=$data["id_sucursal"];
+    $observaciones="Nuevo pedido generado automaticamente por el sistema al detectar un despacho mayor al pendiente de uno o mas cultivos";
+    
+    $okNuevoPedido=insertPedido($id_cliente,$fecha,$campana,$sucursal,$observaciones,$id_despacho,$aDetalleNuevoPedido);
+  }
+
   $todoOk=0;
-  if($cantProdOK==count($aProductos) and $cantContenedoresOK==count($aContenedores)){
+  if($cantProdOK==count($aProductos) and $cantContenedoresOK==count($aContenedores) and $okNuevoPedido==1){
     $todoOk=1;
   }
 

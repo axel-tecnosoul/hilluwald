@@ -13,7 +13,7 @@ $columns = $_GET['columns'];
 
 $data_columns = $fields = ['d.id','date_format(d.fecha,"%d/%m/%Y")', 'c.razon_social', 'd.id_pedido', 'd.id_cliente_retira','d.campana','d.id_transporte', 'ch.nombre_apellido','ve.descripcion', 'd.patente2', 'lo.nombre', 'd.id_plantador', 'l.localidad', 'd.id_usuario', 'd.fecha_hora_alta'];
 
-$from="FROM despachos d INNER JOIN despachos_detalle dd ON dd.id_despacho= d.id LEFT JOIN clientes c ON c.id = d.id_cliente INNER JOIN especies es ON dd.id_cultivo=es.id INNER JOIN transportes t ON d.id_transporte=t.id INNER JOIN choferes ch ON d.id_chofer=ch.id LEFT JOIN lotes lo ON d.id_lote = lo.id INNER JOIN localidades l ON d.id_localidad = l.id  INNER JOIN vehiculos ve ON d.id_vehiculo=ve.id INNER JOIN cultivos cu ON dd.id_cultivo=cu.id INNER JOIN especies e ON dd.id_especie=e.id INNER JOIN procedencias_especies pr ON dd.id_procedencia=pr.id";
+$from="FROM despachos d INNER JOIN despachos_detalle dd ON dd.id_despacho= d.id LEFT JOIN clientes c ON c.id = d.id_cliente INNER JOIN especies es ON dd.id_especie=es.id INNER JOIN transportes t ON d.id_transporte=t.id INNER JOIN choferes ch ON d.id_chofer=ch.id LEFT JOIN lotes lo ON d.id_lote = lo.id INNER JOIN localidades l ON d.id_localidad = l.id  INNER JOIN vehiculos ve ON d.id_vehiculo=ve.id INNER JOIN cultivos cu ON dd.id_material=cu.id INNER JOIN especies e ON dd.id_especie=e.id INNER JOIN procedencias_especies pr ON dd.id_procedencia=pr.id";
 
 $orderBy = " ORDER BY ";
 foreach ($_GET['order'] as $order) {
