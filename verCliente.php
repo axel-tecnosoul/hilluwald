@@ -75,7 +75,7 @@ Database::disconnect();
       background-color: #007bff!important;
       color: #fff!important;
     }
-    .contenedores {
+    .devolucion_contenedores {
       background-color: #ffc107!important;
       color: #000!important;
     }
@@ -704,9 +704,13 @@ Database::disconnect();
         })
 
         $(document).on("click",".btnNuevaDevolucionContenedores",function(){
+          let id_despacho=this.dataset.idDespacho
           let modal=$("#nuevaDevolucionContenedores")
           modal.modal("show")
-          modal.find("span.idPedido").html(this.dataset.idPedido)
+          modal.find("span.idDespacho").html(id_despacho)
+          $("#id_despacho_devolucion_contenedores").val(id_despacho)
+
+          getDetalleContenedoresDespachados(id_despacho)
         })
 
         $(document).on("click",".btnNuevaDevolucionPlantines",function(){
@@ -766,14 +770,14 @@ Database::disconnect();
               {render: function(data, type, row, meta) {
                 let tipo_comprobante=row.tipo_comprobante;
                 let clase;
-                if(tipo_comprobante=="Pedido"){
-                  clase="pedidos";
-                }
+                let id_mostrar;
                 if(tipo_comprobante=="Despacho"){
                   clase="despachos";
+                  id_mostrar=row.id_despacho;
                 }
-                if(tipo_comprobante=="Pago"){
-                  clase="pagos";
+                if(tipo_comprobante=="Devolucion"){
+                  clase="devolucion_contenedores";
+                  id_mostrar=row.id_devolucion;
                 }
                 if(tipo_comprobante=="Despacho"){
                   return `
@@ -782,14 +786,14 @@ Database::disconnect();
                         ${tipo_comprobante+' N° '+row.id_despacho}
                       </button>
                       <div class="dropdown-menu">
-                        <a href="#" class="dropdown-item contenedores btnNuevaDevolucionContenedores" data-id-pedido="${row.id_despacho}">
+                        <a href="#" class="dropdown-item devolucion_contenedores btnNuevaDevolucionContenedores" data-id-despacho="${row.id_despacho}">
                           <i class="fa fa-plus"></i> Devolucion
                         </a>
                       </div>
                     </div>
                   `;
                 }else{
-                  return '<button class="btn btn-sm '+clase+'">'+tipo_comprobante+' N° '+row.id_despacho+'</button>'
+                  return '<button class="btn btn-sm '+clase+'">'+tipo_comprobante+' N° '+id_mostrar+'</button>'
                 }
               }},
               /*{

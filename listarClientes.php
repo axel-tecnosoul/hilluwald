@@ -59,10 +59,10 @@ include_once("funciones.php");?>
                           <tr>
                             <th>ID</th>
                             <th>Razon Social</th>
-                            <th>Condicion fiscal</th>
                             <th>CUIT</th>
+                            <th>Condicion fiscal</th>
                             <th>Telefono</th>
-                            <th>Localidad</th>
+                            <!-- <th>Localidad</th> -->
                             <th>Activo</th>
                             <th>Opciones</th>
                           </tr>
@@ -190,10 +190,10 @@ include_once("funciones.php");?>
           "columns":[
             {"data": "id_cliente"},
             {"data": "razon_social"},
-            {"data": "cond_fiscal"},
             {"data": "cuit"},
+            {"data": "cond_fiscal"},
             {"data": "telefono"},
-            {"data": "localidad"},
+            //{"data": "localidad"},
             {"data": "activo"},
             {render: function(data, type, row, meta) {
               let btnModificar='<a href="modificarCliente.php?id='+row.id_cliente+'"><img src="img/icon_modificar.png" width="24 height="25" border="0" alt="Modificar Cliente" title="Modificar Cliente"></a>&nbsp;&nbsp;'

@@ -39,41 +39,7 @@ $aCtaCte=[];
 if($desde<=$hasta){
 
   //INICIO SALDO ANTERIOR
-  /*
-  $filtroHastaSaldoAnterior="AND DATE(fecha_hora)<'$desde'";
-
-  $aCtaCte[]=[
-    "id_venta"=>0,
-    "id"=>"Saldo anterior",
-    "fecha_hora"=>date("d-m-Y H:i",strtotime($desde)),
-    "motivo"=>"",
-    "detalle"=>"",
-    "forma_pago"=>"",
-    "credito"=>0,
-    "debito"=>0,
-    "saldo"=>$saldo_anterior,
-    "detalle_productos"=>"",
-  ];
-
-  $modo_debug=0;
-  //PARA PODER DEBUGUEAR MOSTRAMOS VARIABLES EN LA COLUMNA DETALLE
-  if($modo_debug==1){
-    $detalle="total_facturas_recibos: $total_facturas_recibos<br>ingresos_externos: $ingresos_externos<br>egresos_caja_chica: $egresos_caja_chica<br>total_pago_proveedores: $total_pago_proveedores<br>";
-    $detalle.="data[total_ventas]: $data[total_ventas]<br>data2[ingresos_externos]: $data2[ingresos_externos]<br>data3[egresos_caja_chica]: $data3[egresos_caja_chica]<br>data4[total_pago_proveedores]: $data4[total_pago_proveedores]<br>";
-    $aCtaCte[]=[
-      "id_venta"=>0,
-      "id"=>"",
-      "fecha_hora"=>date("d-m-Y H:i",strtotime($desde)),
-      "motivo"=>"",
-      "detalle"=>$detalle,
-      "forma_pago"=>"",
-      "credito"=>0,
-      "debito"=>0,
-      "saldo"=>0,
-      "detalle_productos"=>"",
-    ];
-  }*/
-
+  
   //FIN SALDO ANTERIOR
 
   //INICIO OBTENCION DE REGISTROS A MOSTRAR EN LA TABLA
@@ -84,25 +50,6 @@ if($desde<=$hasta){
   //echo $sql;
   foreach ($pdo->query($sql) as $row) {
     
-    //$iconVer="<a href='verMovimientoCajaChica.php?id=".$row["id_movimiento"]."' target='_blank' class='badge badge-primary'><i class='fa fa-eye' aria-hidden='true'></i></a>";
-    //$iconVer="<span data-id='".$row["id_movimiento"]."' data-tipo='movimiento' class='ver badge badge-primary'><i class='fa fa-eye' aria-hidden='true'></i></span>";
-
-    /*$iconEdit="";
-    $cerrado="<i class='fa fa-lock' aria-hidden='true'></i> ";
-    if($row["id_cierre_caja"]==0){
-      $iconEdit="<a href='modificarMovimientoCajaChica.php?id=".$row["id_movimiento"]."' target='_blank' class='badge badge-secondary'><i class='fa fa-pencil-square-o' aria-hidden='true'></i></a>";
-      $cerrado="<i class='fa fa-unlock' aria-hidden='true'></i> ";
-    }
-
-    if($row["tipo_movimiento"]=="Ingreso"){
-      $credito=$row["total"];
-      $debito=0;
-      $saldo=0;
-    }else{
-      $credito=0;
-      $debito=$row["total"];
-      $saldo=0;
-    }*/
     $aCtaCte[]=[
       "tipo_comprobante"=>"Despacho",
       "id_despacho_contenedor"=>$row['id_despacho_contenedor'],
@@ -112,51 +59,30 @@ if($desde<=$hasta){
       "cantidad_orificios"=>$row["cantidad_orificios"] ?: "",
       "ancho"=>$row["ancho"] ?: "",
       "alto"=>$row['alto'],
-      "cantidad_despachada"=>$row['cantidad_despachada'],
+      "cantidad"=>$row['cantidad_despachada'],
       "total_cantidad_devuelta"=>$row['total_cantidad_devuelta'],
     ];
   }
 
-  $b=1;
-  if($b=0){
   //obtenemos los despachos
-  $sql = "SELECT p.id,p.id_pedido,date_format(p.fecha,'%d/%m/%Y') AS fecha,p.campana,pd.cantidad_plantines,p.fecha_hora_alta,s.servicio,pe.procedencia,c.material FROM despachos p INNER JOIN despachos_detalle pd ON pd.id_despacho=p.id INNER JOIN servicios s ON pd.id_servicio=s.id LEFT JOIN procedencias_especies pe ON pd.id_procedencia=pe.id LEFT JOIN cultivos c ON pd.id_material=c.id WHERE 1 $filtroDesde $filtroHasta $filtroCliente $filtroCultivo";//p.anulado=0 
+  $sql = "SELECT d.id AS id_devolucion,dc.id AS id_despacho_contenedor,d.id_despacho,date_format(d.fecha,'%d/%m/%Y') AS fecha,dc.cantidad_devuelta,d.fecha_hora_alta FROM devolucion_contenedores d INNER JOIN devolucion_contenedores_detalle dc ON dc.id_devolucion_contenedores=d.id WHERE 1 $filtroDesde $filtroHasta $filtroCliente $filtroContenedor";//p.anulado=0 
   //echo $sql;
   foreach ($pdo->query($sql) as $row) {
-    
-    //$iconVer="<a href='verMovimientoCajaChica.php?id=".$row["id_movimiento"]."' target='_blank' class='badge badge-primary'><i class='fa fa-eye' aria-hidden='true'></i></a>";
-    //$iconVer="<span data-id='".$row["id_movimiento"]."' data-tipo='movimiento' class='ver badge badge-primary'><i class='fa fa-eye' aria-hidden='true'></i></span>";
 
-    /*$iconEdit="";
-    $cerrado="<i class='fa fa-lock' aria-hidden='true'></i> ";
-    if($row["id_cierre_caja"]==0){
-      $iconEdit="<a href='modificarMovimientoCajaChica.php?id=".$row["id_movimiento"]."' target='_blank' class='badge badge-secondary'><i class='fa fa-pencil-square-o' aria-hidden='true'></i></a>";
-      $cerrado="<i class='fa fa-unlock' aria-hidden='true'></i> ";
-    }
-
-    if($row["tipo_movimiento"]=="Ingreso"){
-      $credito=$row["total"];
-      $debito=0;
-      $saldo=0;
-    }else{
-      $credito=0;
-      $debito=$row["total"];
-      $saldo=0;
-    }*/
-    /*$aCtaCte[]=[
-      "tipo_comprobante"=>"Despacho",
-      "id_despacho"=>$row['id'],
-      "id_pedido"=>$row['id_pedido'],
+    $aCtaCte[]=[
+      "tipo_comprobante"=>"Devolucion",
+      "id_despacho"=>$row['id_despacho'],
+      "id_despacho_contenedor"=>$row['id_despacho_contenedor'],
       "fecha"=>$row['fecha'],// AS fecha_hora
-      "campana"=>$row["campana"],
-      "servicio"=>$row["servicio"],
-      "procedencia"=>$row["procedencia"],
-      "material"=>$row["material"],
-      "cantidad"=>$row['cantidad_plantines'],
-      "fecha_hora_alta"=>$row['fecha_hora_alta'],
-    ];*/
+      "id_devolucion"=>$row["id_devolucion"],
+      /*"tipo"=>$row["tipo"],
+      "cantidad_orificios"=>$row["cantidad_orificios"] ?: "",
+      "ancho"=>$row["ancho"] ?: "",
+      "alto"=>$row['alto'],*/
+      "cantidad"=>$row['cantidad_devuelta'],
+    ];
   }
-  }
+  
   Database::disconnect();
 
   function date_compare($a, $b){
@@ -185,23 +111,24 @@ if($desde<=$hasta){
     //$aCtaCte[$key]['fecha']=date("d/m/Y H:i",strtotime($value['fecha']));
     switch ($value["tipo_comprobante"]) {
       case 'Despacho':
-        $cantidad_despachada=$aCtaCte[$key]['cantidad_despachada'];
+        $cantidad_despachada=$aCtaCte[$key]['cantidad'];
         $saldo_contenedores=$cantidad_despachada;
         if($key>0){
           $saldo_contenedores=$aCtaCte[$key-1]["saldo_contenedores"]+$cantidad_despachada;
         }
 
-        $aCtaCte[$key]["cantidad_devuelta"]="";
+        $aCtaCte[$key]["cantidad_despachada"]=$cantidad_despachada;
+        $aCtaCte[$key]["cantidad_devuelta"]=0;
         $aCtaCte[$key]["saldo_contenedores"]=$saldo_contenedores;
         break;
-      case 'Despacho':
-        $cantidad_devuelta=$aCtaCte[$key]['cantidad_devuelta'];
+      case 'Devolucion':
+        $cantidad_devuelta=$aCtaCte[$key]['cantidad'];
         $saldo_contenedores=$cantidad_devuelta;
         if($key>0){
           $saldo_contenedores=$aCtaCte[$key-1]["saldo_contenedores"]-$cantidad_devuelta;
         }
 
-        $aCtaCte[$key]["cantidad_despacho"]="";
+        $aCtaCte[$key]["cantidad_despachada"]=0;
         $aCtaCte[$key]["cantidad_devuelta"]=$cantidad_devuelta;
         $aCtaCte[$key]["saldo_contenedores"]=$saldo_contenedores;
         break;
