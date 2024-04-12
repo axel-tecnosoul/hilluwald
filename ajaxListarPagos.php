@@ -145,6 +145,12 @@ $row2 = $pdo->query($sql2)->fetch();
 
 $total_facturas_recibos = ($row2['total_facturas_recibos'] ?: 0);*/
 
+//$sql2 = "SELECT SUM(p.monto_total) AS total $from WHERE $whereFiltered ";
+$sql2 = "SELECT SUM(p.monto_total) AS total FROM pagos p WHERE p.anulado=0 $filtroDesde $filtroHasta $filtroCliente ";
+//echo $sql2;
+$row2 = $pdo->query($sql2)->fetch();
+$total_pagos = ($row2['total'] ?: 0);
+
 //$sql = "SELECT * FROM productos ".($where ? "WHERE $where " : '')."$orderBy LIMIT $length OFFSET $start";
 $sql = "SELECT $campos $from ".($whereFiltered ? "WHERE $whereFiltered " : '')."$orderBy LIMIT $length OFFSET $start";
 error_log($sql);
@@ -176,7 +182,7 @@ if ($st) {
       'length' => $length,
       'start' => $start,
       'query' => $sql,
-      //'total_facturas_recibos'=>$total_facturas_recibos,
+      'total_pagos'=>$total_pagos,
     ];
 } else {
     var_dump($pdo->errorInfo());

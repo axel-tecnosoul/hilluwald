@@ -162,9 +162,9 @@ include_once("funciones.php");?>
         table.DataTable().destroy();
         table.DataTable({
           //dom: 'rtip',
-          serverSide: true,
+          //serverSide: true,
           processing: true,
-          ajax:{url:'ajaxListarClientes.php'},
+          ajax:{url:'ajaxListarClientes.php',dataSrc:""},
           stateSave: true,
           responsive: true,
           language: {
@@ -199,7 +199,7 @@ include_once("funciones.php");?>
               let btnModificar='<a href="modificarCliente.php?id='+row.id_cliente+'"><img src="img/icon_modificar.png" width="24 height="25" border="0" alt="Modificar Cliente" title="Modificar Cliente"></a>&nbsp;&nbsp;'
               let btnVer='<a href="verCliente.php?id='+row.id_cliente+'"><img src="img/eye.png" width="24" height="15" border="0" alt="Ver Cliente" title="Ver Cliente"></a>&nbsp;&nbsp;'
               let btnDelete = '<a href="#" title="Elminar" onclick="openModalEliminar(' + row.id_cliente + ')"><img src="img/icon_baja.png" width="24" height="25" border="0" alt="Elminiar"></a>&nbsp;&nbsp;'
-              return btnVer + btnModificar +  btnDelete;
+              return btnVer + btnModificar + btnDelete;
             }}
           ]
         })

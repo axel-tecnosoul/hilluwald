@@ -286,11 +286,11 @@ $desde=date("Y-m-d",strtotime($hoy." -1 year"))?>
           { "className": "dt-body-right", "targets": [3] },
         ],
         initComplete: function(settings, json){
-          //let total_facturas_recibos=json.queryInfo.total_facturas_recibos
-          let total_pagos=0;
+          let total_pagos=json.queryInfo.total_pagos
+          /*let total_pagos=0;
           json.data.forEach(function (data) {
             total_pagos+=parseFloat(data.monto_total);
-          });
+          });*/
 
           var api = this.api();
           // Update footer
