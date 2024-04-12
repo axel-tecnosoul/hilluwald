@@ -10,6 +10,7 @@
 		
     <li><a class="sidebar-header" href="listarPedidos.php"><i data-feather="file"></i><span>Pedidos</span><i class="fa fa-angle-right pull-right"></i></a></li>
     <li><a class="sidebar-header" href="listarDespachos.php"><i data-feather="truck"></i><span>Despachos</span><i class="fa fa-angle-right pull-right"></i></a></li>
+    <li><a class="sidebar-header" href="listarPagos.php"><i data-feather="dollar-sign"></i><span>Pagos</span><i class="fa fa-angle-right pull-right"></i></a></li>
 
     <li><a class="sidebar-header" href="listarClientes.php"><i data-feather="user"></i><span>Clientes</span><i class="fa fa-angle-right pull-right"></i></a></li>
 
