@@ -135,8 +135,8 @@ if ( !empty($_POST)) {
       $precio_unitario = $_POST['precio_unitario'][$key];
       $subtotal = $_POST['subtotal'][$key];
 
-      if($id_procedencia<1) $id_procedencia=NULL;
-      if($id_material<1) $id_material=NULL;
+      if($id_procedencia=="null" or $id_procedencia<1) $id_procedencia=NULL;
+      if($id_material=="null" or $id_material<1) $id_material=NULL;
 
       $aProductos[]=[
         "id_servicio"=>$id_servicio,
@@ -216,6 +216,7 @@ if ( !empty($_POST)) {
 
     if ($modoDebug==1) {
       var_dump($aDebug);
+      die();
     }else{
       die("Ha ocurrido un error al cargar el pago");
     }

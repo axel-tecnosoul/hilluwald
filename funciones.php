@@ -132,8 +132,8 @@ function insertPedido($id_cliente,$fecha,$campana,$sucursal,$observaciones,$id_d
     $id_material = $detalle['id_material'];
     $plantines_retirados = $detalle['plantines_retirados'];
 
-    if($id_procedencia<1) $id_procedencia=NULL;
-    if($id_material<1) $id_material=NULL;
+    if($id_procedencia=="null" or $id_procedencia<1) $id_procedencia=NULL;
+    if($id_material=="null" or $id_material<1) $id_material=NULL;
 
     if($cantidad>0){
 
