@@ -14,6 +14,8 @@
 		// insert data
 		$pdo = Database::connect();
 		$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+    if($_POST['localidad']=="") $_POST['localidad']=NULL;
 		
 		$sql = "INSERT INTO clientes(razon_social, direccion, telefono, email, cuit, cond_fiscal, id_localidad, id_usuario, fecha_hora_alta) VALUES (?,?,?,?,?,?,?,?,now())";
 		$q = $pdo->prepare($sql);
@@ -109,7 +111,7 @@
                             <div class="form-group row">
                               <div class="form-group col-4">
                                 <label for="razon_social">Razon Social</label>
-                                <input type="text" class="form-control" id="razon_social" name="razon_social" aria-describedby="Razon Social" placeholder="Ingrese la Razon Social">
+                                <input type="text" class="form-control" id="razon_social" name="razon_social" aria-describedby="Razon Social" placeholder="Ingrese la Razon Social" required>
                                 <!-- <small id="razon_social" class="form-text text-muted">Razon Social</small> -->
                               </div>
 
@@ -169,8 +171,8 @@
                               </div>
                               
                               <div class="form-group col-4">
-                                <label for="sucursales">Sucursales</label>
-                                <select name="sucursales[]" id="sucursales[]" class="js-example-basic-single col-sm-12" multiple><?php
+                                <label for="sucursales">Sucursales en donde realiza pedidos</label>
+                                <select name="sucursales[]" id="sucursales[]" class="js-example-basic-single col-sm-12" multiple required><?php
                                   $pdo = Database::connect();
                                   $sql = " SELECT id, nombre FROM sucursales";
                                   foreach ($pdo->query($sql) as $row) {?>
@@ -321,7 +323,7 @@
     <!-- Theme js-->
     <script src="assets/js/script.js"></script>
     <!-- Plugin used-->
-	<script src="assets/js/select2/select2.full.min.js"></script>
+	  <script src="assets/js/select2/select2.full.min.js"></script>
     <script src="assets/js/select2/select2-custom.js"></script>
     <script type="text/javascript">
 

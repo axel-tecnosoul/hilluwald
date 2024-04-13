@@ -270,7 +270,7 @@
                             </div>
                             
                             <div class="form-group col-4">
-                                <label for="sucursales">Sucursales</label>
+                                <label for="sucursales">Sucursales en donde realiza pedidos</label>
                                 <select name="sucursales[]" class="js-example-basic-single col-12" multiple>
                                   <option value="">- Seleccione -</option><?php
                                   $pdo = Database::connect();
